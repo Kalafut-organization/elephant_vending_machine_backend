@@ -5,13 +5,13 @@ CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinn
 1. Navigate to the root directory of this project
 1. Run `python 3 -m venv .venv` to create a virtual environment
 1. Activate your virtual environment
-..* On Windows run `.venv\Scripts\activate.bat`
-..* On Unix or MacOS run `source .venv/bin/activate`
+    * On Windows run `.venv\Scripts\activate.bat`
+    * On Unix or MacOS run `source .venv/bin/activate`
 
 ## Starting the application
 1. `export FLASK_APP=elephant_vending_machine`
-..* If outside the project directory be sure to include the full path to the application directory
-..* OPTIONAL: To enable development features run `export FLASK_ENV=development`
+    * If outside the project directory be sure to include the full path to the application directory
+    * OPTIONAL: To enable development features run `export FLASK_ENV=development`
 1. `pip install -e .`
 1. `flask run`
 
