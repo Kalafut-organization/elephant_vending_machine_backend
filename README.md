@@ -14,3 +14,6 @@ CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinn
 ..* OPTIONAL: To enable development features run `export FLASK_ENV=development`
 1. `pip install -e .`
 1. `flask run`
+
+## Running test suite
+To execute the test suite simply run `pytest -v`
