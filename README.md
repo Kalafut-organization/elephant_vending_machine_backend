@@ -15,5 +15,6 @@ CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinn
 1. `pip install -e .`
 1. `flask run`
 
-## Running test suite
-To execute the test suite simply run `pytest -v`
+## Test suite
+* To execute the test suite run `coverage run -m pytest`
+* To view coverage report after tests have been run use `coverage report`
