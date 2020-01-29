@@ -7,6 +7,7 @@ CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinn
 1. Activate your virtual environment
     * On Windows run `.venv\Scripts\activate.bat`
     * On Unix or MacOS run `source .venv/bin/activate`
+1. Use `pip install -r requirements.txt` to install all required dependencies
 
 ## Starting the application
 1. `export FLASK_APP=elephant_vending_machine`
