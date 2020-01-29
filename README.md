@@ -16,9 +16,12 @@ CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinn
 1. `flask run`
 
 ## Test suite
-* To execute the test suite run `coverage run -m pytest`
-* To view coverage report after tests have been run use `coverage report`
+1. Install coverage.py with `pip install coverage`
+1. Install pytest with `pip install pytest`
+1. To execute the test suite run `coverage run -m pytest`
+1. To view coverage report after tests have been run use `coverage report`
 
 ## Linting
+1. Install pylint with `pip install pylint`
 1. Navigate to the root directory of this project
 1. To check your code style, run `pylint elephant_vending_machine`
