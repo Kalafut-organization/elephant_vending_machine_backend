@@ -12,4 +12,4 @@ def client():
 
 def test_root_route(client):
     response = client.get('/')
-    assert b'Hello Elephants!' in response.data
+    assert b'Hello Elephantsa!' in response.data
