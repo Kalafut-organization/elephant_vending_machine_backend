@@ -6,9 +6,8 @@ a lot of routes.
 """
 # Circular import OK here. See https://flask.palletsprojects.com/en/1.1.x/patterns/packages/
 # pylint: disable=cyclic-import
-from elephant_vending_machine import APP
 from flask import request
-from flask_api import status
+from elephant_vending_machine import APP
 
 @APP.route('/')
 def index():
@@ -33,8 +32,9 @@ def run_trial():
     Returns:
         HTTP response OK or Bad Request with payload 'Running {trial_name}'
     """
-    if(request.args.get('trial_name') != None):
-        return 'Running ' + request.args.get('trial_name')
+    response = ""
+    if request.args.get('trial_name') is not None:
+        response = 'Running ' + request.args.get('trial_name')
     else:
-        return 'No trial_name specified'
-
+        response = 'No trial_name specified'
+    return response
