@@ -7,6 +7,8 @@ a lot of routes.
 # Circular import OK here. See https://flask.palletsprojects.com/en/1.1.x/patterns/packages/
 # pylint: disable=cyclic-import
 from flask import request
+from werkzeug.utils import secure_filename
+import os
 from elephant_vending_machine import APP
 
 @APP.route('/')
@@ -30,7 +32,8 @@ def run_trial():
     the query string, otherwise a 400 error will be returned
 
     Returns:
-        HTTP response OK or Bad Request with payload 'Running {trial_name}'
+        HTTP response OK with payload 'Running {trial_name}' or
+        BAD REQUEST with payload 'No trial_name specified'
     """
     response = ""
     if request.args.get('trial_name') is not None:
@@ -38,3 +41,17 @@ def run_trial():
     else:
         response = 'No trial_name specified'
     return response
+
+
+@APP.route('/add-image', methods=['GET','POST'])
+def upload_image():
+    """Responds with 'File recieved' string
+
+    All requests sent to this route should have an image file 
+    included in the request, otherwise a 400 error will be returned
+
+    Returns:
+        HTTP response OK with payload 'File recieved' or
+        BAD REQUEST with payload 'No image file in request'
+    """
+    return "This is where you'd send images"
