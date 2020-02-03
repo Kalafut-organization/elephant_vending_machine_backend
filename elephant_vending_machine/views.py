@@ -22,7 +22,7 @@ def index():
     """
     return 'Hello Elephants!'
 
-@APP.route('/run-trial', methods=['GET', 'POST'])
+@APP.route('/run-trial', methods=['POST'])
 def run_trial():
     """Responds with 'Running {trial_name}' string
 
@@ -30,8 +30,8 @@ def run_trial():
     the query string, otherwise a 400 error will be returned
 
     Returns:
-        HTTP response OK with payload 'Running {trial_name}' or
-        BAD REQUEST with payload 'No trial_name specified'
+        HTTP response 200 with payload 'Running {trial_name}' or
+        HTTP response 400 with payload 'No trial_name specified'
     """
     response = ""
     if request.args.get('trial_name') is not None:
@@ -41,34 +41,35 @@ def run_trial():
     return response
 
 
-@APP.route('/add-image', methods=['GET', 'POST'])
+@APP.route('/add-image', methods=['POST'])
 def upload_image():
-    """Responds with 'File recieved' string
+    """Responds with 'File received' string
 
     All requests sent to this route should have an image file
     included in the body of the request, otherwise a 400 error
     will be returned
 
     Returns:
-        HTTP response OK with payload 'File recieved' or
-        BAD REQUEST with payload 'No image file in request'
+        HTTP response 200 with payload 'File received' or
+        HTTP response 500 with payload 'No image file in request.'
     """
     response = ""
-    if request.method == 'POST' and 'file' in request.files:
-        response = "File recieved."
+    if 'file' in request.files:
+        response = "File received."
     else:
-        response = "No image file in request"
+        response = "No image file in request."
     return response
 
-@APP.route('/get-log', methods=['GET'])
-def get_log():
+@APP.route('/log', methods=['GET'])
+def log():
     """Returns the specified log file
 
     All requests sent to this route should have a log_name in
     the query string, otherwise a 400 error will be returned
 
     Returns:
-        The log file if it exists, or BAD REQUEST if it does not.
+        HTTP response 200 if log file exists, or HTTP response 500
+        if it does not.
     """
     response = ""
     if request.args.get('log_name') is not None:
