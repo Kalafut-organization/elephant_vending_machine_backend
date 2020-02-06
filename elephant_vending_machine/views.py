@@ -9,19 +9,6 @@ a lot of routes.
 from flask import request
 from elephant_vending_machine import APP
 
-@APP.route('/')
-def index():
-    """Responds with basic 'Hello Elephants!' string
-
-    All requests sent to the default route return a simple
-    string. This method is intended to be removed once actual
-    routes are added.
-
-    Returns:
-        HTTP response OK with payload 'Hello Elephants'
-    """
-    return 'Hello Elephants!'
-
 @APP.route('/run-trial', methods=['POST'])
 def run_trial():
     """Responds with 'Running {trial_name}' string
