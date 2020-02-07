@@ -6,8 +6,10 @@ a lot of routes.
 """
 # Circular import OK here. See https://flask.palletsprojects.com/en/1.1.x/patterns/packages/
 # pylint: disable=cyclic-import
+from datetime import datetime
 from flask import request
 from elephant_vending_machine import APP
+from .lib.experiment_logger import ExperimentLogger
 
 @APP.route('/run-trial', methods=['POST'])
 def run_trial():
@@ -22,7 +24,11 @@ def run_trial():
     """
     response = ""
     if request.args.get('trial_name') is not None:
-        response = 'Running ' + request.args.get('trial_name')
+        trial_name = request.args.get('trial_name')
+        logger = ExperimentLogger(str(datetime.utcnow()) + trial_name + '.csv')
+        logger.log('Experiment ' + trial_name + ' started')
+        response = 'Running ' + str(trial_name)
+        logger.close()
     else:
         response = 'No trial_name specified'
     return response
