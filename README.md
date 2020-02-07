@@ -32,6 +32,3 @@ CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinn
 1. Install pylint with `pip install pylint`
 1. Navigate to the root directory of this project
 1. To check your code style, run `pylint elephant_vending_machine`
-
-
-TEST TEXT PLEASE IGNORE

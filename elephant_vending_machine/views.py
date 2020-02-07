@@ -9,7 +9,7 @@ a lot of routes.
 from datetime import datetime
 from flask import request
 from elephant_vending_machine import APP
-from .lib.experiment_logger import ExperimentLogger
+from .lib.experiment_logger import create_experiment_logger
 
 @APP.route('/run-trial', methods=['POST'])
 def run_trial():
@@ -26,10 +26,10 @@ def run_trial():
     if request.args.get('trial_name') is not None:
         trial_name = request.args.get('trial_name')
         log_filename = str(datetime.utcnow()) + ' ' + trial_name + '.csv'
-        exp_logger = ExperimentLogger().create_logger(log_filename)
+        exp_logger = create_experiment_logger(log_filename)
 
-        exp_logger.info('Experiment ' + trial_name + ' started')
-        
+        exp_logger.info("Experiment %s started", trial_name)
+
         response = 'Running ' + str(trial_name)
     else:
         response = 'No trial_name specified'
