@@ -9,7 +9,7 @@ a lot of routes.
 from datetime import datetime
 from flask import request
 from elephant_vending_machine import APP
-from .lib.experiment_logger import create_experiment_logger
+from .libraries.experiment_logger import create_experiment_logger
 
 @APP.route('/run-trial', methods=['POST'])
 def run_trial():
