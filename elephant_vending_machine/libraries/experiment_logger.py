@@ -13,7 +13,7 @@ from datetime import datetime
 class CsvFormatter(logging.Formatter):
     """Instances of CsvFormatter are used to convert a LogRecord instance to text.
 
-    CsvFormatter instances convert LogRecord instances to properly a properly formatted
+    CsvFormatter instances convert LogRecord instances to a properly formatted
     line in a csv file.
     """
 
