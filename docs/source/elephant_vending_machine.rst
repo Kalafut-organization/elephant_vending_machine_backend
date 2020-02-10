@@ -1,6 +1,13 @@
 elephant\_vending\_machine package
 ==================================
 
+Subpackages
+-----------
+
+.. toctree::
+
+   elephant_vending_machine.libraries
+
 Submodules
 ----------
 
