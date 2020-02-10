@@ -8,24 +8,10 @@ a lot of routes.
 
 # Circular import OK here. See https://flask.palletsprojects.com/en/1.1.x/patterns/packages/
 # pylint: disable=cyclic-import
+from datetime import datetime
 from flask import request
 from elephant_vending_machine import APP
-
-@APP.route('/')
-def index():
-    """
-    Responds with basic 'Hello Elephants!' string
-
-    All requests sent to the default route return a simple
-    string. This method is intended to be removed once actual
-    routes are added.
-
-    :Returns:
-        HTTP response OK with payload 'Hello Elephants'
-
-    """
-
-    return 'Hello Elephants!'
+from .libraries.experiment_logger import create_experiment_logger
 
 @APP.route('/run-trial', methods=['POST'])
 def run_trial():
@@ -43,7 +29,13 @@ def run_trial():
 
     response = ""
     if request.args.get('trial_name') is not None:
-        response = 'Running ' + request.args.get('trial_name')
+        trial_name = request.args.get('trial_name')
+        log_filename = str(datetime.utcnow()) + ' ' + trial_name + '.csv'
+        exp_logger = create_experiment_logger(log_filename)
+
+        exp_logger.info("Experiment %s started", trial_name)
+
+        response = 'Running ' + str(trial_name)
     else:
         response = 'No trial_name specified'
     return response

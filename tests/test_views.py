@@ -2,6 +2,11 @@ import pytest
 
 from elephant_vending_machine import elephant_vending_machine
 
+class MockLogger:
+
+    @staticmethod
+    def info(*args, **kwargs):
+        return 
 
 @pytest.fixture
 def client():
@@ -10,11 +15,8 @@ def client():
     with elephant_vending_machine.APP.test_client() as client:
         yield client
 
-def test_root_route(client):
-    response = client.get('/')
-    assert b'Hello Elephants!' in response.data
-
-def test_run_trial_route_success(client):
+def test_run_trial_route_success(client, monkeypatch):
+    monkeypatch.setattr('elephant_vending_machine.views.create_experiment_logger', lambda file_name: MockLogger())
     response = client.post('/run-trial?trial_name=demo')
     assert b'Running demo' in response.data
 
