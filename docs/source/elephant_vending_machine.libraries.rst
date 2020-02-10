@@ -4,14 +4,9 @@ elephant\_vending\_machine.libraries package
 Submodules
 ----------
 
-elephant\_vending\_machine.libraries.experiment\_logger module
---------------------------------------------------------------
+.. toctree::
 
-.. automodule:: elephant_vending_machine.libraries.experiment_logger
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
+   elephant_vending_machine.libraries.experiment_logger
 
 Module contents
 ---------------

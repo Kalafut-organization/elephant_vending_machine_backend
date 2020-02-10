@@ -11,14 +11,9 @@ Subpackages
 Submodules
 ----------
 
-elephant\_vending\_machine.views module
----------------------------------------
+.. toctree::
 
-.. automodule:: elephant_vending_machine.views
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
+   elephant_vending_machine.views
 
 Module contents
 ---------------

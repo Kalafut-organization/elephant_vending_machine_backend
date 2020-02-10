@@ -34,11 +34,14 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
-    'sphinx.ext.autosummary'
+    'sphinx.ext.autosummary',
+    'sphinxcontrib.apidoc'
 ]
 
 napoleon_numpy_docstring = False
-napoleon_use_param = False
+apidoc_module_dir = '../elephant_vending_machine'
+apidoc_output_dir = 'source'
+apidoc_separate_modules = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
