@@ -1,5 +1,4 @@
-"""
-Define all routes for the behavioral experiment server.
+"""Define all routes for the behavioral experiment server.
 
 Here, all API routes for the experiment server are defined.
 Consider splitting into its own package if end up being
@@ -15,13 +14,12 @@ from .libraries.experiment_logger import create_experiment_logger
 
 @APP.route('/run-trial', methods=['POST'])
 def run_trial():
-    """
-    Responds with 'Running {trial_name}' string
+    """Responds with 'Running {trial_name}' string
 
     All requests sent to this route should have a trial_name in
     the query string, otherwise a 400 error will be returned
 
-    :Returns:
+    Returns:
         HTTP response 200 with payload 'Running {trial_name}' or
         HTTP response 400 with payload 'No trial_name specified'
 
@@ -43,14 +41,13 @@ def run_trial():
 
 @APP.route('/add-image', methods=['POST'])
 def upload_image():
-    """
-    Responds with 'File received' string
+    """Responds with 'File received' string
 
     All requests sent to this route should have an image file
     included in the body of the request, otherwise a 400 error
     will be returned
 
-    :Returns:
+    Returns:
         HTTP response 200 with payload 'File received' or
         HTTP response 500 with payload 'No image file in request.'
 
@@ -65,13 +62,12 @@ def upload_image():
 
 @APP.route('/log', methods=['GET'])
 def log():
-    """
-    Returns the specified log file
+    """Returns the specified log file
 
     All requests sent to this route should have a log_name in
     the query string, otherwise a 400 error will be returned
 
-    :Returns:
+    Returns:
         HTTP response 200 if log file exists, or HTTP response 500
         if it does not.
 
