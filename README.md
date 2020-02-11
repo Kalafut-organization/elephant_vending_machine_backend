@@ -32,3 +32,12 @@ CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinn
 1. Install pylint with `pip install pylint`
 1. Navigate to the root directory of this project
 1. To check your code style, run `pylint elephant_vending_machine`
+
+## Build and view API documentation
+1. Install sphinx with `pip install -r requirements.txt`
+1. Navigate to `docs` directory
+1. `make html` to build API documentation
+1. Open `index.html` under `docs/_build/html/` in a browser to view documentation
+
+## Known issues
+1. API documentation does not build properly in a Windows environment. Use Unix or MacOS to reliably build and view documentation.
