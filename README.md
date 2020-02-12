@@ -3,6 +3,7 @@ CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinn
 
 ![Python package](https://github.com/mknox1225/elephants_cse5911/workflows/Python%20package/badge.svg?branch=master)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
+![coverage](https://gitlab.com/gitlab-org/gitlab-foss/badges/master/coverage.svg?job=coverage)
 
 ## Setting up your virtual environment
 1. Navigate to the root directory of this project
