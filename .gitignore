@@ -133,3 +133,6 @@ dmypy.json
 
 # Experiment logs
 /logs/*
+
+# Images in upload folder
+/elephant_vending/static/img/*

@@ -7,9 +7,13 @@ a lot of routes.
 # Circular import OK here. See https://flask.palletsprojects.com/en/1.1.x/patterns/packages/
 # pylint: disable=cyclic-import
 from datetime import datetime
+import os
 from flask import request
+from werkzeug.utils import secure_filename
 from elephant_vending_machine import APP
 from .libraries.experiment_logger import create_experiment_logger
+
+ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif', 'svg'}
 
 @APP.route('/run-trial', methods=['POST'])
 def run_trial():
@@ -36,7 +40,7 @@ def run_trial():
     return response
 
 
-@APP.route('/add-image', methods=['POST'])
+@APP.route('/image', methods=['POST'])
 def upload_image():
     """Responds with 'File received' string
 
@@ -46,14 +50,34 @@ def upload_image():
 
     Returns:
         HTTP response 200 with payload 'File received' or
-        HTTP response 500 with payload 'No image file in request.'
+        HTTP response 400 with payload 'No image file in request.'
     """
     response = ""
-    if 'file' in request.files:
-        response = "File received."
+    response_code = 400
+    if 'file' not in request.files:
+        response = "Error with request: No file field in body of request."
     else:
-        response = "No image file in request."
-    return response
+        file = request.files['file']
+        if file.filename == '':
+            response = "Error with request: File field in body of response with no file present."
+        elif file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(APP.config['IMAGE_UPLOAD_FOLDER'], filename))
+            response = "Success: Image saved."
+            response_code = 200
+        else:
+            response = "Error with request: File extension not allowed."
+    return response, response_code
+
+def allowed_file(filename):
+    """Determines whether an uploaded image file has an allowed extension.
+
+    Returns:
+        True if filename includes extension and extension is an allowed extension
+        False otherwise
+    """
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @APP.route('/log', methods=['GET'])
 def log():
