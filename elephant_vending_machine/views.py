@@ -52,8 +52,8 @@ def upload_image():
     will be returned
 
     Returns:
-        HTTP response 200 with payload 'File received' or
-        HTTP response 400 with payload 'No image file in request.'
+        HTTP response 200 with payload 'Success: Image saved.' or
+        HTTP response 400 with payload describing the issue with the request.
     """
 
     response = ""

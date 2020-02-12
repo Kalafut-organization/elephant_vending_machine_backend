@@ -135,4 +135,4 @@ dmypy.json
 /logs/*
 
 # Images in upload folder
-/elephant_vending/static/img/*
+/elephant_vending_machine/static/img/*
