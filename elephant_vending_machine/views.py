@@ -42,18 +42,55 @@ def run_trial():
         response = 'No trial_name specified'
     return response
 
+def allowed_file(filename):
+    """Determines whether an uploaded image file has an allowed extension.
+
+    Returns:
+        True if filename includes extension and extension is an allowed extension
+        False otherwise
+    """
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @APP.route('/image', methods=['POST'])
 def upload_image():
-    """Responds with 'File received' string
+    """Return string indicating result of request
+
+    **Example request**:
+
+    .. sourcecode:: http
+      
+      POST /image HTTP/1.1
+      Host: 127.0.0.1:5000
+      Content-Type: multipart/form-data; boundary=--------------------------827430006917349763475527
+      Accept-Encoding: gzip, deflate, br
+      Content-Length: 737067
+      Connection: keep-alive
+      ----------------------------827430006917349763475527
+      Content-Disposition: form-data; name="file"; filename="elephant.jpeg"
+
+      <elephant.jpeg>
+      ----------------------------827430006917349763475527--
+
+    **Example response**:
+
+    .. sourcecode:: http
+
+      HTTP/1.0 200 OK
+      Content-Type: text/html; charset=utf-8
+      Content-Length: 21
+      Server: Werkzeug/0.16.1 Python/3.8.1
+      Date: Thu, 13 Feb 2020 15:35:32 GMT
+
+      Success: Image saved.
 
     All requests sent to this route should have an image file
     included in the body of the request, otherwise a 400 error
     will be returned
 
-    Returns:
-        HTTP response 200 with payload 'Success: Image saved.' or
-        HTTP response 400 with payload describing the issue with the request.
+    :status 200: file saved
+    :status 400: malformed request
     """
 
     response = ""
@@ -73,15 +110,6 @@ def upload_image():
             response = "Error with request: File extension not allowed."
     return response, response_code
 
-def allowed_file(filename):
-    """Determines whether an uploaded image file has an allowed extension.
-
-    Returns:
-        True if filename includes extension and extension is an allowed extension
-        False otherwise
-    """
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @APP.route('/log', methods=['GET'])
 def log():
