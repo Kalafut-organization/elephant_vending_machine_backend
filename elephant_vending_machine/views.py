@@ -103,7 +103,8 @@ def upload_image():
             response = "Error with request: File field in body of response with no file present."
         elif file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(APP.config['IMAGE_UPLOAD_FOLDER'], filename))
+            image_upload_folder = os.path.dirname(os.path.abspath(__file__)) + '/static/img'
+            file.save(os.path.join(image_upload_folder, filename))
             response = "Success: Image saved."
             response_code = 201
         else:
