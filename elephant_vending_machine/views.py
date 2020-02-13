@@ -59,8 +59,8 @@ def upload_image():
 
     **Example request**:
 
-    .. sourcecode:: http
-      
+    .. sourcecode::
+
       POST /image HTTP/1.1
       Host: 127.0.0.1:5000
       Content-Type: multipart/form-data; boundary=--------------------------827430006917349763475527
@@ -89,7 +89,7 @@ def upload_image():
     included in the body of the request, otherwise a 400 error
     will be returned
 
-    :status 200: file saved
+    :status 201: file saved
     :status 400: malformed request
     """
 
@@ -105,7 +105,7 @@ def upload_image():
             filename = secure_filename(file.filename)
             file.save(os.path.join(APP.config['IMAGE_UPLOAD_FOLDER'], filename))
             response = "Success: Image saved."
-            response_code = 200
+            response_code = 201
         else:
             response = "Error with request: File extension not allowed."
     return response, response_code

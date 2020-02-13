@@ -37,5 +37,5 @@ def test_post_image_route_with_file_bad_extension(client):
 def test_post_image_route_with_file(client):
     data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.png')}
     response = client.post('/image', data=data) 
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert b'Success: Image saved.' in response.data
