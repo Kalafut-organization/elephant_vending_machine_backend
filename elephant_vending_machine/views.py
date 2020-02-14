@@ -15,6 +15,7 @@ from elephant_vending_machine import APP
 from .libraries.experiment_logger import create_experiment_logger
 
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif', 'svg'}
+IMAGE_UPLOAD_FOLDER = '/static/img'
 
 @APP.route('/run-trial', methods=['POST'])
 def run_trial():
@@ -103,8 +104,8 @@ def upload_image():
             response = "Error with request: File field in body of response with no file present."
         elif file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            image_upload_folder = os.path.dirname(os.path.abspath(__file__)) + '/static/img'
-            file.save(os.path.join(image_upload_folder, filename))
+            save_path = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
+            file.save(os.path.join(save_path, filename))
             response = "Success: Image saved."
             response_code = 201
         else:
