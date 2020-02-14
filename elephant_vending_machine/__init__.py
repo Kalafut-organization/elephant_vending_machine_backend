@@ -4,7 +4,6 @@ This module creates the Flask appliaction object so that each
 module can import it safely and the __name__ variable will always
 resolve to the correct package.
 """
-import os
 from flask import Flask
 
 APP = Flask(__name__)
