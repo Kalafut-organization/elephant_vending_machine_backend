@@ -9,6 +9,8 @@ a lot of routes.
 # pylint: disable=cyclic-import
 from datetime import datetime
 import os
+import subprocess
+from subprocess import CalledProcessError
 from flask import request
 from werkzeug.utils import secure_filename
 from elephant_vending_machine import APP
@@ -43,8 +45,29 @@ def run_trial():
         response = 'No trial_name specified'
     return response
 
+def add_remote_image(local_image_path, filename):
+    """Adds an image to the remote hosts defined in flask config.
+
+    Parameters:
+        local_image_path (str): The local path of the image to be copied
+        filename (str): The filename of the local file to be copied
+
+    Raises:
+        CalledProcessError: If scp or ssh calls fail for one of the hosts
+    """
+    for host in APP.config['REMOTE_HOSTS']:
+        user = APP.config['REMOTE_HOST_USERNAME']
+        directory = APP.config['REMOTE_IMAGE_DIRECTORY']
+        ssh_command = f"ssh {user}@{host} mkdir -p {directory}"
+        subprocess.run(ssh_command, check=True)
+        scp_command = f"scp {local_image_path}/{filename} {user}@{host}:{directory}/{filename}"
+        subprocess.run(scp_command, check=True)
+
 def allowed_file(filename):
     """Determines whether an uploaded image file has an allowed extension.
+
+    Parameters:
+        filename (str): The filename which is to be checked
 
     Returns:
         True if filename includes extension and extension is an allowed extension
@@ -108,11 +131,17 @@ def upload_image():
             file.save(os.path.join(save_path, filename))
             response = "Success: Image saved."
             response_code = 201
+
+            try:
+                add_remote_image(save_path, filename)
+            except CalledProcessError:
+                response = "Error: Failed to copy file to hosts"
+                response_code = 400
         else:
             response = "Error with request: File extension not allowed."
     return response, response_code
 
-
+APP.config['REMOTE_IMAGE_DIRECTORY']
 @APP.route('/log', methods=['GET'])
 def log():
     """Returns the specified log file

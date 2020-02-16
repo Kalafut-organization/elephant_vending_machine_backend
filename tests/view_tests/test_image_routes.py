@@ -2,6 +2,10 @@ import pytest
 from io import BytesIO
 
 from elephant_vending_machine import elephant_vending_machine
+from subprocess import CompletedProcess, CalledProcessError
+
+def raise_(ex):
+    raise ex
 
 @pytest.fixture
 def client():
@@ -9,7 +13,6 @@ def client():
 
     with elephant_vending_machine.APP.test_client() as client:
         yield client
-
 
 def test_post_image_route_no_file(client):
     response = client.post('/image')
@@ -30,7 +33,16 @@ def test_post_image_route_with_file_bad_extension(client):
 
 def test_post_image_route_with_file(monkeypatch, client):
     monkeypatch.setattr('werkzeug.datastructures.FileStorage.save', lambda save_path, filename: "" )
+    monkeypatch.setattr('subprocess.run', lambda command, check: CompletedProcess(['some_command'], returncode=0))
     data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.png')}
     response = client.post('/image', data=data) 
     assert response.status_code == 201
     assert b'Success: Image saved.' in response.data
+
+def test_post_image_route_copying_exception(monkeypatch, client):
+    monkeypatch.setattr('werkzeug.datastructures.FileStorage.save', lambda save_path, filename: "" )
+    monkeypatch.setattr('subprocess.run', lambda command, check: raise_(CalledProcessError(1, ['ssh'])))
+    data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.png')}
+    response = client.post('/image', data=data) 
+    assert response.status_code == 400
+    assert b'Error: Failed to copy file to hosts' in response.data
