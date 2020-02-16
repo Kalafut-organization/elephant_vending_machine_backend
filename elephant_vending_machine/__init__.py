@@ -5,6 +5,7 @@ module can import it safely and the __name__ variable will always
 resolve to the correct package.
 """
 from flask import Flask
+
 APP = Flask(__name__)
 
 # Circular imports are bad, but views are not used here, only imported, so it's OK
