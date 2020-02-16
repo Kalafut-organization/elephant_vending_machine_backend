@@ -3,7 +3,7 @@ CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinn
 
 ![Python package](https://github.com/mknox1225/elephants_cse5911/workflows/Python%20package/badge.svg?branch=master)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
-[![codecov](https://codecov.io/gh/Kalafut-organization/elephants_cse5911/branch/riya_github_actions/graph/badge.svg)](https://codecov.io/gh/Kalafut-organization/elephants_cse5911)
+[![codecov](https://codecov.io/gh/Kalafut-organization/elephants_cse5911/branch/master/graph/badge.svg)](https://codecov.io/gh/Kalafut-organization/elephants_cse5911)
 [![Documentation Status](https://readthedocs.org/projects/pip/badge/?version=stable)](http://pip.pypa.io/en/stable/?badge=stable)
 
 
