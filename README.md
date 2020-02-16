@@ -22,6 +22,15 @@ CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinn
 1. `pip install -e .`
 1. `flask run`
 
+## Configuring Remote Pis for GPIO Pin Reading
+1. Ensure Pis are running Raspbian
+1. Open the Raspberry Pi Configuration Tool
+1. Set "Remote GPIO" to "enabled"
+1. Configure this to run at boot in the future
+    * Using a terminal, run the following `sudo systemctl enable pigpiod`
+    * Now to manually enable remote access at this time, run `sudo systemctl start pigpiod`
+1. For more information, visit [this documentation](https://gpiozero.readthedocs.io/en/stable/remote_gpio.html)
+
 ## Test suite
 1. Install coverage.py with `pip install coverage`
 1. Install pytest with `pip install pytest`
