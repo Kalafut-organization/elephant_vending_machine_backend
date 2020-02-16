@@ -44,5 +44,5 @@ def test_post_image_route_copying_exception(monkeypatch, client):
     monkeypatch.setattr('subprocess.run', lambda command, check: raise_(CalledProcessError(1, ['ssh'])))
     data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.png')}
     response = client.post('/image', data=data) 
-    assert response.status_code == 400
+    assert response.status_code == 500
     assert b'Error: Failed to copy file to hosts' in response.data
