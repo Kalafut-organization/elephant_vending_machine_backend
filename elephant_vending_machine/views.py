@@ -141,7 +141,6 @@ def upload_image():
             response = "Error with request: File extension not allowed."
     return response, response_code
 
-APP.config['REMOTE_IMAGE_DIRECTORY']
 @APP.route('/log', methods=['GET'])
 def log():
     """Returns the specified log file
