@@ -136,7 +136,7 @@ def upload_image():
                 add_remote_image(save_path, filename)
             except CalledProcessError:
                 response = "Error: Failed to copy file to hosts"
-                response_code = 400
+                response_code = 500
         else:
             response = "Error with request: File extension not allowed."
     return response, response_code
