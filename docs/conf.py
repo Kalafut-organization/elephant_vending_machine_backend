@@ -35,7 +35,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
-    'sphinxcontrib.apidoc'
+    'sphinxcontrib.apidoc',
+    'sphinx.ext.todo'
 ]
 
 napoleon_numpy_docstring = False
@@ -71,6 +72,9 @@ html_context = {
     "github_version": "master", # Version
     "conf_py_path": "/source/", # Path in the checkout to the docs root
 }
+
+# Enable TODOs to show in the documentation
+todo_include_todos=True
 
 # Setup function for custom CSS
 def setup(app):
