@@ -35,7 +35,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
-    'sphinxcontrib.apidoc'
+    'sphinxcontrib.apidoc',
+    'sphinx.ext.todo'
 ]
 
 napoleon_numpy_docstring = False
@@ -63,6 +64,9 @@ html_theme = 'sphinx_rtd_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# Enable TODOs to show in the documentation
+todo_include_todos=True
 
 # Setup function for custom CSS
 def setup(app):
