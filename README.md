@@ -7,7 +7,7 @@ CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinn
 [![Documentation Status](https://readthedocs.org/projects/elephants-cse5911/badge/?version=latest)](https://elephants-cse5911.readthedocs.io/en/latest/?badge=latest)
 
 
-## Setting up your virtual environment
+## Setting up your virtual environment and installing dependencies
 1. Navigate to the root directory of this project
 1. Run `python3 -m venv .venv` to create a virtual environment
 1. Activate your virtual environment
@@ -27,19 +27,14 @@ CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinn
 1. `flask run`
 
 ## Test suite
-1. Install coverage.py with `pip install coverage`
-1. Install pytest with `pip install pytest`
-1. Install CodeCoverage with `pip install codecov`
 1. To execute the test suite run `coverage run -m pytest`
 1. To view coverage report after tests have been run use `coverage report`
 
 ## Linting
-1. Install pylint with `pip install pylint`
 1. Navigate to the root directory of this project
 1. To check your code style, run `pylint elephant_vending_machine`
 
 ## Build and view API documentation
-1. Install sphinx with `pip install -r requirements.txt`
 1. Navigate to `docs` directory
 1. `make html` to build API documentation
 1. Open `index.html` under `docs/_build/html/` in a browser to view documentation
