@@ -44,6 +44,3 @@ CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinn
 1. `make html` to build API documentation
 1. Open `index.html` under `docs/_build/html/` in a browser to view documentation
     * The master branch documentation can be viewed on Read the Docs by clicking the "docs" badge at the top of this README  
-
-## Known issues
-1. API documentation does not build properly in a Windows environment. Use Unix or MacOS to reliably build and view documentation.
