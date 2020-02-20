@@ -14,6 +14,7 @@ CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinn
     * On Windows run `.venv\Scripts\activate.bat`
     * On Unix or MacOS run `source .venv/bin/activate`
     * To deactivate run `deactivate`
+    * NOTE: You will need to activate your virtual environment every time you close and reopen your terminal
 1. Use `pip install -r requirements.txt` to install all required dependencies
 
 ## Starting the application
@@ -42,6 +43,7 @@ CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinn
 1. Navigate to `docs` directory
 1. `make html` to build API documentation
 1. Open `index.html` under `docs/_build/html/` in a browser to view documentation
+    * The master branch documentation can be viewed on Read the Docs by clicking the "docs" badge at the top of this README  
 
 ## Known issues
 1. API documentation does not build properly in a Windows environment. Use Unix or MacOS to reliably build and view documentation.
