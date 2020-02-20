@@ -29,3 +29,12 @@ jobs:
         pip install pytest
         pip install coverage
         coverage run -m pytest
+        coverage xml
+    - name: Upload coverage to codecov
+      uses: codecov.codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage.xml
+        flags: unittests
+        yml: ./codecov.yml
+        fail_ci_if_error: true

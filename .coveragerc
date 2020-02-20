@@ -1,5 +1,5 @@
 [run]
-    source=elephants_cse5911
+source=elephant_vending_machine
 
 omit =
 	# Ignore all files in virtual environment
