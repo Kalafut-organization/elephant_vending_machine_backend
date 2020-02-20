@@ -22,17 +22,12 @@ jobs:
         pip install -r requirements.txt
     - name: Lint with pylint
       run: |
-        pip install pylint
         pylint elephant_vending_machine
     - name: Test with pytest and coverage
       run: |
-        pip install pytest
-        pip install coverage
         coverage run -m pytest
         coverage xml
-    steps:
-    - name: Upload coverage to codecov
-    - uses: actions/checkout@master
+    - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1.0.5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
