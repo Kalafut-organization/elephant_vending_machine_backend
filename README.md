@@ -1,5 +1,5 @@
-# elephants_cse5911
-CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinnati Zoo
+# Elephant Vending Machine
+OSU CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinnati Zoo. Designed to facilitate automated behavioral psychology experiments.
 
 ![Python package](https://github.com/mknox1225/elephants_cse5911/workflows/Python%20package/badge.svg?branch=master)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/Kalafut-organization/elephants_cse5911/blob/master/LICENSE.md)
