@@ -16,8 +16,10 @@ from werkzeug.utils import secure_filename
 from elephant_vending_machine import APP
 from .libraries.experiment_logger import create_experiment_logger
 
-ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif', 'svg'}
+ALLOWED_IMG_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif', 'svg'}
+ALLOWED_EXPERIMENT_EXTENSIONS = {'py'}
 IMAGE_UPLOAD_FOLDER = '/static/img'
+EXPERIMENT_UPLOAD_FOLDER = '/static/experiments'
 
 @APP.route('/run-trial', methods=['POST'])
 def run_trial():
@@ -63,7 +65,7 @@ def add_remote_image(local_image_path, filename):
         scp_command = f"scp {local_image_path}/{filename} {user}@{host}:{directory}/{filename}"
         subprocess.run(scp_command, check=True)
 
-def allowed_file(filename):
+def allowed_file(filename, allowed_extensions):
     """Determines whether an uploaded image file has an allowed extension.
 
     Parameters:
@@ -74,12 +76,12 @@ def allowed_file(filename):
         False otherwise
     """
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+           filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 
 @APP.route('/image', methods=['POST'])
 def upload_image():
-    """Return string indicating result of request
+    """Return string indicating result of image upload request
 
     **Example request**:
 
@@ -125,7 +127,7 @@ def upload_image():
         file = request.files['file']
         if file.filename == '':
             response = "Error with request: File field in body of response with no file present."
-        elif file and allowed_file(file.filename):
+        elif file and allowed_file(file.filename, ALLOWED_IMG_EXTENSIONS):
             filename = secure_filename(file.filename)
             save_path = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
             file.save(os.path.join(save_path, filename))
@@ -137,6 +139,63 @@ def upload_image():
             except CalledProcessError:
                 response = "Error: Failed to copy file to hosts"
                 response_code = 500
+        else:
+            response = "Error with request: File extension not allowed."
+    return response, response_code
+
+@APP.route('/experiment', methods=['POST'])
+def upload_experiment():
+    """Return string indicating result of experiemnt upload request
+
+    **Example request**:
+
+    .. sourcecode::
+
+      POST /experiment HTTP/1.1
+      Host: 127.0.0.1:5000
+      Content-Type: multipart/form-data; boundary=--------------------------827430006917349763475527
+      Accept-Encoding: gzip, deflate, br
+      Content-Length: 737067
+      Connection: keep-alive
+      ----------------------------827430006917349763475527
+      Content-Disposition: form-data; name="file"; filename="elephant.py"
+
+      <elephant.py>
+      ----------------------------827430006917349763475527--
+
+    **Example response**:
+
+    .. sourcecode:: http
+
+      HTTP/1.0 200 OK
+      Content-Type: text/html; charset=utf-8
+      Content-Length: 21
+      Server: Werkzeug/0.16.1 Python/3.8.1
+      Date: Thu, 13 Feb 2020 15:35:32 GMT
+
+      Success: Image saved.
+
+    All requests sent to this route should have a python script file
+    included in the body of the request, otherwise a 400 error
+    will be returned
+
+    :status 201: file saved
+    :status 400: malformed request
+    """
+    response = ""
+    response_code = 400
+    if 'file' not in request.files:
+        response = "Error with request: No file field in body of request."
+    else:
+        file = request.files['file']
+        if file.filename == '':
+            response = "Error with request: File field in body of response with no file present."
+        elif file and allowed_file(file.filename, ALLOWED_EXPERIMENT_EXTENSIONS):
+            filename = file.filename
+            save_path = os.path.dirname(os.path.abspath(__file__)) + EXPERIMENT_UPLOAD_FOLDER
+            file.save(os.path.join(save_path, filename))
+            response = "Success: Experiment saved."
+            response_code = 201
         else:
             response = "Error with request: File extension not allowed."
     return response, response_code
