@@ -201,21 +201,17 @@ def upload_experiment():
     return response, response_code
 
 @APP.route('/log', methods=['GET'])
-def log():
-    """Returns the specified log file
-
-    All requests sent to this route should have a log_name in
-    the query string, otherwise a 400 error will be returned
+def list_logs():
+    """Returns a list of experiment filenames from the experiments directory.
 
     Returns:
-        HTTP response 200 if log file exists, or HTTP response 500
-        if it does not.
+        HTTP response 200 with string containing comma-separated filenames.
 
     """
-
-    response = ""
-    if request.args.get('log_name') is not None:
-        response = 'This would be ' + request.args.get('log_name')
-    else:
-        response = 'Error with request.'
-    return response
+    path_to_current_file = os.path.dirname(os.path.abspath(__file__))
+    logs_path = os.path.join(path_to_current_file, '..', 'logs')
+    directory_list = os.listdir(logs_path)
+    experiment_files = [f for f in directory_list if os.path.isfile(os.path.join(logs_path, f))]
+    experiment_files.remove('.gitignore')
+    response_code = 200
+    return ', '.join(experiment_files), response_code
