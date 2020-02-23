@@ -137,5 +137,8 @@ dmypy.json
 # Images in upload folder
 /elephant_vending_machine/static/img/*
 
+# Experiments in experiments upload folder
+/elephant_vending_machine/static/experiments/*
+
 # Ignore IntelliJ .idea files
 .idea
