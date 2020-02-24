@@ -58,7 +58,8 @@ def add_remote_image(local_image_path, filename):
     for host in APP.config['REMOTE_HOSTS']:
         user = APP.config['REMOTE_HOST_USERNAME']
         directory = APP.config['REMOTE_IMAGE_DIRECTORY']
-        ssh_command = f"ssh -oStrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa {user}@{host} mkdir -p {directory}"
+        ssh_command = f'''ssh -oStrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
+            {user}@{host} mkdir -p {directory}'''
         subprocess.run(ssh_command, check=True, shell=True)
         scp_command = f"scp {local_image_path}/{filename} {user}@{host}:{directory}/{filename}"
         subprocess.run(scp_command, check=True, shell=True)
