@@ -33,7 +33,7 @@ def test_post_image_route_with_file_bad_extension(client):
 
 def test_post_image_route_with_file(monkeypatch, client):
     monkeypatch.setattr('werkzeug.datastructures.FileStorage.save', lambda save_path, filename: "" )
-    monkeypatch.setattr('subprocess.run', lambda command, check: CompletedProcess(['some_command'], returncode=0))
+    monkeypatch.setattr('subprocess.run', lambda command, check, shell: CompletedProcess(['some_command'], returncode=0))
     data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.png')}
     response = client.post('/image', data=data) 
     assert response.status_code == 201
@@ -41,7 +41,7 @@ def test_post_image_route_with_file(monkeypatch, client):
 
 def test_post_image_route_copying_exception(monkeypatch, client):
     monkeypatch.setattr('werkzeug.datastructures.FileStorage.save', lambda save_path, filename: "" )
-    monkeypatch.setattr('subprocess.run', lambda command, check: raise_(CalledProcessError(1, ['ssh'])))
+    monkeypatch.setattr('subprocess.run', lambda command, check, shell: raise_(CalledProcessError(1, ['ssh'])))
     data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.png')}
     response = client.post('/image', data=data) 
     assert response.status_code == 500
