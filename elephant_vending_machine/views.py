@@ -208,10 +208,12 @@ def list_logs():
         HTTP response 200 with string containing comma-separated filenames.
 
     """
+    file_request_path = request.base_url[:request.base_url.rfind('/')] + "/logs/"
     path_to_current_file = os.path.dirname(os.path.abspath(__file__))
     logs_path = os.path.join(path_to_current_file, '..', 'logs')
     directory_list = os.listdir(logs_path)
     experiment_files = [f for f in directory_list if os.path.isfile(os.path.join(logs_path, f))]
     experiment_files.remove('.gitignore')
+    full_experiment_paths = [ file_request_path + f for f in experiment_files]
     response_code = 200
-    return make_response(jsonify({'files': experiment_files}), response_code)
+    return make_response(jsonify({'files': full_experiment_paths}), response_code)
