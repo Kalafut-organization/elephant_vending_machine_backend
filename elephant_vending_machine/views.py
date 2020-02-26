@@ -202,7 +202,7 @@ def upload_experiment():
 
 @APP.route('/log', methods=['GET'])
 def list_logs():
-    """Returns a list of experiment filenames from the experiments directory.
+    """Returns a list of log resources from the logs directory.
 
     Returns:
         HTTP response 200 with string containing comma-separated filenames.
