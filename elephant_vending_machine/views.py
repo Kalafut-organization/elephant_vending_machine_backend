@@ -11,7 +11,7 @@ from datetime import datetime
 import os
 import subprocess
 from subprocess import CalledProcessError
-from flask import request
+from flask import request, make_response, jsonify
 from werkzeug.utils import secure_filename
 from elephant_vending_machine import APP
 from .libraries.experiment_logger import create_experiment_logger
@@ -214,4 +214,4 @@ def list_logs():
     experiment_files = [f for f in directory_list if os.path.isfile(os.path.join(logs_path, f))]
     experiment_files.remove('.gitignore')
     response_code = 200
-    return ', '.join(experiment_files), response_code
+    return make_response(jsonify({'files': experiment_files}), response_code)

@@ -34,5 +34,5 @@ def test_get_log_endpoint(client):
     subprocess.call(["touch", "logs/test_file.csv"])
     subprocess.call(["touch", "logs/test_file2.csv"])
     response = client.get('/log')
-    assert b'test_file2.csv, unittest.csv, test_file.csv' in response.data
+    assert b'{\n  "files": [\n    "test_file2.csv", \n    "unittest.csv", \n    "test_file.csv"\n  ]\n}\n' in response.data
     assert response.status_code == 200
