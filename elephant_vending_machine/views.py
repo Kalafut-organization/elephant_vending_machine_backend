@@ -173,7 +173,7 @@ def upload_experiment():
       Server: Werkzeug/0.16.1 Python/3.8.1
       Date: Thu, 13 Feb 2020 15:35:32 GMT
 
-      Success: Image saved.
+      Success: Experiment saved.
 
     All requests sent to this route should have a python script file
     included in the body of the request, otherwise a 400 error
@@ -202,7 +202,7 @@ def upload_experiment():
 
 @APP.route('/log', methods=['GET'])
 def list_logs():
-    """Returns a list of experiment filenames from the experiments directory.
+    """Returns a list of log resources from the logs directory.
 
     Returns:
         HTTP response 200 with string containing comma-separated filenames.
