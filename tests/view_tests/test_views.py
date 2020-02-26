@@ -35,5 +35,5 @@ def test_get_log_endpoint(client):
     subprocess.call(["touch", "logs/test_file.csv"])
     subprocess.call(["touch", "logs/test_file2.csv"])
     response = client.get('/log')
-    assert make_response(jsonify({'files': ["test_file2.csv","unittest.csv","test_file.csv"]})).data == response.data
+    assert make_response(jsonify({'files': ["test_file2.csv","unittest.csv","test_file.csv"]})).data in response.data
     assert response.status_code == 200
