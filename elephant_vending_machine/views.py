@@ -112,7 +112,9 @@ def upload_image():
       Server: Werkzeug/0.16.1 Python/3.8.1
       Date: Thu, 13 Feb 2020 15:35:32 GMT
 
-      Success: Image saved.
+      {
+          "message":"Success: Image saved."
+      }
 
     All requests sent to this route should have an image file
     included in the body of the request, otherwise a 400 error
