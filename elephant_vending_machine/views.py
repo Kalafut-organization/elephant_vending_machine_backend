@@ -30,7 +30,7 @@ def run_trial():
 
     Returns:
         HTTP response 200 with body {"message":"Running <trial_name>"} or
-        HTTP response 400 with JSON message 'No trial_name specified'
+        HTTP response 400 with body {"message":"No trial_name specified"}
 
     """
 
