@@ -210,7 +210,7 @@ def list_logs():
     """Returns a list of log resources from the logs directory.
 
     Returns:
-        HTTP response 200 with string containing comma-separated filenames.
+        HTTP response 200 with body {'files': [array of links to files]}.
 
     """
     file_request_path = request.base_url[:request.base_url.rfind('/')] + "/logs/"
