@@ -29,7 +29,7 @@ def run_trial():
     the query string, otherwise a 400 error will be returned
 
     Returns:
-        HTTP response 200 with JSON message 'Running {trial_name}' or
+        HTTP response 200 with body {"message":"Running <trial_name>"} or
         HTTP response 400 with JSON message 'No trial_name specified'
 
     """
