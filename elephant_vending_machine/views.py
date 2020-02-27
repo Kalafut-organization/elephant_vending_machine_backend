@@ -148,7 +148,7 @@ def upload_image():
 
 @APP.route('/experiment', methods=['POST'])
 def upload_experiment():
-    """Return string indicating result of experiemnt upload request
+    """Return JSON body with message indicating result of experiment upload request
 
     **Example request**:
 
