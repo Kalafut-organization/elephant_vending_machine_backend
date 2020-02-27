@@ -23,12 +23,12 @@ def client():
 def test_run_trial_route_success(client, monkeypatch):
     monkeypatch.setattr('elephant_vending_machine.views.create_experiment_logger', lambda file_name: MockLogger())
     response = client.post('/run-trial?trial_name=demo')
-    assert jsonify({'message': 'Running demo'}).data in response.data
+    assert b'Running demo' in response.data
     assert response.status_code == 200
 
 def test_run_trial_route_empty_query_string(client):
     response = client.post('/run-trial')
-    assert jsonify({'message': 'No trial_name specified'}).data in response.data
+    assert b'No trial_name specified' in response.data
     assert response.status_code == 400
 
 def test_get_log_endpoint(client):
