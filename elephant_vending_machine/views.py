@@ -176,7 +176,9 @@ def upload_experiment():
       Server: Werkzeug/0.16.1 Python/3.8.1
       Date: Thu, 13 Feb 2020 15:35:32 GMT
 
-      Success: Experiment saved.
+      {
+          "message":"Success: Experiment saved."
+      }
 
     All requests sent to this route should have a python script file
     included in the body of the request, otherwise a 400 error
