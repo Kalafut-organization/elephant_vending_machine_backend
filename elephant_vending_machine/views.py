@@ -29,12 +29,13 @@ def run_trial():
     the query string, otherwise a 400 error will be returned
 
     Returns:
-        HTTP response 200 with payload 'Running {trial_name}' or
-        HTTP response 400 with payload 'No trial_name specified'
+        HTTP response 200 with JSON message 'Running {trial_name}' or
+        HTTP response 400 with JSON message 'No trial_name specified'
 
     """
 
     response = ""
+    response_code = 400
     if request.args.get('trial_name') is not None:
         trial_name = request.args.get('trial_name')
         log_filename = str(datetime.utcnow()) + ' ' + trial_name + '.csv'
@@ -43,9 +44,11 @@ def run_trial():
         exp_logger.info("Experiment %s started", trial_name)
 
         response = 'Running ' + str(trial_name)
+        response_code = 200
     else:
         response = 'No trial_name specified'
-    return response
+        response_code = 400
+    return make_response(jsonify({'message': response}), response_code)
 
 def add_remote_image(local_image_path, filename):
     """Adds an image to the remote hosts defined in flask config.
@@ -141,7 +144,7 @@ def upload_image():
                 response_code = 500
         else:
             response = "Error with request: File extension not allowed."
-    return response, response_code
+    return  make_response(jsonify({'message': response}), response_code)
 
 @APP.route('/experiment', methods=['POST'])
 def upload_experiment():
@@ -198,7 +201,7 @@ def upload_experiment():
             response_code = 201
         else:
             response = "Error with request: File extension not allowed."
-    return response, response_code
+    return  make_response(jsonify({'message': response}), response_code)
 
 @APP.route('/log', methods=['GET'])
 def list_logs():
