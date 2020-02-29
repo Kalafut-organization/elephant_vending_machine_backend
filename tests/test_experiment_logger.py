@@ -4,7 +4,7 @@ import logging
 import pytest
 import re
 
-from elephant_vending_machine.libraries.experiment_logger import CsvFormatter, create_experiment_logger
+from elephants_cse5911.elephant_vending_machine.libraries.experiment_logger import CsvFormatter, create_experiment_logger
 
 class MockLogRecord:
     def __init__(self, message):
