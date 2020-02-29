@@ -11,17 +11,29 @@ and associated sensors on the vending machines.
    Determine pin numbers
 """
 
+<<<<<<< HEAD
 import multiprocessing as mp
+=======
+import threading
+>>>>>>> b20d1f05308eed0da56a961a480a8c8e507ef1cf
 import time
 from gpiozero.pins.pigpio import PiGPIOFactory
 from gpiozero import MotionSensor, LED
 
+<<<<<<< HEAD
+=======
+MOTION_PIN_VERTICAL = 1
+MOTION_PIN_HORIZONTAL = 2
+LED_PIN = 3
+
+>>>>>>> b20d1f05308eed0da56a961a480a8c8e507ef1cf
 class VendingMachine:
     """Provides an abstraction of the physical 'vending machine'.
 
     This class provides an abstraction of the sensors and screen associated
     with the elephant vending machine.
     """
+<<<<<<< HEAD
     LEFT_SCREEN = 9
     MIDDLE_SCREEN = 10
     RIGHT_SCREEN = 11
@@ -29,6 +41,8 @@ class VendingMachine:
     MOTION_PIN_HORIZONTAL = 2
     LED_PIN = 3
 
+=======
+>>>>>>> b20d1f05308eed0da56a961a480a8c8e507ef1cf
     def __init__(self, addresses):
         """Initialize an instance of VendingMachine.
 
@@ -38,14 +52,21 @@ class VendingMachine:
             addresses (list): A list of local IP addresses of the Raspberry Pis
         """
 
+<<<<<<< HEAD
         self.left_group = self.SensorGrouping(addresses[0], LEFT_SCREEN)
         self.middle_group = self.SensorGrouping(addresses[1], MIDDLE_SCREEN)
         self.right_group = self.SensorGrouping(addresses[2], RIGHT_SCREEN)
+=======
+        self.group_one = self.SensorGrouping(addresses[0])
+        self.group_two = self.SensorGrouping(addresses[1])
+        self.group_three = self.SensorGrouping(addresses[2])
+>>>>>>> b20d1f05308eed0da56a961a480a8c8e507ef1cf
 
     def wait_for_input():
         """Waits for input on the IR sensors.
 
         Returns:
+<<<<<<< HEAD
             group: A constant corresponding to the group_id of the first sensor tripped
         """
         if __name__ == "__main__":
@@ -74,25 +95,53 @@ class VendingMachine:
     def callback(t):
         if t in [ LEFT_SCREEN, MIDDLE_SCREEN, RIGHT_SCREEN ]:
             pool.terminate()
+=======
+            group: An integer (1, 2, or 3) corresponding to the first sensor tripped
+        """
+        return
+
+>>>>>>> b20d1f05308eed0da56a961a480a8c8e507ef1cf
     class SensorGrouping:
         """Sensor interactions
 
         An abstraction of the sensors associated with a physical
         screen on the vending machine.
         """
+<<<<<<< HEAD
         def __init__(self, address, screen_identifier):
             self.factory = PiGPIOFactory(host=address)
             self.group_id = screen_identifier
             self.ir_sensor_vertical = MotionSensor(MOTION_PIN_VERTICAL, pin_factory=self.factory)
             self.ir_sensor_horizontal = MotionSensor(MOTION_PIN_HORIZONTAL, pin_factory=self.factory)
             self.led = LED(LED_PIN, pin_factory=self.factory)
+=======
+        def __init__(self, address=''):
+            self.factory = PiGPIOFactory(host=address)
+            if address == '':
+                self.ir_sensor = MotionSensor(MOTION_PIN_VERTICAL)
+                self.ir_sensor = MotionSensor(MOTION_PIN_HORIZONTAL)
+                self.led = LED(LED_PIN)
+            else:
+                self.ir_sensor = MotionSensor(MOTION_PIN_VERTICAL, pin_factory=self.factory)
+                self.ir_sensor = MotionSensor(MOTION_PIN_HORIZONTAL, pin_factory=self.factory)
+                self.led = LED(LED_PIN, pin_factory=self.factory)
+>>>>>>> b20d1f05308eed0da56a961a480a8c8e507ef1cf
 
         def light_led():
             """Controls the lighting of LEDs for a given sensor grouping.
             """
+<<<<<<< HEAD
 
         def wait_for_detection():
             """Waits until the motion sensor is activated and returns the group id
             """
             self.ir_sensor_vertical.wait_for_motion()
             return self.group_id
+=======
+            return
+
+class IRSensorThread(threading.Thread):
+    def __init__(self, thread_id):
+        threading.Thread.__init__(self)
+        self.thread_id = thread_id
+>>>>>>> b20d1f05308eed0da56a961a480a8c8e507ef1cf
