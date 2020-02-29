@@ -47,4 +47,11 @@ OSU CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cin
 1. Navigate to `docs` directory
 1. `make html` to build API documentation
 1. Open `index.html` under `docs/_build/html/` in a browser to view documentation
-    * The master branch documentation can be viewed on Read the Docs by clicking the "docs" badge at the top of this README  
+    * The master branch documentation can be viewed on Read the Docs by clicking the "docs" badge at the top of this README
+
+## Running on Raspberry Pi
+1. Connect to your Raspberry Pi
+1. Clone this repo to the Pi
+1. Navigate to the cloned directory
+1. Run `pip install gunicorn3`
+1. Run `gunicorn3 -b 0.0.0.0:8080 elephant_vending_machine:APP`
