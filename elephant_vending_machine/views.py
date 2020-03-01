@@ -240,9 +240,9 @@ def list_experiments():
     path_to_current_file = os.path.dirname(os.path.abspath(__file__))
     experiments_path = os.path.join(path_to_current_file, 'static', 'experiments')
     directory_list = os.listdir(experiments_path)
-    experiment_files = [f for f in directory_list if os.path.isfile(os.path.join(experiments_path, f))]
-    if '.gitignore' in experiment_files:
-        experiment_files.remove('.gitignore')
-    full_experiment_paths = [file_request_path + f for f in experiment_files]
+    exper_files = [f for f in directory_list if os.path.isfile(os.path.join(experiments_path, f))]
+    if '.gitignore' in exper_files:
+        exper_files.remove('.gitignore')
+    full_experiment_paths = [file_request_path + f for f in exper_files]
     response_code = 200
     return make_response(jsonify({'files': full_experiment_paths}), response_code)
