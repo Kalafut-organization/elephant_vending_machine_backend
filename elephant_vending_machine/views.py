@@ -222,6 +222,7 @@ def list_logs():
     logs_path = os.path.join(path_to_current_file, '..', 'logs')
     directory_list = os.listdir(logs_path)
     log_files = [f for f in directory_list if os.path.isfile(os.path.join(logs_path, f))]
+    log_files.sort()
     if '.gitignore' in log_files:
         log_files.remove('.gitignore')
     full_log_paths = [file_request_path + f for f in log_files]
@@ -241,6 +242,7 @@ def list_experiments():
     experiments_path = os.path.join(path_to_current_file, 'static', 'experiments')
     directory_list = os.listdir(experiments_path)
     exper_files = [f for f in directory_list if os.path.isfile(os.path.join(experiments_path, f))]
+    exper_files.sort()
     if '.gitignore' in exper_files:
         exper_files.remove('.gitignore')
     full_experiment_paths = [file_request_path + f for f in exper_files]
