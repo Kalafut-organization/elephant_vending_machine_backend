@@ -216,12 +216,33 @@ def list_logs():
         HTTP response 200 with body {'files': [array of links to files]}.
 
     """
-    file_request_path = request.base_url[:request.base_url.rfind('/')] + "/logs/"
+    resource_route = "/logs/"
+    file_request_path = request.base_url[:request.base_url.rfind('/')] + resource_route
     path_to_current_file = os.path.dirname(os.path.abspath(__file__))
     logs_path = os.path.join(path_to_current_file, '..', 'logs')
     directory_list = os.listdir(logs_path)
-    experiment_files = [f for f in directory_list if os.path.isfile(os.path.join(logs_path, f))]
-    experiment_files.remove('.gitignore')
+    log_files = [f for f in directory_list if os.path.isfile(os.path.join(logs_path, f))]
+    if '.gitignore' in log_files:
+        log_files.remove('.gitignore')
+    full_log_paths = [file_request_path + f for f in log_files]
+    response_code = 200
+    return make_response(jsonify({'files': full_log_paths}), response_code)
+
+@APP.route('/experiment', methods=['GET'])
+def list_experiments():
+    """Returns a list of experiments from the experiments directory
+
+    Returns:
+        HTTP response 200 with body {'files': [array of links to files]}.
+    """
+    resource_route = "/experiment/"
+    file_request_path = request.base_url[:request.base_url.rfind('/')] + resource_route
+    path_to_current_file = os.path.dirname(os.path.abspath(__file__))
+    experiments_path = os.path.join(path_to_current_file, 'static', 'experiments')
+    directory_list = os.listdir(experiments_path)
+    experiment_files = [f for f in directory_list if os.path.isfile(os.path.join(experiments_path, f))]
+    if '.gitignore' in experiment_files:
+        experiment_files.remove('.gitignore')
     full_experiment_paths = [file_request_path + f for f in experiment_files]
     response_code = 200
     return make_response(jsonify({'files': full_experiment_paths}), response_code)
