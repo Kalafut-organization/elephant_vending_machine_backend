@@ -16,18 +16,19 @@ import time
 from gpiozero.pins.pigpio import PiGPIOFactory
 from gpiozero import MotionSensor, LED
 
+LEFT_SCREEN = 9
+MIDDLE_SCREEN = 10
+RIGHT_SCREEN = 11
+MOTION_PIN_VERTICAL = 1
+MOTION_PIN_HORIZONTAL = 2
+LED_PIN = 3
+
 class VendingMachine:
     """Provides an abstraction of the physical 'vending machine'.
 
     This class provides an abstraction of the sensors and screen associated
     with the elephant vending machine.
     """
-    LEFT_SCREEN = 9
-    MIDDLE_SCREEN = 10
-    RIGHT_SCREEN = 11
-    MOTION_PIN_VERTICAL = 1
-    MOTION_PIN_HORIZONTAL = 2
-    LED_PIN = 3
 
     def __init__(self, addresses):
         """Initialize an instance of VendingMachine.
@@ -55,13 +56,14 @@ class VendingMachine:
                 pool.apply_async(func=worker, args=(i,), callback=callback)
             pool.close()
             pool.join()
-            result = [ r in result if r is not None ]
-            return result
+            final_value = [ r for r in result if r is not None ]
+            return final_value
 
     def worker(i):
         """ The function which is used by the pool. It calls the wait_for_detection() method
             for the passed associated SensorGrouping and returns the value returned by that method.
         """
+        print("Called for " + i)
         group = None
         if i == LEFT_SCREEN:
             group = self.left_group
@@ -74,6 +76,7 @@ class VendingMachine:
     def callback(t):
         if t in [ LEFT_SCREEN, MIDDLE_SCREEN, RIGHT_SCREEN ]:
             pool.terminate()
+
     class SensorGrouping:
         """Sensor interactions
 
