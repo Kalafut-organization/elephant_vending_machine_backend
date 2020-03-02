@@ -14,6 +14,7 @@ and associated sensors on the vending machines.
 import multiprocessing as mp
 from gpiozero.pins.pigpio import PiGPIOFactory
 from gpiozero import MotionSensor, LED
+from time import sleep
 
 
 LEFT_SCREEN = 9
@@ -45,6 +46,25 @@ class VendingMachine:
         self.middle_group = SensorGrouping(addresses[1], MIDDLE_SCREEN)
         self.right_group = SensorGrouping(addresses[2], RIGHT_SCREEN)
 
+    def worker(i):
+        """ The function which is used by the pool. It calls the wait_for_detection() method
+            for the passed associated SensorGrouping and returns the value returned by that method.
+        """
+        group = None
+        if i == LEFT_SCREEN:
+            group = self.left_group
+        elif i == MIDDLE_SCREEN:
+            group = self.middle_group
+        else:
+            group = self.right_group
+        return i, group.wait_for_detection_vertical()
+
+    def callback(t):
+        i, quit = t
+        result[i-LEFT_SCREEN] = quit
+        # if quit:
+        #     pool.terminate()
+
     def wait_for_input(self):
         """Waits for input on the IR sensors.
 
@@ -55,29 +75,10 @@ class VendingMachine:
             pool = mp.Pool()
             result = [None] * 3
             for i in range(LEFT_SCREEN, RIGHT_SCREEN):
-                pool.apply_async(func=worker, args=(i,), callback=callback)
+                pool.apply_async(func=VendingMachine.worker, args=(i,), callback=VendingMachine.callback)
             pool.close()
             pool.join()
-            final_value = [r for r in result if r is not None]
-            return final_value
-
-    def worker(self, i):
-        """ The function which is used by the pool. It calls the wait_for_detection() method
-            for the passed associated SensorGrouping and returns the value returned by that method.
-        """
-        print("Called for " + i)
-        group = None
-        if i == LEFT_SCREEN:
-            group = self.left_group
-        elif i == MIDDLE_SCREEN:
-            group = self.middle_group
-        else:
-            group = self.right_group
-        return group.wait_for_detection()
-
-    def callback(self, t):
-        if t in [LEFT_SCREEN, MIDDLE_SCREEN, RIGHT_SCREEN]:
-            pool.terminate()
+            return result
 
 class SensorGrouping:
     """Sensor interactions
@@ -86,12 +87,12 @@ class SensorGrouping:
     screen on the vending machine.
     """
     def __init__(self, address, screen_identifier):
-        self.factory = PiGPIOFactory(host=address)
+        #self.factory = PiGPIOFactory(host=address)
         self.group_id = screen_identifier
-        self.ir_sensor_vertical = MotionSensor(MOTION_PIN_VERTICAL, pin_factory=self.factory)
-        self.ir_sensor_horizontal = MotionSensor(MOTION_PIN_HORIZONTAL, pin_factory=self.factory)
-        self.led = LED(LED_PIN, pin_factory=self.factory)
-        self.correct_stimulus = false
+        #self.ir_sensor_vertical = MotionSensor(MOTION_PIN_VERTICAL, pin_factory=self.factory)
+        #self.ir_sensor_horizontal = MotionSensor(MOTION_PIN_HORIZONTAL, pin_factory=self.factory)
+        #self.led = LED(LED_PIN, pin_factory=self.factory)
+        self.correct_stimulus = False
 
     def change_led(self, state):
         """Controls the lighting of LEDs for a given sensor grouping.
@@ -116,14 +117,20 @@ class SensorGrouping:
         Returns:
             group_id: The group id indicating which SensorGrouping had it's IR sensor(s) triggered first.
         """
-        self.ir_sensor_vertical.wait_for_motion()
+        #self.ir_sensor_vertical.wait_for_motion()
+        sleep(2)
+        print(self.group_id)
         return self.group_id
 
-     def wait_for_detection_horizontal(self):
+    def wait_for_detection_horizontal(self):
         """Waits until the motion sensor is activated and returns the group id
 
         Returns:
             group_id: The group id indicating which SensorGrouping had it's IR sensor(s) triggered first.
         """
-        self.ir_sensor_horizontal.wait_for_motion()
+        #self.ir_sensor_horizontal.wait_for_motion()
+        sleep(2)
         return self.group_id
+
+vend_mach = VendingMachine([1,2,3])
+print(vend_mach.wait_for_input())
