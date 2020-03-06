@@ -44,5 +44,8 @@ OSU CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cin
 1. Connect to your Raspberry Pi
 1. Clone this repo to the Pi
 1. Navigate to the cloned directory
-1. Run `pip install gunicorn3`
-1. Run `gunicorn3 -b 0.0.0.0:8080 elephant_vending_machine:APP`
+1. [Install docker and docker-compose](https://dev.to/rohansawant/installing-docker-and-docker-compose-on-the-raspberry-pi-in-5-simple-steps-3mgl)
+1. Run `docker-compose up --build` to start the containers
+    * This will ensure the containers automatically restart in case of error or reboots.
+    * To stop the containers, and avoid auto-restarting, use `docker-compose down`
+    * Container storage is persisted between runs
