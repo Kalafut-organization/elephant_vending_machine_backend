@@ -3,6 +3,7 @@ import os
 import subprocess
 from flask import jsonify, make_response
 from io import BytesIO
+import json
 
 from elephant_vending_machine import elephant_vending_machine
 from subprocess import CompletedProcess, CalledProcessError
@@ -49,5 +50,7 @@ def test_get_experiemnt_list_all_endpoint(client):
     subprocess.call(["touch", "elephant_vending_machine/static/experiments/test_file.py"])
     subprocess.call(["touch", "elephant_vending_machine/static/experiments/test_file2.py"])
     response = client.get('/experiment')
-    assert make_response(jsonify({'files': ["http://localhost/static/experiment/test_file.py","http://localhost/static/experiment/test_file2.py"]})).data in response.data
+    response_json_files = json.loads(response.data)['files']
+    min_elements_expected = ["http://localhost/static/experiment/test_file.py","http://localhost/static/experiment/test_file2.py"]
+    assert all(elem in response_json_files for elem in min_elements_expected)
     assert response.status_code == 200
