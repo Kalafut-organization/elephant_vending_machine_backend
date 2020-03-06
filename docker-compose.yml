@@ -4,7 +4,7 @@ services:
     build: .
     restart: always
     volumes:
-      - web_static:/elephant_vending_machine/elephant_vending_machine/static
+      - web_static:/elephant_vending_machine/elephant_vending_machine
     networks:
       - web_network
         
@@ -13,9 +13,7 @@ services:
     restart: always
     volumes:
       - web_static:/var/www-data
-      - type: bind
-        source: ./nginx_conf
-        target: /etc/nginx/conf.d
+      - ./nginx_conf:/etc/nginx/conf.d
     networks:
       - web_network
     ports:
