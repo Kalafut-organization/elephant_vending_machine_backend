@@ -4,7 +4,7 @@ services:
     build: .
     restart: always
     volumes:
-      - web_static:/elephant_vending_machine/elephant_vending_machine
+      - web_static:/usr/src/elephant_vending_machine/elephant_vending_machine
     networks:
       - web_network
         

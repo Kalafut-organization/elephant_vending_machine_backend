@@ -216,10 +216,10 @@ def list_logs():
         HTTP response 200 with body {'files': [array of links to files]}.
 
     """
-    resource_route = "/logs/"
+    resource_route = "/static/logs/"
     file_request_path = request.base_url[:request.base_url.rfind('/')] + resource_route
     path_to_current_file = os.path.dirname(os.path.abspath(__file__))
-    logs_path = os.path.join(path_to_current_file, '..', 'logs')
+    logs_path = os.path.join(path_to_current_file, 'static', 'logs')
     directory_list = os.listdir(logs_path)
     log_files = [f for f in directory_list if os.path.isfile(os.path.join(logs_path, f))]
     log_files.sort()
@@ -236,7 +236,7 @@ def list_experiments():
     Returns:
         HTTP response 200 with body {'files': [array of links to files]}.
     """
-    resource_route = "/experiment/"
+    resource_route = "/static/experiment/"
     file_request_path = request.base_url[:request.base_url.rfind('/')] + resource_route
     path_to_current_file = os.path.dirname(os.path.abspath(__file__))
     experiments_path = os.path.join(path_to_current_file, 'static', 'experiments')
