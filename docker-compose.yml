@@ -2,18 +2,17 @@ version: "3.7"
 services:
   webapp:
     build: .
+    restart: always
     volumes:
-      - type: volume
-        source: web_static
-        target: /elephant_vending_machine/static
+      - web_static:/elephant_vending_machine/elephant_vending_machine/static
     networks:
       - web_network
+        
   webproxy:
     image: nginx
+    restart: always
     volumes:
-      - type: volume
-        source: web_static
-        target: /var/www-data
+      - web_static:/var/www-data
       - type: bind
         source: ./nginx_conf
         target: /etc/nginx/conf.d
@@ -24,9 +23,6 @@ services:
   
 networks:
   web_network:
-    ipam:
-      config:
-        - subnet: "192.168.100.0/24"
 
 volumes:
   web_static:
