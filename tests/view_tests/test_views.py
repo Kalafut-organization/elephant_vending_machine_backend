@@ -2,6 +2,7 @@ import pytest
 import os
 import subprocess
 from flask import jsonify, make_response
+import json
 
 from elephant_vending_machine import elephant_vending_machine
 
@@ -37,5 +38,7 @@ def test_get_log_endpoint(client):
     subprocess.call(["touch", "logs/test_file.csv"])
     subprocess.call(["touch", "logs/test_file2.csv"])
     response = client.get('/log')
-    assert make_response(jsonify({'files': ["http://localhost/logs/test_file2.csv","http://localhost/logs/unittest.csv","http://localhost/logs/test_file.csv"]})).data in response.data
+    response_json_files = json.loads(response.data)['files']
+    min_elements_expected = ["http://localhost/logs/test_file.csv","http://localhost/logs/test_file2.csv","http://localhost/logs/unittest.csv"]
+    assert all(elem in response_json_files for elem in min_elements_expected)
     assert response.status_code == 200

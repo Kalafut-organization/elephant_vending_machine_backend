@@ -1,5 +1,9 @@
 import pytest
+import os
+import subprocess
+from flask import jsonify, make_response
 from io import BytesIO
+import json
 
 from elephant_vending_machine import elephant_vending_machine
 from subprocess import CompletedProcess, CalledProcessError
@@ -13,6 +17,8 @@ def client():
 
     with elephant_vending_machine.APP.test_client() as client:
         yield client
+        subprocess.call(["rm","elephant_vending_machine/static/experiments/test_file.py"])
+        subprocess.call(["rm","elephant_vending_machine/static/experiments/test_file2.py"])
 
 def test_post_experiment_route_no_file(client):
     response = client.post('/experiment')
@@ -37,3 +43,14 @@ def test_post_experiment_route_with_file(monkeypatch, client):
     response = client.post('/experiment', data=data) 
     assert response.status_code == 201
     assert b'Success: Experiment saved.' in response.data
+
+def test_get_experiemnt_list_all_endpoint(client):
+    path_to_current_file = os.path.dirname(os.path.abspath(__file__))
+    save_path = os.path.join(path_to_current_file, '..','..','elephant_vending_machine','static','experiments')
+    subprocess.call(["touch", "elephant_vending_machine/static/experiments/test_file.py"])
+    subprocess.call(["touch", "elephant_vending_machine/static/experiments/test_file2.py"])
+    response = client.get('/experiment')
+    response_json_files = json.loads(response.data)['files']
+    min_elements_expected = ["http://localhost/experiment/test_file.py","http://localhost/experiment/test_file2.py"]
+    assert all(elem in response_json_files for elem in min_elements_expected)
+    assert response.status_code == 200
