@@ -8,6 +8,7 @@ a lot of routes.
 # Circular import OK here. See https://flask.palletsprojects.com/en/1.1.x/patterns/packages/
 # pylint: disable=cyclic-import
 from datetime import datetime
+import importlib.util
 import os
 import subprocess
 from subprocess import CalledProcessError
@@ -21,6 +22,10 @@ ALLOWED_EXPERIMENT_EXTENSIONS = {'py'}
 IMAGE_UPLOAD_FOLDER = '/static/img'
 EXPERIMENT_UPLOAD_FOLDER = '/static/experiments'
 
+class Machine:
+    def print(self, str):
+        print(str)
+
 @APP.route('/run-trial', methods=['POST'])
 def run_trial():
     """Responds with 'Running {trial_name}' string
@@ -33,22 +38,36 @@ def run_trial():
         HTTP response 400 with body {"message":"No trial_name specified"}
 
     """
+    print('I did this')
+    trial_name = request.args.get('trial_name')
+    log_filename = str(datetime.utcnow()) + ' ' + trial_name + '.csv'
+    exp_logger = create_experiment_logger(log_filename)
+    machine = Machine()
 
-    response = ""
-    response_code = 400
-    if request.args.get('trial_name') is not None:
-        trial_name = request.args.get('trial_name')
-        log_filename = str(datetime.utcnow()) + ' ' + trial_name + '.csv'
-        exp_logger = create_experiment_logger(log_filename)
+    exp_logger.info("Experiment %s started", trial_name)
 
-        exp_logger.info("Experiment %s started", trial_name)
+    spec = importlib.util.spec_from_file_location("start_demo", "elephant_vending_machine/static/experiments/start_demo.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.run_experiment(exp_logger, machine)
 
-        response = 'Running ' + str(trial_name)
-        response_code = 200
-    else:
-        response = 'No trial_name specified'
-        response_code = 400
-    return make_response(jsonify({'message': response}), response_code)
+    return "it worked"
+
+    # response = ""
+    # response_code = 400
+    # if request.args.get('trial_name') is not None:
+    #     trial_name = request.args.get('trial_name')
+    #     log_filename = str(datetime.utcnow()) + ' ' + trial_name + '.csv'
+    #     exp_logger = create_experiment_logger(log_filename)
+
+    #     exp_logger.info("Experiment %s started", trial_name)
+
+    #     response = 'Running ' + str(trial_name)
+    #     response_code = 200
+    # else:
+    #     response = 'No trial_name specified'
+    #     response_code = 400
+    # return make_response(jsonify({'message': response}), response_code)
 
 def add_remote_image(local_image_path, filename):
     """Adds an image to the remote hosts defined in flask config.
