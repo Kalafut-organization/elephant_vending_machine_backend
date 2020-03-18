@@ -22,52 +22,66 @@ ALLOWED_EXPERIMENT_EXTENSIONS = {'py'}
 IMAGE_UPLOAD_FOLDER = '/static/img'
 EXPERIMENT_UPLOAD_FOLDER = '/static/experiments'
 
-class Machine:
-    def print(self, str):
-        print(str)
+@APP.route('/run-experiment', methods=['POST'])
+def run_experiment():
+    """Start execution of experiment python file specified by user
 
-@APP.route('/run-trial', methods=['POST'])
-def run_trial():
-    """Responds with 'Running {trial_name}' string
+    **Example request**:
 
-    All requests sent to this route should have a trial_name in
-    the query string, otherwise a 400 error will be returned
+    .. sourcecode::
 
-    Returns:
-        HTTP response 200 with body {"message":"Running <trial_name>"} or
-        HTTP response 400 with body {"message":"No trial_name specified"}
+      POST /run-experiment?name=example_experiment HTTP/1.1
+      Host: localhost:5000
+      Accept-Encoding: gzip, deflate, br
+      Content-Length:
+      Connection: keep-alive
 
+    **Example response**:
+
+    .. sourcecode:: http
+
+      HTTP/1.0 200 OK
+      Content-Type: application/json; charset=utf-8
+      Content-Length: 88
+      Server: Werkzeug/0.16.1 Python/3.8.1
+      Date: Thu, 13 Feb 2020 15:35:32 GMT
+
+      {
+        "log_file": "2020-03-17 05:15:06.558356 example_experiment.csv",
+        "message": "Running example_experiment"
+      }
+
+    All requests sent to this route should have an experiment file
+    included as a query parameter, otherwise a 400 error will be returned
+
+    :status 200: experiment started
+    :status 400: malformed request
     """
-    print('I did this')
-    trial_name = request.args.get('trial_name')
-    log_filename = str(datetime.utcnow()) + ' ' + trial_name + '.csv'
-    exp_logger = create_experiment_logger(log_filename)
-    machine = Machine()
+    response = ""
+    response_code = 400
+    if request.args.get('name') is not None:
+        experiment_name = request.args.get('name')
+        log_filename = str(datetime.utcnow()) + ' ' + experiment_name + '.csv'
+        exp_logger = create_experiment_logger(log_filename)
 
-    exp_logger.info("Experiment %s started", trial_name)
+        exp_logger.info('Experiment %s started', experiment_name)
 
-    spec = importlib.util.spec_from_file_location("start_demo", "elephant_vending_machine/static/experiments/start_demo.py")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    module.run_experiment(exp_logger, machine)
+        spec = importlib.util.spec_from_file_location(
+            experiment_name,
+            f'elephant_vending_machine/static/experiments/{experiment_name}.py')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
 
-    return "it worked"
+        # TODO: Instantiate actual vending machine
+        vending_machine = VendingMachine()
+        module.run_experiment(exp_logger, vending_machine)
 
-    # response = ""
-    # response_code = 400
-    # if request.args.get('trial_name') is not None:
-    #     trial_name = request.args.get('trial_name')
-    #     log_filename = str(datetime.utcnow()) + ' ' + trial_name + '.csv'
-    #     exp_logger = create_experiment_logger(log_filename)
-
-    #     exp_logger.info("Experiment %s started", trial_name)
-
-    #     response = 'Running ' + str(trial_name)
-    #     response_code = 200
-    # else:
-    #     response = 'No trial_name specified'
-    #     response_code = 400
-    # return make_response(jsonify({'message': response}), response_code)
+        response = 'Running ' + str(experiment_name)
+        response_code = 200
+    else:
+        response = 'No experiment_name specified'
+        response_code = 400
+    return make_response(jsonify({'message': response, 'log_file': log_filename}), response_code)
 
 def add_remote_image(local_image_path, filename):
     """Adds an image to the remote hosts defined in flask config.
