@@ -39,6 +39,11 @@ OSU CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cin
 1. Follow this reference: https://tutorials-raspberrypi.com/connect-control-raspberry-pi-ws2812-rgb-led-strips/
 1. For our purposes, we did not use an external power source and found the power provided by the pi to be sufficient.
 
+## Dependencies for Image Display
+1. Image display is done by utilizing feh: https://linux.die.net/man/1/feh
+1. To install feh, run `sudo apt install feh` while connected via SSH to the pi.
+* Note, this will need to be done on each of the remote pis only, the web server does not require installion of feh.
+
 ## Test suite
 1. To execute the test suite run `coverage run -m pytest`
 1. To view coverage report after tests have been run use `coverage report`
