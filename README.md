@@ -35,6 +35,10 @@ OSU CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cin
     * Now to manually enable remote access at this time, run `sudo systemctl start pigpiod`
 1. For more information, visit [this documentation](https://gpiozero.readthedocs.io/en/stable/remote_gpio.html)
 
+## Configuring Remote Pis for RGB LED Strip Interfacing
+1. Follow this reference: https://tutorials-raspberrypi.com/connect-control-raspberry-pi-ws2812-rgb-led-strips/
+1. For our purposes, we did not use an external power source and found the power provided by the pi to be sufficient.
+
 ## Test suite
 1. To execute the test suite run `coverage run -m pytest`
 1. To view coverage report after tests have been run use `coverage report`
