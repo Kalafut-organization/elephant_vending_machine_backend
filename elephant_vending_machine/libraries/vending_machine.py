@@ -26,6 +26,7 @@ LED_PIN = 3
 RED = 33
 GREEN = 34
 
+
 def worker(i, addresses):
     """ The function which is used by the pool. It calls the wait_for_detection() method
         for the passed associated SensorGrouping and returns the value returned by that method.
@@ -39,6 +40,7 @@ def worker(i, addresses):
         group = SensorGrouping(addresses[2], RIGHT_SCREEN)
     result = group.wait_for_detection()
     return result
+
 
 class VendingMachine:
     """Provides an abstraction of the physical 'vending machine'.
@@ -89,8 +91,9 @@ class VendingMachine:
         selection = 'timeout'
         self.pool = mp.Pool()
         for group in groups:
-            self.pool.apply_async(func=worker, args=(group.get_group_id, self.addresses), callback=self.callback)
-        while self.result == None:
+            self.pool.apply_async(func=worker, args=(
+                group.get_group_id, self.addresses), callback=self.callback)
+        while self.result is None:
             current_time = time.perf_counter()
             if current_time - start_time > timeout:
                 self.pool.terminate()
@@ -106,13 +109,15 @@ class VendingMachine:
         return selection
 
 
-
 class SensorGrouping:
     """Provides an abstraction of the devices controlled by Raspberry Pis.
 
     Pi's will have an LED strip, a distance measurement device, and a screen.
     This class will provide utilities for interacting with individual sensors.
     """
+
+    # This class is only one attribute over the recommended limit and all are needed.
+    # pylint: disable=too-many-instance-attributes
     def __init__(self, address, screen_identifier, config=None):
         """Initialize an instance of VendingMachine.
 
@@ -140,6 +145,9 @@ class SensorGrouping:
         """
 
     def get_group_id(self):
+        """Getter for SensorGrouping id
+
+        """
         return self.group_id
 
     def display_on_screen(self, stimuli_name, correct_answer):
@@ -155,10 +163,12 @@ class SensorGrouping:
         if self.pid_of_previous_display_command is not None:
             ssh_remove_command = f'''ssh -oStrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
                 pi@{self.address} kill {self.pid_of_previous_display_command}'''
-            subprocess.run(ssh_remove_command, shell=True)
+            subprocess.run(ssh_remove_command, check=True, shell=True)
         ssh_display_command = f'''ssh -oStrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
-            pi@{self.address} feh {self.config['REMOTE_IMAGE_DIRECTORY']}/{stimuli_name} | echo $! &'''
-        self.pid_of_previous_display_command = subprocess.check_output(ssh_display_command, shell=True)
+            pi@{self.address} feh {self.config['REMOTE_IMAGE_DIRECTORY']}/{stimuli_name} | \
+                echo $! &'''
+        self.pid_of_previous_display_command = subprocess.check_output(
+            ssh_display_command, shell=True)
 
     def wait_for_detection(self):
         """Waits until the motion sensor is activated and returns the group id
