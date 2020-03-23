@@ -151,7 +151,8 @@ class SensorGrouping:
         )
         with shell:
             shell.run(
-                ['sudo', 'PYTHONPATH=\".:build/lib.linux-armv71-2.7\"', 'python', f'''{self.config['REMOTE_LED_SCRIPT_DIRECTORY']}/{color}.py'''])
+                ['sudo', 'PYTHONPATH=\".:build/lib.linux-armv71-2.7\"',
+                 'python', f'''{self.config['REMOTE_LED_SCRIPT_DIRECTORY']}/{color}.py'''])
 
     def get_group_id(self):
         """Getter for SensorGrouping id
