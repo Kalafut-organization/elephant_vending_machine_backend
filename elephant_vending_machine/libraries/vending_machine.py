@@ -13,7 +13,7 @@ and associated sensors on the vending machines.
 
 import multiprocessing as mp
 import time
-import subprocess
+import spur
 from gpiozero.pins.pigpio import PiGPIOFactory
 from gpiozero import MotionSensor, LED
 
@@ -137,12 +137,21 @@ class SensorGrouping:
         self.config = config
         self.pid_of_previous_display_command = None
 
-    def change_led(self, state):
+    def change_led(self, color):
         """Controls the lighting of LEDs for a given sensor grouping.
 
         Parameters:
             state (int): The desired state of the LED.
         """
+        shell = spur.SshShell(
+            hostname=self.address,
+            username='pi',
+            missing_host_key=spur.ssh.MissingHostKey.accept,
+            load_system_host_keys=False
+        )
+        with shell:
+            shell.run(
+                ['sudo', 'PYTHONPATH=\".:build/lib.linux-armv71-2.7\"', 'python', f'''{self.config['REMOTE_LED_SCRIPT_DIRECTORY']}/{color}.py'''])
 
     def get_group_id(self):
         """Getter for SensorGrouping id
@@ -160,21 +169,23 @@ class SensorGrouping:
             correct_answer (boolean): Denotes whether this is the desired selection.
         """
         self.correct_stimulus = correct_answer
-        if self.pid_of_previous_display_command is not None:
-            ssh_remove_command = f'''ssh -oStrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
-                pi@{self.address} kill {self.pid_of_previous_display_command}'''
-            subprocess.run(ssh_remove_command, check=True, shell=True)
-        ssh_display_command = f'''ssh -oStrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
-            pi@{self.address} feh {self.config['REMOTE_IMAGE_DIRECTORY']}/{stimuli_name} | \
-                echo $! &'''
-        self.pid_of_previous_display_command = subprocess.check_output(
-            ssh_display_command, shell=True)
+        shell = spur.SshShell(
+            hostname=self.address,
+            username='pi',
+            missing_host_key=spur.ssh.MissingHostKey.accept,
+            load_system_host_keys=False
+        )
+        with shell:
+            result = shell.spawn(['feh', '-F',
+                                  f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{stimuli_name}''',
+                                  '&'], update_env={'DISPLAY': ':0'}, store_pid=True).pid
+        self.pid_of_previous_display_command = int(result)
 
     def wait_for_detection(self):
         """Waits until the motion sensor is activated and returns the group id
 
         Returns:
             group_id: The group id indicating which
-                        SensorGrouping had it's IR sensor(s) triggered first.
+                        SensorGrouping had it's motion detector triggered first.
         """
         return self.group_id
