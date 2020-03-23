@@ -65,7 +65,7 @@ def create_experiment_logger(file_name):
     """
 
     log_level = logging.INFO
-    experiment_log_path = 'logs/'
+    experiment_log_path = 'elephant_vending_machine/static/logs/'
     logger = logging.getLogger('experiment_logger')
     logger.setLevel(log_level)
     experiment_log_file_handler = FileHandler(experiment_log_path + file_name)

@@ -51,6 +51,6 @@ def test_get_experiemnt_list_all_endpoint(client):
     subprocess.call(["touch", "elephant_vending_machine/static/experiments/test_file2.py"])
     response = client.get('/experiment')
     response_json_files = json.loads(response.data)['files']
-    min_elements_expected = ["http://localhost/experiment/test_file.py","http://localhost/experiment/test_file2.py"]
+    min_elements_expected = ["http://localhost/static/experiment/test_file.py","http://localhost/static/experiment/test_file2.py"]
     assert all(elem in response_json_files for elem in min_elements_expected)
     assert response.status_code == 200

@@ -132,7 +132,7 @@ dmypy.json
 .vscode
 
 # Experiment logs
-/logs/*
+/elephant_vending_machine/static/logs/*
 
 # Images in upload folder
 /elephant_vending_machine/static/img/*
