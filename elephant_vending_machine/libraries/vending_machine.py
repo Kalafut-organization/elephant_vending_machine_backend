@@ -13,9 +13,9 @@ and associated sensors on the vending machines.
 
 import multiprocessing as mp
 import time
-import spur
 from gpiozero.pins.pigpio import PiGPIOFactory
 from gpiozero import MotionSensor, LED
+import spur
 
 
 LEFT_SCREEN = 1
