@@ -1,14 +1,11 @@
-"""Abstract GPIO pin setup and interactions
+"""Abstraction of physical "elephant vending machine"
 
-This module contains funcitonality required to create
-a vending machine instance, with nested SensorGrouping
-instances used as an abstraction of the different screens
-and associated sensors on the vending machines.
+This module  allows for display of images, control of LEDs,
+and detecting motion sensor input on the machine.
 
 .. todo::
 
-   Finish implementing
-   Determine pin numbers
+   Integrate sensors dependent upon sensor interface info
 """
 
 import multiprocessing as mp
@@ -27,14 +24,23 @@ RED = 33
 GREEN = 34
 
 
-def worker(i, addresses):
+def worker(grouping_number, addresses):
     """ The function which is used by the pool. It calls the wait_for_detection() method
         for the passed associated SensorGrouping and returns the value returned by that method.
+
+        Parameters:
+            grouping_number (int): The integer representing which SensorGrouping the worker
+                should monitor, value should be one of: LEFT_SCREEN, MIDDLE_SCREEN, RIGHT_SCREEN
+            addresses (list): A list of local IP addresses of the Raspberry Pis
+
+        Returns:
+            int: One of LEFT_SCREEN, MIDDLE_SCREEN, or RIGHT_SCREEN, corresponding to
+                the SensorGrouping which was selected
     """
     group = None
-    if i == LEFT_SCREEN:
+    if grouping_number == LEFT_SCREEN:
         group = SensorGrouping(addresses[0], LEFT_SCREEN)
-    elif i == MIDDLE_SCREEN:
+    elif grouping_number == MIDDLE_SCREEN:
         group = SensorGrouping(addresses[1], MIDDLE_SCREEN)
     else:
         group = SensorGrouping(addresses[2], RIGHT_SCREEN)
@@ -45,25 +51,32 @@ def worker(i, addresses):
 class VendingMachine:
     """Provides an abstraction of the physical 'vending machine'.
 
-    This class provides an abstraction of the sensors and screen associated
-    with the elephant vending machine.
+    This class provides an abstraction of the overall machine, exposing SensorGrouping attributes
+    for control of individual groupings of screen/sensor/LED strip.
+
+    Parameters:
+        addresses (list): A list of local IP addresses of the Raspberry Pis
+        config (dict): A dictionary with configuration values, should contain
+            REMOTE_LED_SCRIPT_DIRECTORY, a string representing the absolute path
+            to the directory on the remote pis where the LED scripts are stored,
+            and REMOTE_IMAGE_DIRECTORY, a string representing the absolute path
+            to where stimuli images are stored on the remote pis. In the event these
+            values are not passed in, defaults will be assigned as a fallback.
     """
 
     def __init__(self, addresses, config):
-        """Initialize an instance of VendingMachine.
-
-        Provides an interface to the different sensors in divided by their associated screen.
-
-        Parameters:
-            addresses (list): A list of local IP addresses of the Raspberry Pis
-            config (dict): The configuration values of the Flask server
-        """
-
         self.addresses = addresses
         self.left_group = SensorGrouping(addresses[0], LEFT_SCREEN, config)
         self.middle_group = SensorGrouping(addresses[1], MIDDLE_SCREEN, config)
         self.right_group = SensorGrouping(addresses[2], RIGHT_SCREEN, config)
-        self.config = config
+        if config is None:
+            self.config = {}
+        else:
+            self.config = config
+        if 'REMOTE_IMAGE_DIRECTORY' not in self.config:
+            self.config['REMOTE_IMAGE_DIRECTORY'] = '/home/pi/elephant_vending_machine/images'
+        if 'REMOTE_LED_SCRIPT_DIRECTORY' not in self.config:
+            self.config['REMOTE_LED_SCRIPT_DIRECTORY'] = '/home/pi/rpi_ws281x/python'
         self.result = None
         self.pool = None
 
@@ -72,6 +85,9 @@ class VendingMachine:
         and is passed the return value from the worker. As soon as this is called, the
         selection has been determined and the process pool is terminated.
 
+        Parameters:
+            selection (int): The return value of worker(), expected to be one
+                of LEFT_SCREEN, MIDDLE_SCREEN, RIGHT_SCREEN.
         """
         quit_selection = selection
         self.result = quit_selection
@@ -82,8 +98,12 @@ class VendingMachine:
         """Waits for input on the motion sensors. If no motion is detected by the specified
         time to wait, returns with a result to indicate this.
 
+        Parameters:
+            groups (list[SensorGrouping]): The SensorGroupings which should be monitored for input.
+            timeout (int): The amount of time in seconds to wait for input before timing out and
+                returning 'timeout'.
         Returns:
-            selection: A string with value 'left', 'middle', 'right', or 'timeout', indicating
+            String: A string with value 'left', 'middle', 'right', or 'timeout', indicating
             the selection or lack thereof.
         """
         self.result = None
@@ -114,20 +134,20 @@ class SensorGrouping:
 
     Pi's will have an LED strip, a distance measurement device, and a screen.
     This class will provide utilities for interacting with individual sensors.
+
+    Parameters:
+        address (int): The local IP address of the Pi controlling the SensorGrouping
+        config (dict): A dictionary with configuration values, should contain
+            REMOTE_LED_SCRIPT_DIRECTORY, a string representing the absolute path
+            to the directory on the remote pis where the LED scripts are stored,
+            and REMOTE_IMAGE_DIRECTORY, a string representing the absolute path
+            to where stimuli images are stored on the remote pis. In the event these
+            values are not passed in, defaults will be assigned as a fallback.
     """
 
-    # This class is only one attribute over the recommended limit and all are needed.
+    # This class is only slightly over the recommended attribute limit and all are needed.
     # pylint: disable=too-many-instance-attributes
     def __init__(self, address, screen_identifier, config=None):
-        """Initialize an instance of VendingMachine.
-
-        Provides an interface to the different sensors in divided by their associated screen.
-
-         Parameters:
-            address (str): The local network address of the Raspberry Pi controlling the sensors
-            screen_identifier (int): A integer
-            config (dict): The configuration values of the Flask server
-        """
         self.factory = PiGPIOFactory(host=address)
         self.group_id = screen_identifier
         self.sensor = MotionSensor(MOTION_PIN, pin_factory=self.factory)
