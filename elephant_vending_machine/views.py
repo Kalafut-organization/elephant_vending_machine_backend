@@ -153,8 +153,33 @@ def upload_image():
 def list_images():
     """Returns a list of images from the images directory
 
-    Returns:
-        HTTP response 200 with body {'files': [array of links to files]}.
+    **Example request**:
+
+    .. sourcecode::
+
+      GET /image HTTP/1.1
+      Host: 127.0.0.1
+      Accept-Encoding: gzip, deflate, br
+      Connection: keep-alive
+
+    **Example response**:
+
+    .. sourcecode:: http
+
+      HTTP/1.0 200 OK
+      Content-Type: application/json; charset=utf-8
+      Content-Length: 212
+      Server: Werkzeug/0.16.1 Python/3.8.1
+      Date: Thu, 13 Feb 2020 15:35:32 GMT
+
+      {
+        "files": [
+          "http://localhost/static/img/allBlack.png",
+          "http://localhost/static/img/whiteStimuli.png"
+        ]
+      }
+
+    :status 200: image file list successfully returned
     """
     resource_route = "/static/img/"
     file_request_path = request.base_url[:request.base_url.rfind('/')] + resource_route
@@ -228,33 +253,37 @@ def upload_experiment():
             response = "Error with request: File extension not allowed."
     return  make_response(jsonify({'message': response}), response_code)
 
-@APP.route('/log', methods=['GET'])
-def list_logs():
-    """Returns a list of log resources from the logs directory.
-
-    Returns:
-        HTTP response 200 with body {'files': [array of links to files]}.
-
-    """
-    resource_route = "/static/logs/"
-    file_request_path = request.base_url[:request.base_url.rfind('/')] + resource_route
-    path_to_current_file = os.path.dirname(os.path.abspath(__file__))
-    logs_path = os.path.join(path_to_current_file, 'static', 'logs')
-    directory_list = os.listdir(logs_path)
-    log_files = [f for f in directory_list if os.path.isfile(os.path.join(logs_path, f))]
-    log_files.sort()
-    if '.gitignore' in log_files:
-        log_files.remove('.gitignore')
-    full_log_paths = [file_request_path + f for f in log_files]
-    response_code = 200
-    return make_response(jsonify({'files': full_log_paths}), response_code)
-
 @APP.route('/experiment', methods=['GET'])
 def list_experiments():
     """Returns a list of experiments from the experiments directory
 
-    Returns:
-        HTTP response 200 with body {'files': [array of links to files]}.
+    **Example request**:
+
+    .. sourcecode::
+
+      GET /experiment HTTP/1.1
+      Host: 127.0.0.1
+      Accept-Encoding: gzip, deflate, br
+      Connection: keep-alive
+
+    **Example response**:
+
+    .. sourcecode:: http
+
+      HTTP/1.0 200 OK
+      Content-Type: application/json; charset=utf-8
+      Content-Length: 212
+      Server: Werkzeug/0.16.1 Python/3.8.1
+      Date: Thu, 13 Feb 2020 15:35:32 GMT
+
+      {
+        "files": [
+          "http://localhost/static/experiments/exampleExperiment.py",
+          "http://localhost/static/experiments/testColorPerception.py"
+        ]
+      }
+
+    :status 200: experiment file list successfully returned
     """
     resource_route = "/static/experiment/"
     file_request_path = request.base_url[:request.base_url.rfind('/')] + resource_route
@@ -268,3 +297,48 @@ def list_experiments():
     full_experiment_paths = [file_request_path + f for f in exper_files]
     response_code = 200
     return make_response(jsonify({'files': full_experiment_paths}), response_code)
+
+@APP.route('/log', methods=['GET'])
+def list_logs():
+    """Returns a list of log resources from the logs directory.
+
+    **Example request**:
+
+    .. sourcecode::
+
+      GET /log HTTP/1.1
+      Host: 127.0.0.1
+      Accept-Encoding: gzip, deflate, br
+      Connection: keep-alive
+
+    **Example response**:
+
+    .. sourcecode:: http
+
+      HTTP/1.0 200 OK
+      Content-Type: application/json; charset=utf-8
+      Content-Length: 212
+      Server: Werkzeug/0.16.1 Python/3.8.1
+      Date: Thu, 13 Feb 2020 15:35:32 GMT
+
+      {
+        "files": [
+          "http://localhost:5000/static/logs/2020-03-17 04:26:02.085651 exampleExperiment.csv",
+          "http://localhost:5000/static/logs/2020-03-17 04:27:04.019992 exampleExperiment.csv"
+        ]
+      }
+
+    :status 200: log file list successfully returned
+    """
+    resource_route = "/static/logs/"
+    file_request_path = request.base_url[:request.base_url.rfind('/')] + resource_route
+    path_to_current_file = os.path.dirname(os.path.abspath(__file__))
+    logs_path = os.path.join(path_to_current_file, 'static', 'logs')
+    directory_list = os.listdir(logs_path)
+    log_files = [f for f in directory_list if os.path.isfile(os.path.join(logs_path, f))]
+    log_files.sort()
+    if '.gitignore' in log_files:
+        log_files.remove('.gitignore')
+    full_log_paths = [file_request_path + f for f in log_files]
+    response_code = 200
+    return make_response(jsonify({'files': full_log_paths}), response_code)
