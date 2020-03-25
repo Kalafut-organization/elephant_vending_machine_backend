@@ -157,7 +157,7 @@ class SensorGrouping:
         self.config = config
         self.pid_of_previous_display_command = None
 
-    def LED_color_with_time(self, red, green, blue, time):
+    def led_color_with_time(self, red, green, blue, display_time):
         """Displays the color specified by the given RGB values for *time* seconds.
 
         Parameters:
@@ -167,7 +167,7 @@ class SensorGrouping:
                 green should be in the RGB color display.
             blue (int): A number in the range 0-255 specifying how much
                 blue should be in the RGB color display.
-            time (int): The number of seconds that LEDs should display the color
+            display_time (int): The number of seconds that LEDs should display the color
                 before returning to an "off" state.
         """
         shell = spur.SshShell(
@@ -177,9 +177,12 @@ class SensorGrouping:
             load_system_host_keys=False
         )
         with shell:
-            shell.run(
+            shell.spawn(
                 ['sudo', 'PYTHONPATH=\".:build/lib.linux-armv71-2.7\"',
-                 'python', f'''{self.config['REMOTE_LED_SCRIPT_DIRECTORY']}/{color}.py'''])
+                 'python',
+                 # pylint: disable=line-too-long
+                 # I don't see a good way to break this line up.
+                 f'''{self.config['REMOTE_LED_SCRIPT_DIRECTORY']}/led.py {red} {green} {blue} {display_time}'''])
 
     def get_group_id(self):
         """Getter for SensorGrouping id
