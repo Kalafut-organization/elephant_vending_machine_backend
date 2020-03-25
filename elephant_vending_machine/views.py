@@ -149,6 +149,26 @@ def upload_image():
             response = "Error with request: File extension not allowed."
     return  make_response(jsonify({'message': response}), response_code)
 
+@APP.route('/image', methods=['GET'])
+def list_images():
+    """Returns a list of images from the images directory
+
+    Returns:
+        HTTP response 200 with body {'files': [array of links to files]}.
+    """
+    resource_route = "/static/img/"
+    file_request_path = request.base_url[:request.base_url.rfind('/')] + resource_route
+    path_to_current_file = os.path.dirname(os.path.abspath(__file__))
+    images_path = os.path.join(path_to_current_file, 'static', 'img')
+    directory_list = os.listdir(images_path)
+    image_files = [f for f in directory_list if os.path.isfile(os.path.join(images_path, f))]
+    image_files.sort()
+    if '.gitignore' in image_files:
+        image_files.remove('.gitignore')
+    full_image_paths = [file_request_path + f for f in image_files]
+    response_code = 200
+    return make_response(jsonify({'files': full_image_paths}), response_code)
+
 @APP.route('/experiment', methods=['POST'])
 def upload_experiment():
     """Return JSON body with message indicating result of experiment upload request
