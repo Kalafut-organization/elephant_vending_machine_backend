@@ -157,11 +157,18 @@ class SensorGrouping:
         self.config = config
         self.pid_of_previous_display_command = None
 
-    def change_led(self, color):
-        """Controls the lighting of LEDs for a given sensor grouping.
+    def LED_color_with_time(self, red, green, blue, time):
+        """Displays the color specified by the given RGB values for *time* seconds.
 
         Parameters:
-            state (int): The desired state of the LED.
+            red (int): A number in the range 0-255 specifying how much
+                red should be in the RGB color display.
+            green (int): A number in the range 0-255 specifying how much
+                green should be in the RGB color display.
+            blue (int): A number in the range 0-255 specifying how much
+                blue should be in the RGB color display.
+            time (int): The number of seconds that LEDs should display the color
+                before returning to an "off" state.
         """
         shell = spur.SshShell(
             hostname=self.address,
