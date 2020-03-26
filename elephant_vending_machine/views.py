@@ -300,7 +300,7 @@ def list_experiments():
 
 @APP.route('/log', methods=['GET'])
 def list_logs():
-    """Returns a list of log resources from the logs directory.
+    """Returns a list of log resources from the log directory.
 
     **Example request**:
 
@@ -323,17 +323,17 @@ def list_logs():
 
       {
         "files": [
-          "http://localhost:5000/static/logs/2020-03-17 04:26:02.085651 exampleExperiment.csv",
-          "http://localhost:5000/static/logs/2020-03-17 04:27:04.019992 exampleExperiment.csv"
+          "http://localhost:5000/static/log/2020-03-17 04:26:02.085651 exampleExperiment.csv",
+          "http://localhost:5000/static/log/2020-03-17 04:27:04.019992 exampleExperiment.csv"
         ]
       }
 
     :status 200: log file list successfully returned
     """
-    resource_route = "/static/logs/"
+    resource_route = "/static/log/"
     file_request_path = request.base_url[:request.base_url.rfind('/')] + resource_route
     path_to_current_file = os.path.dirname(os.path.abspath(__file__))
-    logs_path = os.path.join(path_to_current_file, 'static', 'logs')
+    logs_path = os.path.join(path_to_current_file, 'static', 'log')
     directory_list = os.listdir(logs_path)
     log_files = [f for f in directory_list if os.path.isfile(os.path.join(logs_path, f))]
     log_files.sort()
