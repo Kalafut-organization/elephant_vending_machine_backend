@@ -288,15 +288,15 @@ def delete_experiment(filename):
     response_code = 400
     response = ""
     if filename in os.listdir(experiment_directory):
-      try:
-        os.remove(os.path.join(experiment_directory, filename))
-        response = f"""File {filename} was successfully deleted."""
-        response_code = 200
-      except IsADirectoryError:
-        response = f"""{filename} exists, but is a directory and not a file. Deletion failed."""
+        try:
+            os.remove(os.path.join(experiment_directory, filename))
+            response = f"""File {filename} was successfully deleted."""
+            response_code = 200
+        except IsADirectoryError:
+            response = f"""{filename} exists, but is a directory and not a file. Deletion failed."""
     else:
-      response = f"""File {filename} does not exist and so couldn't be deleted."""
-    return make_response(jsonify({ 'message': response}), response_code)
+        response = f"""File {filename} does not exist and so couldn't be deleted."""
+    return make_response(jsonify({'message': response}), response_code)
 
 @APP.route('/experiment', methods=['GET'])
 def list_experiments():
