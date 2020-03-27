@@ -253,6 +253,51 @@ def upload_experiment():
             response = "Error with request: File extension not allowed."
     return  make_response(jsonify({'message': response}), response_code)
 
+@APP.route('/experiment/<filename>', methods=['DELETE'])
+def delete_experiment(filename):
+    """Returns a message indicating whether deletion of the specified file was successful
+
+    **Example request**:
+
+    .. sourcecode::
+
+      DELETE /experiment/empty.py HTTP/1.1
+      Host: 127.0.0.1
+      Accept-Encoding: gzip, deflate, br
+      Connection: keep-alive
+
+    **Example response**:
+
+    .. sourcecode:: http
+
+      HTTP/1.0 200 OK
+      Content-Type: application/json
+      Content-Length: 59
+      Access-Control-Allow-Origin: *
+      Server: Werkzeug/0.16.1 Python/3.8.2
+      Date: Fri, 27 Mar 2020 16:13:42 GMT
+
+      {
+        "message": "File empty.py was successfully deleted."
+      }
+
+    :status 200: experiment file list successfully deleted
+    :status 400: file with specified name could not be found
+    """
+    experiment_directory = os.path.dirname(os.path.abspath(__file__)) + EXPERIMENT_UPLOAD_FOLDER
+    response_code = 400
+    response = ""
+    if filename in os.listdir(experiment_directory):
+      try:
+        os.remove(os.path.join(experiment_directory, filename))
+        response = f"""File {filename} was successfully deleted."""
+        response_code = 200
+      except IsADirectoryError:
+        response = f"""{filename} exists, but is a directory and not a file. Deletion failed."""
+    else:
+      response = f"""File {filename} does not exist and so couldn't be deleted."""
+    return make_response(jsonify({ 'message': response}), response_code)
+
 @APP.route('/experiment', methods=['GET'])
 def list_experiments():
     """Returns a list of experiments from the experiment directory
