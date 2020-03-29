@@ -10,18 +10,18 @@ and detecting motion sensor input on the machine.
 
 import multiprocessing as mp
 import time
-from gpiozero.pins.pigpio import PiGPIOFactory
-from gpiozero import MotionSensor, LED
+import sys
 import spur
+import maestro
 
-
+SEMAPHORE = mp.Semaphore(1)
 LEFT_SCREEN = 1
 MIDDLE_SCREEN = 2
 RIGHT_SCREEN = 3
-MOTION_PIN = 10
-LED_PIN = 3
-RED = 33
-GREEN = 34
+SENSOR_THRESHOLD = 50
+LEFT_SENSOR_PIN = 0
+MIDDLE_SENSOR_PIN = 1
+RIGHT_SENSOR_PIN = 2
 
 
 def worker(grouping_number, addresses):
@@ -38,13 +38,17 @@ def worker(grouping_number, addresses):
                 the SensorGrouping which was selected
     """
     group = None
+    pin = None
     if grouping_number == LEFT_SCREEN:
         group = SensorGrouping(addresses[0], LEFT_SCREEN)
+        pin = LEFT_SENSOR_PIN
     elif grouping_number == MIDDLE_SCREEN:
         group = SensorGrouping(addresses[1], MIDDLE_SCREEN)
+        pin = MIDDLE_SENSOR_PIN
     else:
         group = SensorGrouping(addresses[2], RIGHT_SCREEN)
-    result = group.wait_for_detection()
+        pin = RIGHT_SENSOR_PIN
+    result = group.wait_for_detection(pin, SENSOR_THRESHOLD)
     return result
 
 
@@ -57,11 +61,16 @@ class VendingMachine:
     Parameters:
         addresses (list): A list of local IP addresses of the Raspberry Pis
         config (dict): A dictionary with configuration values, should contain
-            REMOTE_LED_SCRIPT_DIRECTORY, a string representing the absolute path
+            REMOTE_LED_SCRIPT_DIRECTORY: a string representing the absolute path
             to the directory on the remote pis where the LED scripts are stored,
-            and REMOTE_IMAGE_DIRECTORY, a string representing the absolute path
-            to where stimuli images are stored on the remote pis. In the event these
-            values are not passed in, defaults will be assigned as a fallback.
+            REMOTE_IMAGE_DIRECTORY: a string representing the absolute path
+            to where stimuli images are stored on the remote pis, SENSOR_THRESHOLD:
+            the minimum sensor reading that will not count as motion detected.
+            LEFT_SENSOR_PIN: an integer in the range 0-5 indicating which pin on
+            the maestro board the left sensor pin is wired to. There will also be
+            MIDDLE_SENSOR_PIN and RIGHT_SENSOR_PIN, with corresponding purposes.
+            In the event these values are not passed in, defaults will be assigned
+            as a fallback.
     """
 
     def __init__(self, addresses, config):
@@ -77,6 +86,14 @@ class VendingMachine:
             self.config['REMOTE_IMAGE_DIRECTORY'] = '/home/pi/elephant_vending_machine/images'
         if 'REMOTE_LED_SCRIPT_DIRECTORY' not in self.config:
             self.config['REMOTE_LED_SCRIPT_DIRECTORY'] = '/home/pi/rpi_ws281x/python'
+        if 'LEFT_SENSOR_PIN' not in self.config:
+            self.config['LEFT_SENSOR_PIN'] = 0
+        if 'MIDDLE_SENSOR_PIN' not in self.config:
+            self.config['MIDDLE_SENSOR_PIN'] = 1
+        if 'RIGHT_SENSOR_PIN' not in self.config:
+            self.config['RIGHT_SENSOR_PIN'] = 2
+        if 'SENSOR_THRESHOLD' not in self.config:
+            self.config['SENSOR_THRESHOLD'] = 40
         self.result = None
         self.pool = None
 
@@ -112,7 +129,7 @@ class VendingMachine:
         self.pool = mp.Pool()
         for group in groups:
             self.pool.apply_async(func=worker, args=(
-                group.get_group_id, self.addresses), callback=self.callback)
+                group.group_id, self.addresses), callback=self.callback)
         while self.result is None:
             current_time = time.perf_counter()
             if current_time - start_time > timeout:
@@ -145,13 +162,8 @@ class SensorGrouping:
             values are not passed in, defaults will be assigned as a fallback.
     """
 
-    # This class is only slightly over the recommended attribute limit and all are needed.
-    # pylint: disable=too-many-instance-attributes
     def __init__(self, address, screen_identifier, config=None):
-        self.factory = PiGPIOFactory(host=address)
         self.group_id = screen_identifier
-        self.sensor = MotionSensor(MOTION_PIN, pin_factory=self.factory)
-        self.led = LED(LED_PIN, pin_factory=self.factory)
         self.correct_stimulus = False
         self.address = address
         self.config = config
@@ -184,12 +196,6 @@ class SensorGrouping:
                  # I don't see a good way to break this line up.
                  f'''{self.config['REMOTE_LED_SCRIPT_DIRECTORY']}/led.py {red} {green} {blue} {display_time}'''])
 
-    def get_group_id(self):
-        """Getter for SensorGrouping id
-
-        """
-        return self.group_id
-
     def display_on_screen(self, stimuli_name, correct_answer):
         """Displays the specified stimuli on the screen.
         Should only be called if the SensorGrouping config is not None
@@ -212,11 +218,16 @@ class SensorGrouping:
                                   '&'], update_env={'DISPLAY': ':0'}, store_pid=True).pid
         self.pid_of_previous_display_command = int(result)
 
-    def wait_for_detection(self):
+    def wait_for_detection(self, pin, threshold):
         """Waits until the motion sensor is activated and returns the group id
 
         Returns:
             group_id: The group id indicating which
                         SensorGrouping had it's motion detector triggered first.
         """
+        input = maestro.Controller()
+        reading = sys.maxsize
+        while (reading > threshold) or (reading == 0):
+            with SEMAPHORE:
+                reading = int(input.getPosition(pin))
         return self.group_id
