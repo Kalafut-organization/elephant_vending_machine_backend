@@ -8,13 +8,11 @@ and detecting motion sensor input on the machine.
    Integrate sensors dependent upon sensor interface info
 """
 
-import multiprocessing as mp
 import time
 import sys
 import spur
 import maestro
 
-SEMAPHORE = mp.Semaphore(1)
 LEFT_SCREEN = 1
 MIDDLE_SCREEN = 2
 RIGHT_SCREEN = 3
@@ -22,34 +20,6 @@ SENSOR_THRESHOLD = 50
 LEFT_SENSOR_PIN = 0
 MIDDLE_SENSOR_PIN = 1
 RIGHT_SENSOR_PIN = 2
-
-
-def worker(grouping_number, addresses):
-    """ The function which is used by the pool. It calls the wait_for_detection() method
-        for the passed associated SensorGrouping and returns the value returned by that method.
-
-        Parameters:
-            grouping_number (int): The integer representing which SensorGrouping the worker
-                should monitor, value should be one of: LEFT_SCREEN, MIDDLE_SCREEN, RIGHT_SCREEN
-            addresses (list): A list of local IP addresses of the Raspberry Pis
-
-        Returns:
-            int: One of LEFT_SCREEN, MIDDLE_SCREEN, or RIGHT_SCREEN, corresponding to
-                the SensorGrouping which was selected
-    """
-    group = None
-    pin = None
-    if grouping_number == LEFT_SCREEN:
-        group = SensorGrouping(addresses[0], LEFT_SCREEN)
-        pin = LEFT_SENSOR_PIN
-    elif grouping_number == MIDDLE_SCREEN:
-        group = SensorGrouping(addresses[1], MIDDLE_SCREEN)
-        pin = MIDDLE_SENSOR_PIN
-    else:
-        group = SensorGrouping(addresses[2], RIGHT_SCREEN)
-        pin = RIGHT_SENSOR_PIN
-    result = group.wait_for_detection(pin, SENSOR_THRESHOLD)
-    return result
 
 
 class VendingMachine:
@@ -75,9 +45,6 @@ class VendingMachine:
 
     def __init__(self, addresses, config):
         self.addresses = addresses
-        self.left_group = SensorGrouping(addresses[0], LEFT_SCREEN, config)
-        self.middle_group = SensorGrouping(addresses[1], MIDDLE_SCREEN, config)
-        self.right_group = SensorGrouping(addresses[2], RIGHT_SCREEN, config)
         if config is None:
             self.config = {}
         else:
@@ -87,29 +54,20 @@ class VendingMachine:
         if 'REMOTE_LED_SCRIPT_DIRECTORY' not in self.config:
             self.config['REMOTE_LED_SCRIPT_DIRECTORY'] = '/home/pi/rpi_ws281x/python'
         if 'LEFT_SENSOR_PIN' not in self.config:
-            self.config['LEFT_SENSOR_PIN'] = 0
+            self.config['LEFT_SENSOR_PIN'] = LEFT_SENSOR_PIN
         if 'MIDDLE_SENSOR_PIN' not in self.config:
-            self.config['MIDDLE_SENSOR_PIN'] = 1
+            self.config['MIDDLE_SENSOR_PIN'] = MIDDLE_SENSOR_PIN
         if 'RIGHT_SENSOR_PIN' not in self.config:
-            self.config['RIGHT_SENSOR_PIN'] = 2
+            self.config['RIGHT_SENSOR_PIN'] = RIGHT_SENSOR_PIN
         if 'SENSOR_THRESHOLD' not in self.config:
-            self.config['SENSOR_THRESHOLD'] = 40
+            self.config['SENSOR_THRESHOLD'] = SENSOR_THRESHOLD
+        self.left_group = SensorGrouping(
+            addresses[0], LEFT_SCREEN, self.config['LEFT_SENSOR_PIN'], self.config)
+        self.middle_group = SensorGrouping(
+            addresses[1], MIDDLE_SCREEN, self.config['MIDDLE_SENSOR_PIN'], self.config)
+        self.right_group = SensorGrouping(
+            addresses[2], RIGHT_SCREEN, self.config['RIGHT_SENSOR_PIN'], self.config)
         self.result = None
-        self.pool = None
-
-    def callback(self, selection):
-        """When a worker process finishes, this method is invoked in the main thread
-        and is passed the return value from the worker. As soon as this is called, the
-        selection has been determined and the process pool is terminated.
-
-        Parameters:
-            selection (int): The return value of worker(), expected to be one
-                of LEFT_SCREEN, MIDDLE_SCREEN, RIGHT_SCREEN.
-        """
-        quit_selection = selection
-        self.result = quit_selection
-        if quit_selection:
-            self.pool.terminate()
 
     def wait_for_input(self, groups, timeout):
         """Waits for input on the motion sensors. If no motion is detected by the specified
@@ -123,27 +81,29 @@ class VendingMachine:
             String: A string with value 'left', 'middle', 'right', or 'timeout', indicating
             the selection or lack thereof.
         """
-        self.result = None
-        start_time = time.perf_counter()
+        reader = maestro.Controller()
         selection = 'timeout'
-        self.pool = mp.Pool()
-        for group in groups:
-            self.pool.apply_async(func=worker, args=(
-                group.group_id, self.addresses), callback=self.callback)
-        while self.result is None:
-            current_time = time.perf_counter()
-            if current_time - start_time > timeout:
-                self.pool.terminate()
+        start_time = time.perf_counter()
+        elapsed_time = time.perf_counter() - start_time
+        readings = [1000] * len(groups)
+        while all(reading > SENSOR_THRESHOLD or reading == 0 for reading in readings) and elapsed_time < timeout:
+            for i in len(groups):
+                readings[i] = reader.getPosition(groups[i].sensor_pin)
+            elapsed_time = time.perf_counter() - start_time
+        selection_index = None
+        for i in len(readings):
+            if SENSOR_THRESHOLD > readings[i] > 0:
+                selection_index = i
                 break
-        self.pool.close()
-        self.pool.join()
-        if self.result == LEFT_SCREEN:
-            selection = 'left'
-        elif self.result == MIDDLE_SCREEN:
-            selection = 'middle'
-        elif self.result == RIGHT_SCREEN:
-            selection = 'right'
+        if selection_index is not None:
+            if groups[selection_index].group_id == LEFT_SCREEN:
+                selection = 'left'
+            elif groups[selection_index].group_id == MIDDLE_SCREEN:
+                selection = 'middle'
+            else:
+                selection = 'right'
         return selection
+
 
 
 class SensorGrouping:
@@ -162,10 +122,11 @@ class SensorGrouping:
             values are not passed in, defaults will be assigned as a fallback.
     """
 
-    def __init__(self, address, screen_identifier, config=None):
+    def __init__(self, address, screen_identifier, sensor_pin, config):
         self.group_id = screen_identifier
         self.correct_stimulus = False
         self.address = address
+        self.sensor_pin = sensor_pin
         self.config = config
         self.pid_of_previous_display_command = None
 
@@ -217,17 +178,3 @@ class SensorGrouping:
                                   f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{stimuli_name}''',
                                   '&'], update_env={'DISPLAY': ':0'}, store_pid=True).pid
         self.pid_of_previous_display_command = int(result)
-
-    def wait_for_detection(self, pin, threshold):
-        """Waits until the motion sensor is activated and returns the group id
-
-        Returns:
-            group_id: The group id indicating which
-                        SensorGrouping had it's motion detector triggered first.
-        """
-        input = maestro.Controller()
-        reading = sys.maxsize
-        while (reading > threshold) or (reading == 0):
-            with SEMAPHORE:
-                reading = int(input.getPosition(pin))
-        return self.group_id
