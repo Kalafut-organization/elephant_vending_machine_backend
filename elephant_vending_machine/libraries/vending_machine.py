@@ -9,7 +9,6 @@ and detecting motion sensor input on the machine.
 """
 
 import time
-import sys
 import spur
 import maestro
 
@@ -21,7 +20,8 @@ LEFT_SENSOR_PIN = 0
 MIDDLE_SENSOR_PIN = 1
 RIGHT_SENSOR_PIN = 2
 
-
+# This is how our Vending Machine would be logically organized, ignoring linting warning.
+# pylint: disable=too-few-public-methods
 class VendingMachine:
     """Provides an abstraction of the physical 'vending machine'.
 
@@ -69,7 +69,8 @@ class VendingMachine:
             addresses[2], RIGHT_SCREEN, self.config['RIGHT_SENSOR_PIN'], self.config)
         self.result = None
 
-    def wait_for_input(self, groups, timeout):
+    @staticmethod
+    def wait_for_input(groups, timeout):
         """Waits for input on the motion sensors. If no motion is detected by the specified
         time to wait, returns with a result to indicate this.
 
@@ -86,7 +87,8 @@ class VendingMachine:
         start_time = time.perf_counter()
         elapsed_time = time.perf_counter() - start_time
         readings = [1000] * len(groups)
-        while all(reading > SENSOR_THRESHOLD or reading == 0 for reading in readings) and elapsed_time < timeout:
+        while (all(reading > SENSOR_THRESHOLD or reading == 0 for reading in readings) and
+               elapsed_time < timeout):
             for i in len(groups):
                 readings[i] = reader.getPosition(groups[i].sensor_pin)
             elapsed_time = time.perf_counter() - start_time
@@ -103,7 +105,6 @@ class VendingMachine:
             else:
                 selection = 'right'
         return selection
-
 
 
 class SensorGrouping:
