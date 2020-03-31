@@ -87,13 +87,13 @@ class VendingMachine:
         start_time = time.perf_counter()
         elapsed_time = time.perf_counter() - start_time
         readings = [1000] * len(groups)
-        while (all(reading > SENSOR_THRESHOLD or reading == 0 for reading in readings) and
+        while (all(reading >= SENSOR_THRESHOLD or reading == 0 for reading in readings) and
                elapsed_time < timeout):
-            for i in len(groups):
+            for i in range(len(groups)):
                 readings[i] = reader.getPosition(groups[i].sensor_pin)
             elapsed_time = time.perf_counter() - start_time
         selection_index = None
-        for i in len(readings):
+        for i in range(len(readings)):
             if SENSOR_THRESHOLD > readings[i] > 0:
                 selection_index = i
                 break

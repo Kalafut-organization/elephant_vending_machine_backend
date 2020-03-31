@@ -31,13 +31,6 @@ def test_wait_for_input_timeout(monkeypatch):
     assert result == 'timeout'
 
 
-def test_wait_for_detection(monkeypatch):
-    monkeypatch.setattr('maestro.Controller.getPosition', lambda input: 0)
-    vending_machine = VendingMachine(['1', '2', '3'], {})
-    result = vending_machine.wait_for_input(
-        [vending_machine.left_group, vending_machine.right_group], 5)
-    assert result in ['left', 'right']
-
 
 @pytest.mark.skip(reason="There is no good way to unit test an ssh connection and visual display with pytest.")
 def test_display(monkeypatch):
