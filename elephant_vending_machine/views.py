@@ -20,6 +20,7 @@ ALLOWED_IMG_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif', 'svg'}
 ALLOWED_EXPERIMENT_EXTENSIONS = {'py'}
 IMAGE_UPLOAD_FOLDER = '/static/img'
 EXPERIMENT_UPLOAD_FOLDER = '/static/experiment'
+LOG_FOLDER = '/static/log'
 
 @APP.route('/run-trial', methods=['POST'])
 def run_trial():
@@ -148,6 +149,51 @@ def upload_image():
         else:
             response = "Error with request: File extension not allowed."
     return  make_response(jsonify({'message': response}), response_code)
+
+@APP.route('/image/<filename>', methods=['DELETE'])
+def delete_image(filename):
+    """Returns a message indicating whether deletion of the specified file was successful
+
+    **Example request**:
+
+    .. sourcecode::
+
+      DELETE /image/blank.jpg HTTP/1.1
+      Host: 127.0.0.1
+      Accept-Encoding: gzip, deflate, br
+      Connection: keep-alive
+
+    **Example response**:
+
+    .. sourcecode:: http
+
+      HTTP/1.0 200 OK
+      Content-Type: application/json
+      Content-Length: 59
+      Access-Control-Allow-Origin: *
+      Server: Werkzeug/0.16.1 Python/3.8.2
+      Date: Fri, 27 Mar 2020 16:13:42 GMT
+
+      {
+        "message": "File blank.jpg was successfully deleted."
+      }
+
+    :status 200: image file successfully deleted
+    :status 400: file with specified name could not be found
+    """
+    image_directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
+    response_code = 400
+    response = ""
+    if filename in os.listdir(image_directory):
+        try:
+            os.remove(os.path.join(image_directory, filename))
+            response = f"File {filename} was successfully deleted."
+            response_code = 200
+        except IsADirectoryError:
+            response = f"{filename} exists, but is a directory and not a file. Deletion failed."
+    else:
+        response = f"File {filename} does not exist and so couldn't be deleted."
+    return make_response(jsonify({'message': response}), response_code)
 
 @APP.route('/image', methods=['GET'])
 def list_images():
@@ -281,7 +327,7 @@ def delete_experiment(filename):
         "message": "File empty.py was successfully deleted."
       }
 
-    :status 200: experiment file list successfully deleted
+    :status 200: experiment file successfully deleted
     :status 400: file with specified name could not be found
     """
     experiment_directory = os.path.dirname(os.path.abspath(__file__)) + EXPERIMENT_UPLOAD_FOLDER
@@ -342,6 +388,51 @@ def list_experiments():
     full_experiment_paths = [file_request_path + f for f in exper_files]
     response_code = 200
     return make_response(jsonify({'files': full_experiment_paths}), response_code)
+
+@APP.route('/log/<filename>', methods=['DELETE'])
+def delete_log(filename):
+    """Returns a message indicating whether deletion of the specified file was successful
+
+    **Example request**:
+
+    .. sourcecode::
+
+      DELETE /log/somelog.csv HTTP/1.1
+      Host: 127.0.0.1
+      Accept-Encoding: gzip, deflate, br
+      Connection: keep-alive
+
+    **Example response**:
+
+    .. sourcecode:: http
+
+      HTTP/1.0 200 OK
+      Content-Type: application/json
+      Content-Length: 59
+      Access-Control-Allow-Origin: *
+      Server: Werkzeug/0.16.1 Python/3.8.2
+      Date: Fri, 27 Mar 2020 16:13:42 GMT
+
+      {
+        "message": "File somelog.csv was successfully deleted."
+      }
+
+    :status 200: log file successfully deleted
+    :status 400: file with specified name could not be found
+    """
+    log_directory = os.path.dirname(os.path.abspath(__file__)) + LOG_FOLDER
+    response_code = 400
+    response = ""
+    if filename in os.listdir(log_directory):
+        try:
+            os.remove(os.path.join(log_directory, filename))
+            response = f"File {filename} was successfully deleted."
+            response_code = 200
+        except IsADirectoryError:
+            response = f"{filename} exists, but is a directory and not a file. Deletion failed."
+    else:
+        response = f"File {filename} does not exist and so couldn't be deleted."
+    return make_response(jsonify({'message': response}), response_code)
 
 @APP.route('/log', methods=['GET'])
 def list_logs():

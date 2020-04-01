@@ -18,8 +18,6 @@ def client():
 
     with elephant_vending_machine.APP.test_client() as client:
         yield client
-        subprocess.call(["rm","elephant_vending_machine/static/log/test_file.csv"])
-        subprocess.call(["rm","elephant_vending_machine/static/log/test_file2.csv"])
 
 def test_run_trial_route_success(client, monkeypatch):
     monkeypatch.setattr('elephant_vending_machine.views.create_experiment_logger', lambda file_name: MockLogger())
@@ -31,12 +29,3 @@ def test_run_trial_route_empty_query_string(client):
     response = client.post('/run-trial')
     assert b'No trial_name specified' in response.data
     assert response.status_code == 400
-
-def test_get_log_endpoint(client):
-    subprocess.call(["touch", "elephant_vending_machine/static/log/test_file.csv"])
-    subprocess.call(["touch", "elephant_vending_machine/static/log/test_file2.csv"])
-    response = client.get('/log')
-    response_json_files = json.loads(response.data)['files']
-    min_elements_expected = ["http://localhost/static/log/test_file.csv","http://localhost/static/log/test_file2.csv","http://localhost/static/log/unittest.csv"]
-    assert all(elem in response_json_files for elem in min_elements_expected)
-    assert response.status_code == 200
