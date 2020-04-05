@@ -132,13 +132,13 @@ dmypy.json
 .vscode
 
 # Experiment logs
-/elephant_vending_machine/static/logs/*
+/elephant_vending_machine/static/log/*
 
 # Images in upload folder
 /elephant_vending_machine/static/img/*
 
-# Experiments in experiments upload folder
-/elephant_vending_machine/static/experiments/*
+# Experiments in experiment upload folder
+/elephant_vending_machine/static/experiment/*
 
 # Ignore IntelliJ .idea files
 .idea

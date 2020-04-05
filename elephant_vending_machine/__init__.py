@@ -5,8 +5,10 @@ module can import it safely and the __name__ variable will always
 resolve to the correct package.
 """
 from flask import Flask
+from flask_cors import CORS, cross_origin
 
 APP = Flask(__name__)
+CORS(APP)
 APP.config.update(
     REMOTE_HOSTS=['192.168.1.11', '192.168.1.12', '192.168.1.13'],
     REMOTE_HOST_USERNAME='pi',

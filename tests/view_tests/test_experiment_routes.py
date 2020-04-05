@@ -17,8 +17,9 @@ def client():
 
     with elephant_vending_machine.APP.test_client() as client:
         yield client
-        subprocess.call(["rm","elephant_vending_machine/static/experiments/test_file.py"])
-        subprocess.call(["rm","elephant_vending_machine/static/experiments/test_file2.py"])
+        subprocess.call(["rm","elephant_vending_machine/static/experiment/test_file.py"])
+        subprocess.call(["rm","elephant_vending_machine/static/experiment/test_file2.py"])
+        subprocess.call(["rm","elephant_vending_machine/static/experiment/empty.py"])
 
 def test_post_experiment_route_no_file(client):
     response = client.post('/experiment')
@@ -45,12 +46,28 @@ def test_post_experiment_route_with_file(monkeypatch, client):
     assert b'Success: Experiment saved.' in response.data
 
 def test_get_experiemnt_list_all_endpoint(client):
-    path_to_current_file = os.path.dirname(os.path.abspath(__file__))
-    save_path = os.path.join(path_to_current_file, '..','..','elephant_vending_machine','static','experiments')
-    subprocess.call(["touch", "elephant_vending_machine/static/experiments/test_file.py"])
-    subprocess.call(["touch", "elephant_vending_machine/static/experiments/test_file2.py"])
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/test_file.py"])
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/test_file2.py"])
     response = client.get('/experiment')
     response_json_files = json.loads(response.data)['files']
     min_elements_expected = ["http://localhost/static/experiment/test_file.py","http://localhost/static/experiment/test_file2.py"]
     assert all(elem in response_json_files for elem in min_elements_expected)
     assert response.status_code == 200
+
+def test_delete_experiment_happy_path(client):
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/empty.py"])
+    response = client.delete('/experiment/empty.py')
+    assert response.status_code == 200
+    assert json.loads(response.data)['message'] == 'File empty.py was successfully deleted.'
+
+def test_delete_experiment_file_not_found(client):
+    response = client.delete('/experiment/empty.py')
+    assert response.status_code == 400
+    assert json.loads(response.data)['message'] == 'File empty.py does not exist and so couldn\'t be deleted.'
+
+def test_delete_experiment_is_a_directory_exception(client, monkeypatch):
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/empty.py"])
+    monkeypatch.setattr('os.remove', lambda file: (_ for _ in ()).throw(IsADirectoryError))
+    response = client.delete('/experiment/empty.py')
+    assert response.status_code == 400
+    assert json.loads(response.data)['message'] == 'empty.py exists, but is a directory and not a file. Deletion failed.'
