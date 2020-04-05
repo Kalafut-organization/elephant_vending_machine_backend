@@ -2,10 +2,6 @@
 
 This module  allows for display of images, control of LEDs,
 and detecting motion sensor input on the machine.
-
-.. todo::
-
-   Integrate sensors dependent upon sensor interface info
 """
 
 import time
@@ -43,7 +39,7 @@ class VendingMachine:
             as a fallback.
     """
 
-    def __init__(self, addresses, config):
+    def __init__(self, addresses, config={}):
         self.addresses = addresses
         if config is None:
             self.config = {}
@@ -110,8 +106,8 @@ class VendingMachine:
 class SensorGrouping:
     """Provides an abstraction of the devices controlled by Raspberry Pis.
 
-    Pi's will have an LED strip, a distance measurement device, and a screen.
-    This class will provide utilities for interacting with individual sensors.
+    Pi's will have an LED strip and a screen.
+    This class will provide utilities for interacting with individual LED strips and screens.
 
     Parameters:
         address (int): The local IP address of the Pi controlling the SensorGrouping
