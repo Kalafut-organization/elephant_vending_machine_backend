@@ -3,19 +3,16 @@ import pytest
 import time
 
 
-class MockController:
-    def getPosition(self, x):
-        return 0
+def new_init(self):
+    self.getPosition = lambda pin_number: 30 if pin_number == 0 else 0
 
 
-def timeout_wait_for_detection(a):
-    time.sleep(2)
-    return LEFT_SCREEN
+def new_init_timeout(self):
+    self.getPosition = lambda pin_number: 0
 
 
 def test_wait_for_input(monkeypatch):
-    monkeypatch.setattr(
-        'elephant_vending_machine.libraries.vending_machine.SensorGrouping.wait_for_detection', lambda a: LEFT_SCREEN)
+    monkeypatch.setattr('maestro.Controller.__init__', new_init)
     vending_machine = VendingMachine(['1', '2', '3'], {})
     result = vending_machine.wait_for_input(
         [vending_machine.left_group, vending_machine.right_group], 5)
@@ -24,12 +21,11 @@ def test_wait_for_input(monkeypatch):
 
 def test_wait_for_input_timeout(monkeypatch):
     monkeypatch.setattr(
-        'elephant_vending_machine.libraries.vending_machine.SensorGrouping.wait_for_detection', timeout_wait_for_detection)
+        'maestro.Controller.__init__', new_init_timeout)
     vending_machine = VendingMachine(['1', '2', '3'], {})
     result = vending_machine.wait_for_input(
         [vending_machine.left_group, vending_machine.right_group], 1)
     assert result == 'timeout'
-
 
 
 @pytest.mark.skip(reason="There is no good way to unit test an ssh connection and visual display with pytest.")
