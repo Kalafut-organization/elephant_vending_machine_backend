@@ -1,5 +1,7 @@
 import pytest
+import subprocess
 from io import BytesIO
+import json
 
 from elephant_vending_machine import elephant_vending_machine
 from subprocess import CompletedProcess, CalledProcessError
@@ -13,6 +15,9 @@ def client():
 
     with elephant_vending_machine.APP.test_client() as client:
         yield client
+        subprocess.call(["rm", "elephant_vending_machine/static/img/test_file.png"])
+        subprocess.call(["rm", "elephant_vending_machine/static/img/test_file2.jpg"])
+        subprocess.call(["rm", "elephant_vending_machine/static/img/blank.jpg"])
 
 def test_post_image_route_no_file(client):
     response = client.post('/image')
@@ -46,3 +51,30 @@ def test_post_image_route_copying_exception(monkeypatch, client):
     response = client.post('/image', data=data) 
     assert response.status_code == 500
     assert b'Error: Failed to copy file to hosts' in response.data
+
+def test_get_image_endpoint(client):
+    subprocess.call(["touch", "elephant_vending_machine/static/img/test_file.png"])
+    subprocess.call(["touch", "elephant_vending_machine/static/img/test_file2.jpg"])
+    response = client.get('/image')
+    response_json_files = json.loads(response.data)['files']
+    min_elements_expected = ["http://localhost/static/img/test_file.png","http://localhost/static/img/test_file2.jpg"]
+    assert all(elem in response_json_files for elem in min_elements_expected)
+    assert response.status_code == 200
+
+def test_delete_image_happy_path(client):
+    subprocess.call(["touch", "elephant_vending_machine/static/img/blank.jpg"])
+    response = client.delete('/image/blank.jpg')
+    assert response.status_code == 200
+    assert json.loads(response.data)['message'] == 'File blank.jpg was successfully deleted.'
+
+def test_delete_image_file_not_found(client):
+    response = client.delete('/image/blank.jpg')
+    assert response.status_code == 400
+    assert json.loads(response.data)['message'] == 'File blank.jpg does not exist and so couldn\'t be deleted.'
+
+def test_delete_image_is_a_directory_exception(client, monkeypatch):
+    subprocess.call(["touch", "elephant_vending_machine/static/img/blank.jpg"])
+    monkeypatch.setattr('os.remove', lambda file: (_ for _ in ()).throw(IsADirectoryError))
+    response = client.delete('/image/blank.jpg')
+    assert response.status_code == 400
+    assert json.loads(response.data)['message'] == 'blank.jpg exists, but is a directory and not a file. Deletion failed.'

@@ -61,11 +61,11 @@ def create_experiment_logger(file_name):
 
     Returns:
         Logger: experiment_logger instance configured to write INFO level logs
-        to logs directory
+        to log directory
     """
 
     log_level = logging.INFO
-    experiment_log_path = 'elephant_vending_machine/static/logs/'
+    experiment_log_path = 'elephant_vending_machine/static/log/'
     logger = logging.getLogger('experiment_logger')
     logger.setLevel(log_level)
     experiment_log_file_handler = FileHandler(experiment_log_path + file_name)
