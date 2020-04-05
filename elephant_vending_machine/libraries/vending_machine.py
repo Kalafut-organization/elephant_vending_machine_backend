@@ -39,7 +39,7 @@ class VendingMachine:
             as a fallback.
     """
 
-    def __init__(self, addresses, config={}):
+    def __init__(self, addresses, config=None):
         self.addresses = addresses
         if config is None:
             self.config = {}
@@ -85,10 +85,14 @@ class VendingMachine:
         readings = [1000] * len(groups)
         while (all(reading >= SENSOR_THRESHOLD or reading == 0 for reading in readings) and
                elapsed_time < timeout):
+            # range(len()) has less overhead than enumerate
+            # pylint: disable=consider-using-enumerate
             for i in range(len(groups)):
                 readings[i] = reader.getPosition(groups[i].sensor_pin)
             elapsed_time = time.perf_counter() - start_time
         selection_index = None
+        # range(len()) has less overhead than enumerate
+        # pylint: disable=consider-using-enumerate
         for i in range(len(readings)):
             if SENSOR_THRESHOLD > readings[i] > 0:
                 selection_index = i
