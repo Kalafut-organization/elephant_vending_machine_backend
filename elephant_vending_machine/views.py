@@ -16,6 +16,7 @@ from flask import request, make_response, jsonify
 from werkzeug.utils import secure_filename
 from elephant_vending_machine import APP
 from .libraries.experiment_logger import create_experiment_logger
+from .libraries.vending_machine import VendingMachine
 
 ALLOWED_IMG_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif', 'svg'}
 ALLOWED_EXPERIMENT_EXTENSIONS = {'py'}
@@ -73,8 +74,7 @@ def run_experiment():
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
-        # TODO: Instantiate actual vending machine
-        vending_machine = VendingMachine()
+        vending_machine = VendingMachine(APP.config['REMOTE_HOSTS'], {})
         module.run_experiment(exp_logger, vending_machine)
 
         response = 'Running ' + str(experiment_name)
