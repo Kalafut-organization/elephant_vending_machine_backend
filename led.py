@@ -16,7 +16,6 @@ found at https://tutorials-raspberrypi.com/connect-control-raspberry-pi-ws2812-r
 import time
 import sys
 from neopixel import *
-import argparse
 # LED strip configuration:
 LED_COUNT = 16      # Number of LED pixels.
 LED_PIN = 18      # GPIO pin connected to the pixels (18 uses PWM!).
@@ -29,7 +28,7 @@ LED_INVERT = False
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 
-def set_color_for_time(strip, color, time):
+def set_color_for_time(strip, color, time_in_ms):
     """This method displays the specified color for the specified amount of time.
 
     Parameters:
@@ -40,17 +39,17 @@ def set_color_for_time(strip, color, time):
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, color)
     strip.show()
-    time.sleep(time)
+    time.sleep(time_in_ms / 1000)
     strip.clear()
 
 
 if __name__ == '__main__':
-    red = int(sys.argv[1])
-    green = int(sys.argv[2])
-    blue = int(sys.argv[3])
-    color_to_display = Color(red, green, blue)
-    time_in_seconds = int(sys.argv[4])
+    RED = int(sys.argv[1])
+    GREEN = int(sys.argv[2])
+    BLUE = int(sys.argv[3])
+    COLOR_TO_DISPLAY = Color(RED, GREEN, BLUE)
+    TIME_IN_MS = int(sys.argv[4])
     strip = Adafruit_NeoPixel(
         LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
     strip.begin()
-    set_green(strip, color_to_display, time_in_seconds)
+    set_color_for_time(strip, COLOR_TO_DISPLAY, TIME_IN_MS)

@@ -16,6 +16,15 @@ LEFT_SENSOR_PIN = 0
 MIDDLE_SENSOR_PIN = 1
 RIGHT_SENSOR_PIN = 2
 
+def get_current_time_milliseconds():
+    """Timeouts will be handled in milliseconds.
+    This method will return the time elapsed since
+    the CPU recieved power in nanoseconds, and thus
+    is only useful for measuring relative time intervals,
+    it is not adjusted for the absolute time.
+    """
+    return time.perf_counter_ns() / 1000000
+
 # This is how our Vending Machine would be logically organized, ignoring linting warning.
 # pylint: disable=too-few-public-methods
 class VendingMachine:
@@ -73,15 +82,15 @@ class VendingMachine:
         Parameters:
             groups (list[SensorGrouping]): The SensorGroupings which should be monitored for input.
             timeout (int): The amount of time in seconds to wait for input before timing out and
-                returning 'timeout'.
+                returning 'timeout' (measured in milliseconds).
         Returns:
             String: A string with value 'left', 'middle', 'right', or 'timeout', indicating
             the selection or lack thereof.
         """
         reader = maestro.Controller()
         selection = 'timeout'
-        start_time = time.perf_counter()
-        elapsed_time = time.perf_counter() - start_time
+        start_time = get_current_time_milliseconds()
+        elapsed_time = get_current_time_milliseconds() - start_time
         readings = [1000] * len(groups)
         while (all(reading >= SENSOR_THRESHOLD or reading == 0 for reading in readings) and
                elapsed_time < timeout):
@@ -89,7 +98,7 @@ class VendingMachine:
             # pylint: disable=consider-using-enumerate
             for i in range(len(groups)):
                 readings[i] = reader.getPosition(groups[i].sensor_pin)
-            elapsed_time = time.perf_counter() - start_time
+            elapsed_time = get_current_time_milliseconds() - start_time
         selection_index = None
         # range(len()) has less overhead than enumerate
         # pylint: disable=consider-using-enumerate
