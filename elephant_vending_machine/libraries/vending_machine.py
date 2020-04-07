@@ -23,7 +23,7 @@ def get_current_time_milliseconds():
     is only useful for measuring relative time intervals,
     it is not adjusted for the absolute time.
     """
-    return time.perf_counter_ns() / 1000000
+    return time.perf_counter() * 1000
 
 # This is how our Vending Machine would be logically organized, ignoring linting warning.
 # pylint: disable=too-few-public-methods
