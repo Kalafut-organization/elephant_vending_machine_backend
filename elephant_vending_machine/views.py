@@ -71,7 +71,7 @@ def run_experiment():
 
         spec = importlib.util.spec_from_file_location(
             experiment_name,
-            f'elephant_vending_machine/static/experiments/{experiment_name}.py')
+            f'elephant_vending_machine/static/experiment/{experiment_name}.py')
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
