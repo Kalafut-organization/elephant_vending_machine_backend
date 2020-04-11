@@ -22,7 +22,6 @@ def client():
 def test_run_trial_route_success(client, monkeypatch):
     mock_logger = MockLogger()
     monkeypatch.setattr('elephant_vending_machine.views.create_experiment_logger', lambda file_name: mock_logger)
-    monkeypatch.setattr('elephant_vending_machine.views.VendingMachine', lambda addresses, config: mock_logger)
 
     experiment_path = "elephant_vending_machine/static/experiment/unittestExperiment.py"
     subprocess.call(["touch", experiment_path])
