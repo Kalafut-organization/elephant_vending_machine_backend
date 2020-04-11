@@ -59,8 +59,9 @@ def run_experiment():
     :status 200: experiment started
     :status 400: malformed request
     """
-    response = ""
+    response_message = ""
     response_code = 400
+    response_body = {}
     if request.args.get('name') is not None:
         experiment_name = request.args.get('name')
         log_filename = str(datetime.utcnow()) + ' ' + experiment_name + '.csv'
@@ -77,12 +78,15 @@ def run_experiment():
         vending_machine = VendingMachine(APP.config['REMOTE_HOSTS'], {})
         module.run_experiment(exp_logger, vending_machine)
 
-        response = 'Running ' + str(experiment_name)
+        response_message = 'Running ' + str(experiment_name)
         response_code = 200
+        response_body['log_file'] = log_filename
     else:
-        response = 'No experiment_name specified'
+        response_message = 'No experiment_name specified'
         response_code = 400
-    return make_response(jsonify({'message': response, 'log_file': log_filename}), response_code)
+
+    response_body['message'] = response_message
+    return make_response(jsonify(response_body), response_code)
 
 def add_remote_image(local_image_path, filename):
     """Adds an image to the remote hosts defined in flask config.
