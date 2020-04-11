@@ -8,9 +8,9 @@ from elephant_vending_machine import elephant_vending_machine
 
 class MockLogger:
 
-    @staticmethod
-    def info(*args, **kwargs):
-        return 
+    def info(self, *args, **kwargs):
+        self.args = list(args)
+ 
 
 @pytest.fixture
 def client():
@@ -20,18 +20,22 @@ def client():
         yield client
 
 def test_run_trial_route_success(client, monkeypatch):
-    monkeypatch.setattr('elephant_vending_machine.views.create_experiment_logger', lambda file_name: MockLogger())
-    monkeypatch.setattr('elephant_vending_machine.views.VendingMachine', lambda addresses, config: MockLogger())
+    mock_logger = MockLogger()
+    monkeypatch.setattr('elephant_vending_machine.views.create_experiment_logger', lambda file_name: mock_logger)
+    monkeypatch.setattr('elephant_vending_machine.views.VendingMachine', lambda addresses, config: mock_logger)
+
     experiment_path = "elephant_vending_machine/static/experiment/unittestExperiment.py"
     subprocess.call(["touch", experiment_path])
     experiment_file = open(experiment_path, 'w')
     experiment_file.write('def run_experiment(experiment_logger, vending_machine):')
     experiment_file.write('    experiment_logger.info("Entered unit test experiment")')
     experiment_file.close()
+
     response = client.post('/run-experiment?name=unittestExperiment')
     subprocess.call(["rm", "elephant_vending_machine/static/experiment/unittestExperiment.py"])
     assert b'Running unittestExperiment' in response.data
     assert response.status_code == 200
+    assert mock_logger.args == ['Entered unit test experiment']
 
 def test_run_trial_route_empty_query_string(client):
     response = client.post('/run-experiment')
