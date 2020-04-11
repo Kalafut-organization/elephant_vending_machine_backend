@@ -1,9 +1,9 @@
 # Elephant Vending Machine
 OSU CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cincinnati Zoo. Designed to facilitate automated behavioral psychology experiments.
 
-![Python package](https://github.com/mknox1225/elephants_cse5911/workflows/Python%20package/badge.svg?branch=master)
+[![build](https://github.com/Kalafut-organization/elephant_vending_machine_backend/workflows/build/badge.svg)](https://github.com/Kalafut-organization/elephant_vending_machine_backend/actions?query=workflow%3Abuild)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/Kalafut-organization/elephants_cse5911/blob/master/LICENSE.md)
-[![codecov](https://codecov.io/gh/Kalafut-organization/elephants_cse5911/branch/master/graph/badge.svg)](https://codecov.io/gh/Kalafut-organization/elephants_cse5911)
+[![codecov](https://codecov.io/gh/Kalafut-organization/elephant_vending_machine_backend/branch/master/graph/badge.svg)](https://codecov.io/gh/Kalafut-organization/elephant_vending_machine_backend)
 [![Documentation Status](https://readthedocs.org/projects/elephants-cse5911/badge/?version=latest)](https://elephants-cse5911.readthedocs.io/en/latest/?badge=latest)
 
 
@@ -25,6 +25,15 @@ OSU CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cin
     * OPTIONAL: To enable development features run `export FLASK_ENV=development` on Unix or `set FLASK_ENV=development` on Windows
 1. `pip install -e .`
 1. `flask run`
+
+## Configuring Remote Pis for RGB LED Strip Interfacing
+1. Follow this reference: https://tutorials-raspberrypi.com/connect-control-raspberry-pi-ws2812-rgb-led-strips/
+1. For our purposes, we did not use an external power source and found the power provided by the pi to be sufficient.
+
+## Dependencies for Image Display
+1. Image display is done by utilizing feh: https://linux.die.net/man/1/feh
+1. To install feh, run `sudo apt install feh` while connected via SSH to the pi.
+* Note, this will need to be done on each of the remote pis only, the web server does not require installion of feh.
 
 ## Test suite
 1. To execute the test suite run `coverage run -m pytest`

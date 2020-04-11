@@ -7,6 +7,7 @@ Submodules
 .. toctree::
 
    elephant_vending_machine.libraries.experiment_logger
+   elephant_vending_machine.libraries.vending_machine
 
 Module contents
 ---------------
