@@ -24,8 +24,8 @@ IMAGE_UPLOAD_FOLDER = '/static/img'
 EXPERIMENT_UPLOAD_FOLDER = '/static/experiment'
 LOG_FOLDER = '/static/log'
 
-@APP.route('/run-experiment', methods=['POST'])
-def run_experiment():
+@APP.route('/run-experiment/<filename>', methods=['POST'])
+def run_experiment(filename):
     """Start execution of experiment python file specified by user
 
     **Example request**:
@@ -59,30 +59,30 @@ def run_experiment():
     :status 200: experiment started
     :status 400: malformed request
     """
+    experiment_directory = os.path.dirname(os.path.abspath(__file__)) + EXPERIMENT_UPLOAD_FOLDER
     response_message = ""
     response_code = 400
     response_body = {}
-    if request.args.get('name') is not None:
-        experiment_name = request.args.get('name')
-        log_filename = str(datetime.utcnow()) + ' ' + experiment_name + '.csv'
+    if filename in os.listdir(experiment_directory):
+        log_filename = str(datetime.utcnow()) + ' ' + filename + '.csv'
         exp_logger = create_experiment_logger(log_filename)
 
-        exp_logger.info('Experiment %s started', experiment_name)
+        exp_logger.info('Experiment %s started', filename)
 
         spec = importlib.util.spec_from_file_location(
-            experiment_name,
-            f'elephant_vending_machine/static/experiment/{experiment_name}.py')
+            filename,
+            f'elephant_vending_machine/static/experiment/{filename}')
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
         vending_machine = VendingMachine(APP.config['REMOTE_HOSTS'], {})
         module.run_experiment(exp_logger, vending_machine)
 
-        response_message = 'Running ' + str(experiment_name)
+        response_message = 'Running ' + str(filename)
         response_code = 200
         response_body['log_file'] = log_filename
     else:
-        response_message = 'No experiment_name specified'
+        response_message = f"No experiment named {filename}"
         response_code = 400
 
     response_body['message'] = response_message

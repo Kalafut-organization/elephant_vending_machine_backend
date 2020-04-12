@@ -30,13 +30,13 @@ def test_run_trial_route_success(client, monkeypatch):
     experiment_file.write('    experiment_logger.info("Entered unit test experiment")')
     experiment_file.close()
 
-    response = client.post('/run-experiment?name=unittestExperiment')
-    subprocess.call(["rm", "elephant_vending_machine/static/experiment/unittestExperiment.py"])
+    response = client.post('/run-experiment/unittestExperiment.py')
     assert b'Running unittestExperiment' in response.data
     assert response.status_code == 200
     assert mock_logger.args == ['Entered unit test experiment']
+    subprocess.call(["rm", "elephant_vending_machine/static/experiment/unittestExperiment.py"])
 
-def test_run_trial_route_empty_query_string(client):
-    response = client.post('/run-experiment')
-    assert b'No experiment_name specified' in response.data
+def test_run_trial_experiment_file_doesnt_exist(client):
+    response = client.post('/run-experiment/aNonexistentExperiment.py')
+    assert b'No experiment named aNonexistentExperiment' in response.data
     assert response.status_code == 400
