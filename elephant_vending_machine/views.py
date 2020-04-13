@@ -75,6 +75,7 @@ def allowed_file(filename, allowed_extensions):
 
     Parameters:
         filename (str): The filename which is to be checked
+        allowed_extensions (array of str): The allowed file extensions
 
     Returns:
         True if filename includes extension and extension is an allowed extension

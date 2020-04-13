@@ -6,6 +6,7 @@ from io import BytesIO
 import json
 
 from elephant_vending_machine import elephant_vending_machine
+from elephant_vending_machine import views
 from subprocess import CompletedProcess, CalledProcessError
 
 def raise_(ex):
@@ -71,3 +72,9 @@ def test_delete_experiment_is_a_directory_exception(client, monkeypatch):
     response = client.delete('/experiment/empty.py')
     assert response.status_code == 400
     assert json.loads(response.data)['message'] == 'empty.py exists, but is a directory and not a file. Deletion failed.'
+
+def test_valid_file_extensions_valid_file():
+    assert views.allowed_file('pythonscript.py', {'py'}) == True
+
+def test_valid_file_extensions_invalid_file():
+    assert views.allowed_file('sourcecode.c', {'py'}) == False
