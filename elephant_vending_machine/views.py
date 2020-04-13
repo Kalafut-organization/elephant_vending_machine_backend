@@ -8,6 +8,7 @@ a lot of routes.
 # Circular import OK here. See https://flask.palletsprojects.com/en/1.1.x/patterns/packages/
 # pylint: disable=cyclic-import
 from datetime import datetime
+import importlib.util
 import os
 import subprocess
 from subprocess import CalledProcessError
@@ -15,6 +16,7 @@ from flask import request, make_response, jsonify
 from werkzeug.utils import secure_filename
 from elephant_vending_machine import APP
 from .libraries.experiment_logger import create_experiment_logger
+from .libraries.vending_machine import VendingMachine
 
 ALLOWED_IMG_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif', 'svg'}
 ALLOWED_EXPERIMENT_EXTENSIONS = {'py'}
@@ -22,34 +24,69 @@ IMAGE_UPLOAD_FOLDER = '/static/img'
 EXPERIMENT_UPLOAD_FOLDER = '/static/experiment'
 LOG_FOLDER = '/static/log'
 
-@APP.route('/run-trial', methods=['POST'])
-def run_trial():
-    """Responds with 'Running {trial_name}' string
+@APP.route('/run-experiment/<filename>', methods=['POST'])
+def run_experiment(filename):
+    """Start execution of experiment python file specified by user
 
-    All requests sent to this route should have a trial_name in
-    the query string, otherwise a 400 error will be returned
+    **Example request**:
 
-    Returns:
-        HTTP response 200 with body {"message":"Running <trial_name>"} or
-        HTTP response 400 with body {"message":"No trial_name specified"}
+    .. sourcecode::
 
+      POST /run-experiment?name=example_experiment HTTP/1.1
+      Host: localhost:5000
+      Accept-Encoding: gzip, deflate, br
+      Content-Length:
+      Connection: keep-alive
+
+    **Example response**:
+
+    .. sourcecode:: http
+
+      HTTP/1.0 200 OK
+      Content-Type: application/json; charset=utf-8
+      Content-Length: 88
+      Server: Werkzeug/0.16.1 Python/3.8.1
+      Date: Thu, 13 Feb 2020 15:35:32 GMT
+
+      {
+        "log_file": "2020-03-17 05:15:06.558356 example_experiment.csv",
+        "message": "Running example_experiment"
+      }
+
+    All requests sent to this route should have an experiment file
+    included as a query parameter, otherwise a 400 error will be returned
+
+    :status 200: experiment started
+    :status 400: malformed request
     """
-
-    response = ""
+    experiment_directory = os.path.dirname(os.path.abspath(__file__)) + EXPERIMENT_UPLOAD_FOLDER
+    response_message = ""
     response_code = 400
-    if request.args.get('trial_name') is not None:
-        trial_name = request.args.get('trial_name')
-        log_filename = str(datetime.utcnow()) + ' ' + trial_name + '.csv'
+    response_body = {}
+    if filename in os.listdir(experiment_directory):
+        log_filename = str(datetime.utcnow()) + ' ' + filename + '.csv'
         exp_logger = create_experiment_logger(log_filename)
 
-        exp_logger.info("Experiment %s started", trial_name)
+        exp_logger.info('Experiment %s started', filename)
 
-        response = 'Running ' + str(trial_name)
+        spec = importlib.util.spec_from_file_location(
+            filename,
+            f'elephant_vending_machine/static/experiment/{filename}')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        vending_machine = VendingMachine(APP.config['REMOTE_HOSTS'], {})
+        module.run_experiment(exp_logger, vending_machine)
+
+        response_message = 'Running ' + str(filename)
         response_code = 200
+        response_body['log_file'] = log_filename
     else:
-        response = 'No trial_name specified'
+        response_message = f"No experiment named {filename}"
         response_code = 400
-    return make_response(jsonify({'message': response}), response_code)
+
+    response_body['message'] = response_message
+    return make_response(jsonify(response_body), response_code)
 
 def add_remote_image(local_image_path, filename):
     """Adds an image to the remote hosts defined in flask config.
