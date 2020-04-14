@@ -7,3 +7,5 @@ omit =
 	*/tests/*
 	# Ignore Sphinx documentation files
 	*/docs/*
+	# Ignore experiment files
+	*/static/experiment/*
