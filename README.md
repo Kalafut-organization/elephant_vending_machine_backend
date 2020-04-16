@@ -18,6 +18,7 @@ OSU CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cin
 1. Use `pip install -r requirements.txt` to install all required dependencies
 
 ## Starting the application
+NOTE: See section "Running in Production" if you intend to make calls from the front-end
 1. Tell Flask where to find application instance
     * On Windows run `set FLASK_APP=elephant_vending_machine`
     * On Unix or MacOS run `export FLASK_APP=elephant_vending_machine`
@@ -49,7 +50,8 @@ OSU CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cin
 1. Open `index.html` under `docs/_build/html/` in a browser to view documentation
     * The master branch documentation can be viewed on Read the Docs by clicking the "docs" badge at the top of this README
 
-## Running on Raspberry Pi
+## Running in production
+NOTE: This step is necessary to allow the front-end to make API calls. If you don't run the project using Docker it uses a port that the front-end is not expecting and API calls will fail.
 1. Connect to your Raspberry Pi
 1. Clone this repo to the Pi
 1. Navigate to the cloned directory
