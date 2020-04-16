@@ -3,7 +3,21 @@ Welcome to Elephant Vending Machine's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Hardware Setup
+
+   hardware/overview
+   hardware/router
+   hardware/webserverpi
+   hardware/sensorpi
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Using System
+
+   usage/guiaccess
+   usage/runningexperiments
+   usage/managingfiles
+   
 
 Indices and tables
 ==================
