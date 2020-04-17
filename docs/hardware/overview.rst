@@ -1,5 +1,6 @@
 Hardware Overview
 =================
+
 .. image:: ../_static/images/equipment_diagram.png
   :width: 800
   :alt: Connected hardware components
@@ -17,3 +18,23 @@ hardware. Each Sensor Pi has an LED strip and a screen. The LED strip is
 used to provide visual feedback to the elephant about whether or not the
 selection it made was correct as determined by the experiment file. The
 screens are used to display stimuli to the elephant.
+
+
+Parts List
+##########
+
++-------------------------------+----------------------+----------+
+| Component                     |  Model               | Quantity |
++===============================+======================+==========+
+| Router                        | TP-Link Archer C1200 | 1        |
++-------------------------------+----------------------+----------+
+| Raspberry Pi                  | Raspberry Pi 3 B     | 4        |
++-------------------------------+----------------------+----------+
+| Analogue-to-Digital Converter | 192.168.0.12         | 1        |
++-------------------------------+----------------------+----------+
+| Sonar Sensor                  | Unknown              | 3        |
++-------------------------------+----------------------+----------+
+| Led Strip                     | Unknown              | 3        |
++-------------------------------+----------------------+----------+
+| Monitor                       | Unknown              | 3        |
++-------------------------------+----------------------+----------+
