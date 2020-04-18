@@ -40,13 +40,15 @@ def set_color_for_time(strip, color, time_in_ms):
         strip.setPixelColor(i, color)
     strip.show()
     time.sleep(time_in_ms / 1000)
-    strip.clear()
+    for i in range(strip.numPixels()):
+        strip.setPixelColor(i, Color(0, 0, 0))
+    strip.show()
 
 
 if __name__ == '__main__':
-    RED = int(sys.argv[1])
+    RED = int(sys.argv[3])
     GREEN = int(sys.argv[2])
-    BLUE = int(sys.argv[3])
+    BLUE = int(sys.argv[1])
     COLOR_TO_DISPLAY = Color(RED, GREEN, BLUE)
     TIME_IN_MS = int(sys.argv[4])
     strip = Adafruit_NeoPixel(
