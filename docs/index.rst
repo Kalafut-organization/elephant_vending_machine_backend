@@ -9,6 +9,7 @@ Welcome to Elephant Vending Machine's documentation!
    hardware/router
    hardware/webserverpi
    hardware/sensorpi
+   hardware/sensorwiring
 
 .. toctree::
    :maxdepth: 2
