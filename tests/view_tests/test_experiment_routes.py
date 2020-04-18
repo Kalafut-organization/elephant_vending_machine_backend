@@ -78,3 +78,6 @@ def test_valid_file_extensions_valid_file():
 
 def test_valid_file_extensions_invalid_file():
     assert views.allowed_file('sourcecode.c', {'py'}) == False
+
+def test_valid_file_extension_double_extension():
+    assert views.allowed_file('sourcecode.c.py', {'py'}) == True
