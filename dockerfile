@@ -1,4 +1,7 @@
 FROM python:3.8
+RUN mkdir -p /root/.ssh
+COPY id_rsa /root/.ssh/id_rsa
+RUN chmod 700 /root/.ssh/id_rsa
 WORKDIR /usr/src/elephant_vending_machine
 COPY . .
 RUN pip install --upgrade pip
