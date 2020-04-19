@@ -3,6 +3,7 @@ services:
   webapp:
     build: .
     restart: always
+  
     volumes:
       - web_static:/usr/src/elephant_vending_machine/elephant_vending_machine
     
