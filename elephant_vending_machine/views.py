@@ -59,7 +59,8 @@ def run_experiment(filename):
     :status 200: experiment started
     :status 400: malformed request
     """
-    experiment_directory = os.path.dirname(os.path.abspath(__file__)) + EXPERIMENT_UPLOAD_FOLDER
+    path_to_current_file = os.path.dirname(os.path.abspath(__file__))
+    experiment_directory = os.path.join(path_to_current_file, 'static', 'experiment')
     response_message = ""
     response_code = 400
     response_body = {}
