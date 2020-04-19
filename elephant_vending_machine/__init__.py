@@ -10,7 +10,7 @@ from flask_cors import CORS, cross_origin
 APP = Flask(__name__)
 CORS(APP)
 APP.config.update(
-    REMOTE_HOSTS=['192.168.1.11', '192.168.1.12', '192.168.1.13'],
+    REMOTE_HOSTS=['192.168.0.11', '192.168.0.12', '192.168.0.13'],
     REMOTE_HOST_USERNAME='pi',
     REMOTE_IMAGE_DIRECTORY='~/elephant_vending_machine/images'
 )
