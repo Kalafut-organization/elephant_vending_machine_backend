@@ -12,7 +12,7 @@ CORS(APP)
 APP.config.update(
     REMOTE_HOSTS=['192.168.0.11', '192.168.0.12', '192.168.0.13'],
     REMOTE_HOST_USERNAME='pi',
-    REMOTE_IMAGE_DIRECTORY='~/elephant_vending_machine/images'
+    REMOTE_IMAGE_DIRECTORY='/home/pi/elephant_vending_machine/images'
 )
 
 # Circular imports are bad, but views are not used here, only imported, so it's OK

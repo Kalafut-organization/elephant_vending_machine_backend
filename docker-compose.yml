@@ -5,22 +5,15 @@ services:
     restart: always
     volumes:
       - web_static:/usr/src/elephant_vending_machine/elephant_vending_machine
-    networks:
-      - web_network
-        
+    
   webproxy:
     image: nginx
     restart: always
     volumes:
       - web_static:/var/www-data
       - ./nginx_conf:/etc/nginx/conf.d
-    networks:
-      - web_network
     ports:
       - "80:80"
-  
-networks:
-  web_network:
 
 volumes:
   web_static:
