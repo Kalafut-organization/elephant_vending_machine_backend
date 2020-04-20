@@ -4,7 +4,7 @@ import time
 
 
 def new_init(self):
-    self.getPosition = lambda pin_number: 30 if pin_number == 0 else 0
+    self.getPosition = lambda pin_number: 5 if pin_number == 0 else 0
 
 
 def new_init_timeout(self):
