@@ -1,0 +1,4 @@
+codecov:
+	ignore:
+		dockerfile
+		docker-compose.yml
