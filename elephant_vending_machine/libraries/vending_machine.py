@@ -155,8 +155,9 @@ class SensorGrouping:
                 before returning to an "off" state.
         """
         ssh_command = f'''ssh -oStrictHostKeyChecking=no -i /root/.ssh/id_rsa pi@{self.address} \
-                    sudo PYTHONPATH=\".:build/lib.linux-armv71-2.7\" python \
-                    {self.config['REMOTE_LED_SCRIPT_DIRECTORY']}/led.py {red} {green} {blue} {display_time}'''
+            sudo PYTHONPATH=\".:build/lib.linux-armv71-2.7\" python \
+            {self.config['REMOTE_LED_SCRIPT_DIRECTORY']}/led.py \
+            {red} {green} {blue} {display_time}'''
         subprocess.run(ssh_command, check=True, shell=True)
 
     def display_on_screen(self, stimuli_name, correct_answer):
