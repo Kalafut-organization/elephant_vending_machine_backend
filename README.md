@@ -51,7 +51,10 @@ NOTE: See section "Running in Production" if you intend to make calls from the f
     * The master branch documentation can be viewed on Read the Docs by clicking the "docs" badge at the top of this README
 
 ## Running in production
-NOTE: This step is necessary to allow the front-end to make API calls. If you don't run the project using Docker it uses a port that the front-end is not expecting and API calls will fail.
+NOTE: This step is necessary to allow the front-end to make API calls. If you don't run the project using Docker it uses a port that the front-end is not expecting and API calls will fail. If running on a device without the sonar sensors connected (such as your dev machine),
+you'll have to remove the `devices` line from the `docker-compose.yml` file. You'll also need to add a file called `id_rsa` to the project
+folder. If using the image syncing, this must be a passwordless SSH key that has been set up with the remote machines to sync images to. Otherwise, it can be an empty file.
+
 1. Connect to your Raspberry Pi
 1. Clone this repo to the Pi
 1. Navigate to the cloned directory
