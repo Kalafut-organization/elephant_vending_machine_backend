@@ -5,8 +5,8 @@ and detecting motion sensor input on the machine.
 """
 
 import time
-import spur
 import subprocess
+import spur
 import maestro
 
 LEFT_SCREEN = 1
@@ -154,7 +154,9 @@ class SensorGrouping:
             display_time (int): The number of seconds that LEDs should display the color
                 before returning to an "off" state.
         """
-        ssh_command = f'''ssh -oStrictHostKeyChecking=no -i /root/.ssh/id_rsa pi@{self.address} sudo PYTHONPATH=\".:build/lib.linux-armv71-2.7\" python {self.config['REMOTE_LED_SCRIPT_DIRECTORY']}/led.py {red} {green} {blue} {display_time}'''
+        ssh_command = f'''ssh -oStrictHostKeyChecking=no -i /root/.ssh/id_rsa pi@{self.address} \
+                    sudo PYTHONPATH=\".:build/lib.linux-armv71-2.7\" python \
+                    {self.config['REMOTE_LED_SCRIPT_DIRECTORY']}/led.py {red} {green} {blue} {display_time}'''
         subprocess.run(ssh_command, check=True, shell=True)
 
     def display_on_screen(self, stimuli_name, correct_answer):
