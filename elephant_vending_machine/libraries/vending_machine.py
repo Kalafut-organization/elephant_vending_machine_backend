@@ -141,7 +141,7 @@ class SensorGrouping:
         self.pid_of_previous_display_command = None
 
     def led_color_with_time(self, red, green, blue, display_time):
-        """Displays the color specified by the given RGB values for *time* seconds.
+        """Displays the color specified by the given RGB values for *time* milliseconds.
 
         Parameters:
             red (int): A number in the range 0-255 specifying how much
@@ -150,7 +150,7 @@ class SensorGrouping:
                 green should be in the RGB color display.
             blue (int): A number in the range 0-255 specifying how much
                 blue should be in the RGB color display.
-            display_time (int): The number of seconds that LEDs should display the color
+            display_time (int): The number of milliseconds that LEDs should display the color
                 before returning to an "off" state.
         """
         shell = spur.SshShell(
