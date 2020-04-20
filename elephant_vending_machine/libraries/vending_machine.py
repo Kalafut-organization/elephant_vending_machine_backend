@@ -135,7 +135,6 @@ class SensorGrouping:
 
     def __init__(self, address, screen_identifier, sensor_pin, config):
         self.group_id = screen_identifier
-        self.correct_stimulus = False
         self.address = address
         self.sensor_pin = sensor_pin
         self.config = config
@@ -160,16 +159,14 @@ class SensorGrouping:
             {red} {green} {blue} {display_time}'''
         subprocess.run(ssh_command, check=True, shell=True)
 
-    def display_on_screen(self, stimuli_name, correct_answer):
+    def display_on_screen(self, stimuli_name):
         """Displays the specified stimuli on the screen.
         Should only be called if the SensorGrouping config is not None
 
         Parameters:
             stimuli_name (str): The name of the file corresponding to the desired
                                 stimuli to be displayed.
-            correct_answer (boolean): Denotes whether this is the desired selection.
         """
-        self.correct_stimulus = correct_answer
         shell = spur.SshShell(
             hostname=self.address,
             username='pi',
