@@ -7,7 +7,6 @@ These are the necessary steps that must be taken to configure the router
 in the event that it has been reset to factory defaults.
 
 #. Connect your computer via ethernet to router port "Ethernet 1"
-#. Connect your computer via ethernet to router port "Ethernet 1"
 #. Navigate to :code:`192.168.0.1` in a web browser
 #. Set the admin login password, which Katie should have, and click "Next"
 #. Set timezone to "Eastern Time" and click "Next"
