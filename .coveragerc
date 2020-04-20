@@ -9,6 +9,3 @@ omit =
 	*/docs/*
 	# Ignore experiment files
 	*/static/experiment/*
-	# Ignore docker files
-	dockerfile
-	docker-compose.yml
