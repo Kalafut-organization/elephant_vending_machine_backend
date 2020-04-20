@@ -25,40 +25,44 @@ def run_experiment(experiment_logger, vending_machine):
         trial_num = trial_index + 1
         experiment_logger.info("Trial %s started", trial_num)
 		
-		vending_machine.left_group.display_on_screen(BLANK_SCREEN, False)
-		vending_machine.middle_group.display_on_screen(FIXATION_STIMULI, True)
-		vending_machine.right_group.display_on_screen(BLANK_SCREEN, False)
+		vending_machine.left_group.display_on_screen(BLANK_SCREEN)
+		vending_machine.middle_group.display_on_screen(FIXATION_STIMULI)
+		vending_machine.right_group.display_on_screen(BLANK_SCREEN)
 		experiment_logger.info("Presented fixation cross")
 		
 		correct_response = False
 		
 		while not correct_response:
-			selection = vending_machine.wait_for_selection(vending_machine.left_group, vending_machine.middle_group, vending_machine.right_group)
+            # Wait for choice on left, middle, or right screens. Timeout if no selection after 5 minutes (300000 milliseconds)
+			selection = vending_machine.wait_for_input([vending_machine.left_group, vending_machine.middle_group, vending_machine.right_group], 30000)
 
 			if selection == 'middle':
 				experiment_logger.info("Trial %s picked middle when selecting fixation cross", trial_num)
+                # Flash middle screen LEDs green for 3 seconds (3000 milliseconds)
+                vending_machine.middle_group.led_color_with_time(0, 255, 0, 3000)
 				correct_response = True
 			elif selection == 'left':
 				experiment_logger.info("Trial %s picked left when selecting fixation cross", trial_num)
-			else:
+			elif selection == 'right':
 				experiment_logger.info("Trial %s picked right when selecting fixation cross", trial_num)
+            else:
+                experiment_logger.info("Trial %s timed out when waiting to select fixation cross", trial_num)
 
         # Randomly decide to display white stimuli on left or right display
         white_on_left = random.choice([True, False])
 
         if white_on_left:
-            vending_machine.left_group.display_on_screen(WHITE_STIMULI, True)
-			vending_machine.middle_group.display_on_screen(FIXATION_STIMULI, False)
-            vending_machine.right_group.display_on_screen(BLACK_STIMULI, False)
+            vending_machine.left_group.display_on_screen(WHITE_STIMULI)
+			vending_machine.middle_group.display_on_screen(FIXATION_STIMULI)
+            vending_machine.right_group.display_on_screen(BLACK_STIMULI)
             experiment_logger.info("Trial %s correct stimuli displayed on left", trial_num)
         else:
-            vending_machine.left_group.display_on_screen(BLACK_STIMULI, False)
-			vending_machine.middle_group.display_on_screen(FIXATION_STIMULI, False)
-            vending_machine.right_group.display_on_screen(WHITE_STIMULI, True)
+            vending_machine.left_group.display_on_screen(BLACK_STIMULI)
+			vending_machine.middle_group.display_on_screen(FIXATION_STIMULI)
+            vending_machine.right_group.display_on_screen(WHITE_STIMULI)
             experiment_logger.info("Trial %s correct stimuli displayed on right", trial_num)
 
-        # Wait for choice on left or right screen. If no selection after 5 minutes (300000 milliseconds)
-        selection = vending_machine.wait_for_selection(vending_machine.left_group, vending_machine.right_group, timeout=300000)
+        selection = vending_machine.wait_for_input([vending_machine.left_group, vending_machine.right_group], 300000)
 
 		if selection == 'timeout':
 			experiment_logger.info("Trial %s no selection made.", trial_num)
