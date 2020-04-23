@@ -77,6 +77,7 @@ Installing and Starting the Frontend
 #. Ensure the Pi is connected to the internet
 #. Download the frontend project with :code:`git clone https://github.com/Kalafut-organization/elephant_vending_machine_frontend.git`
 #. Update npm with :code:`curl https://www.npmjs.com/install.sh | sudo sh`
-#. Install dependencies with :code:`npm install`
+#. Navigate to the cloned directory
+#. Run :code:`docker-compose build --no-cached` to build the images
 #. Connect the Pi to the configured project router via ethernet
-#. Start the frontend with :code:`npm start`
+#. Start the backend server with :code:`docker-compose up`
