@@ -185,7 +185,7 @@ def upload_image():
             except CalledProcessError:
                 if filename in os.listdir(save_path):
                     os.remove(os.path.join(save_path, filename))
-                response = "Error: Failed to copy file to hosts.", \
+                response = "Error: Failed to copy file to hosts. ", \
                   "Image not saved, please try again"
                 response_code = 500
         else:
