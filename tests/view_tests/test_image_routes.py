@@ -47,8 +47,8 @@ def test_post_image_route_with_file(monkeypatch, client):
 def test_post_image_route_copying_exception(monkeypatch, client):
     monkeypatch.setattr('werkzeug.datastructures.FileStorage.save', lambda save_path, filename: "" )
     monkeypatch.setattr('subprocess.run', lambda command, check, shell: raise_(CalledProcessError(1, ['ssh'])))
-    subprocess.call(["touch", "elephant_vending_machine/static/img/test_file.jpg"])
-    data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.png')}
+    subprocess.call(["touch", "elephant_vending_machine/static/img/test_delete.jpg"])
+    data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_delete.png')}
     response = client.post('/image', data=data) 
     assert response.status_code == 500
     assert b"Error: Failed to copy file to hosts. ", \
