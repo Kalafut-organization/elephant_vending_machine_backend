@@ -62,8 +62,9 @@ def test_get_image_endpoint(client):
     assert all(elem in response_json_files for elem in min_elements_expected)
     assert response.status_code == 200
 
-def test_delete_image_happy_path(client):
+def test_delete_image_happy_path(monkeypatch, client):
     subprocess.call(["touch", "elephant_vending_machine/static/img/blank.jpg"])
+    monkeypatch.setattr('subprocess.run', lambda command, check, shell: CompletedProcess(['some_command'], returncode=0))
     response = client.delete('/image/blank.jpg')
     assert response.status_code == 200
     assert json.loads(response.data)['message'] == 'File blank.jpg was successfully deleted.'
