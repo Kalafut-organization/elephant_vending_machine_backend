@@ -108,6 +108,22 @@ def add_remote_image(local_image_path, filename):
         scp_command = f"scp {local_image_path}/{filename} {user}@{host}:{directory}/{filename}"
         subprocess.run(scp_command, check=True, shell=True)
 
+def delete_remote_image(filename):
+    """Deletes an image from the remote hosts defined in flask config.
+
+    Parameters:
+        filename (str): The filename of the remote file to be deleted
+
+    Raises:
+        CalledProcessError: If scp or ssh calls fail for one of the hosts
+    """
+    for host in APP.config['REMOTE_HOSTS']:
+        user = APP.config['REMOTE_HOST_USERNAME']
+        directory = APP.config['REMOTE_IMAGE_DIRECTORY']
+        ssh_command = f'''ssh -oStrictHostKeyChecking=accept-new -i /root/.ssh/id_rsa \
+            {user}@{host} rm {directory}/{filename}'''
+        subprocess.run(ssh_command, check=True, shell=True)
+
 def allowed_file(filename, allowed_extensions):
     """Determines whether an uploaded image file has an allowed extension.
 
@@ -229,6 +245,7 @@ def delete_image(filename):
     if filename in os.listdir(image_directory):
         try:
             os.remove(os.path.join(image_directory, filename))
+            delete_remote_image(filename)
             response = f"File {filename} was successfully deleted."
             response_code = 200
         except IsADirectoryError:

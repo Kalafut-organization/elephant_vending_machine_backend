@@ -5,8 +5,8 @@ services:
     restart: always
     #devices:
     #  - "/dev/ttyACM0:/dev/ttyACM0"    
-    #volumes:
-    #  - web_static:/usr/src/elephant_vending_machine/elephant_vending_machine
+    volumes:
+      - web_static:/usr/src/elephant_vending_machine/elephant_vending_machine
     
   webproxy:
     image: nginx
