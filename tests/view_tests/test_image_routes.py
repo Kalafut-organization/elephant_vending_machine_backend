@@ -52,12 +52,13 @@ def test_post_image_route_with_file(client):
         "Image not saved, please try again" in response.data
 
 def test_post_image_route_copying_exception(monkeypatch, client):
-    monkeypatch.setattr('werkzeug.datastructures.FileStorage.save', lambda save_path, filename: "" )
     monkeypatch.setattr('subprocess.run', lambda command, check, shell: raise_(CalledProcessError(1, ['ssh'])))
-    data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.png')}
+    subprocess.call(["touch", "elephant_vending_machine/static/img/test_delete.jpg"])
+    data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_delete.png')}
     response = client.post('/image', data=data) 
     assert response.status_code == 500
-    assert b'Error: Failed to copy file to hosts' in response.data
+    assert b"Error: Failed to copy file to hosts. ", \
+        "Image not saved, please try again" in response.data
 
 def test_get_image_endpoint(client):
     subprocess.call(["touch", "elephant_vending_machine/static/img/test_file.png"])
@@ -68,8 +69,9 @@ def test_get_image_endpoint(client):
     assert all(elem in response_json_files for elem in min_elements_expected)
     assert response.status_code == 200
 
-def test_delete_image_happy_path(client):
+def test_delete_image_happy_path(monkeypatch, client):
     subprocess.call(["touch", "elephant_vending_machine/static/img/blank.jpg"])
+    monkeypatch.setattr('subprocess.run', lambda command, check, shell: CompletedProcess(['some_command'], returncode=0))
     response = client.delete('/image/blank.jpg')
     assert response.status_code == 200
     assert json.loads(response.data)['message'] == 'File blank.jpg was successfully deleted.'
