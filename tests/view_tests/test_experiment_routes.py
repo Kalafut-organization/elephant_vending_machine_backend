@@ -1,3 +1,4 @@
+import py_compile
 import pytest
 import os
 import subprocess
@@ -45,6 +46,13 @@ def test_post_experiment_route_with_file(monkeypatch, client):
     response = client.post('/experiment', data=data) 
     assert response.status_code == 201
     assert b'Success: Experiment saved.' in response.data
+
+def test_post_experiment_route_compiler_error(monkeypatch, client):
+    monkeypatch.setattr('py_compile.compile', lambda filename, doRaise: raise_(py_compile.PyCompileError()))
+    data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.py')}
+    response = client.post('/experiment', data=data) 
+    assert response.status_code == 400
+    assert b'Error: Experiment failed to compile correctly, please fix the errors and re-upload' in response.data
 
 def test_get_experiemnt_list_all_endpoint(client):
     subprocess.call(["touch", "elephant_vending_machine/static/experiment/test_file.py"])

@@ -11,6 +11,7 @@ from datetime import datetime
 import importlib.util
 import os
 import subprocess
+import py_compile
 from subprocess import CalledProcessError
 from flask import request, make_response, jsonify
 from werkzeug.utils import secure_filename
@@ -352,6 +353,13 @@ def upload_experiment():
             filename = file.filename
             save_path = os.path.dirname(os.path.abspath(__file__)) + EXPERIMENT_UPLOAD_FOLDER
             file.save(os.path.join(save_path, filename))
+            try:
+                py_compile.compile(os.path.join(save_path, filename), doraise=True)
+            except py_compile.PyCompileError as err:
+                os.remove(os.path.join(save_path, filename))
+                response = "Error: Experiment failed to compile correctly, please fix the errors and re-upload"
+                response_code = 400
+                return  make_response(jsonify({'message': response}), response_code)
             response = "Success: Experiment saved."
             response_code = 201
         else:
