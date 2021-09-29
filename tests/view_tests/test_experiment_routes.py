@@ -42,7 +42,7 @@ def test_post_experiment_route_with_file_bad_extension(client):
 
 def test_post_experiment_route_with_file(monkeypatch, client):
     monkeypatch.setattr('werkzeug.datastructures.FileStorage.save', lambda save_path, filename: "" )
-    monkeypatch.setattr('py_compile.compile', lambda filename: "")
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/test_file.py"])
     data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.py')}
     response = client.post('/experiment', data=data) 
     assert response.status_code == 201
