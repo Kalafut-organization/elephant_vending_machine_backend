@@ -49,7 +49,6 @@ def test_post_experiment_route_with_file(monkeypatch, client):
     assert b'Success: Experiment saved.' in response.data
 
 def test_post_experiment_route_compiler_error(monkeypatch, client):
-    monkeypatch.setattr('py_compile.compile', lambda filename: raise_(py_compile.PyCompileError()))
     data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.py')}
     response = client.post('/experiment', data=data) 
     assert response.status_code == 400
