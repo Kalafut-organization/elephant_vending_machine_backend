@@ -355,9 +355,10 @@ def upload_experiment():
             file.save(os.path.join(save_path, filename))
             try:
                 py_compile.compile(os.path.join(save_path, filename), doraise=True)
-            except py_compile.PyCompileError as err:
+            except py_compile.PyCompileError:
                 os.remove(os.path.join(save_path, filename))
-                response = "Error: Experiment failed to compile correctly, please fix the errors and re-upload"
+                response = "Error: Experiment failed to compile correctly,", \
+                   "please fix the errors and re-upload"
                 response_code = 400
                 return  make_response(jsonify({'message': response}), response_code)
             response = "Success: Experiment saved."
