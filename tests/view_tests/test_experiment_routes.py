@@ -53,7 +53,8 @@ def test_post_experiment_route_compiler_error(monkeypatch, client):
     data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.py')}
     response = client.post('/experiment', data=data) 
     assert response.status_code == 400
-    assert b'Error: Experiment failed to compile correctly, please fix the errors and re-upload' in response.data
+    assert b'Error: Experiment failed to compile correctly,', \
+         'please fix the errors and re-upload' in response.data
 
 def test_get_experiemnt_list_all_endpoint(client):
     subprocess.call(["touch", "elephant_vending_machine/static/experiment/test_file.py"])
