@@ -42,14 +42,14 @@ def test_post_experiment_route_with_file_bad_extension(client):
 
 def test_post_experiment_route_with_file(monkeypatch, client):
     monkeypatch.setattr('werkzeug.datastructures.FileStorage.save', lambda save_path, filename: "" )
-    monkeypatch.setattr('py_compile.compile', lambda filename: "")
+    monkeypatch.setattr('py_compile.compile', lambda filename="elephant_vending_machine/static/experiment/test_file.py": "")
     data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.py')}
     response = client.post('/experiment', data=data) 
     assert response.status_code == 201
     assert b'Success: Experiment saved.' in response.data
 
 def test_post_experiment_route_compiler_error(monkeypatch, client):
-    monkeypatch.setattr('py_compile.compile', lambda filename: raise_(py_compile.PyCompileError()))
+    monkeypatch.setattr('py_compile.compile', lambda filename="elephant_vending_machine/static/experiment/test_file.py", doRaise="True": raise_(py_compile.PyCompileError()))
     data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.py')}
     response = client.post('/experiment', data=data) 
     assert response.status_code == 400
