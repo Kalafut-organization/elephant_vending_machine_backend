@@ -657,7 +657,7 @@ def delete_group(name):
             shutil.rmtree(os.path.join(directory, name))
             response = f"Group {name} was successfully deleted."
             response_code = 200
-        except OSError as error:
+        except OSError:
             response = "An error has occurred and the group could not be deleted"
     else:
         response = f"Group {name} does not exist and so couldn't be deleted."
