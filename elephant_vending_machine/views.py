@@ -10,10 +10,10 @@ a lot of routes.
 from datetime import datetime
 import importlib.util
 import os
+import sys
 import shutil
 import subprocess
 import py_compile
-from subprocess import CalledProcessError
 from flask import request, make_response, jsonify
 from werkzeug.utils import secure_filename
 from elephant_vending_machine import APP
@@ -193,7 +193,8 @@ def upload_image(group):
             response = "Error with request: File field in body of response with no file present."
         elif file and allowed_file(file.filename, ALLOWED_IMG_EXTENSIONS):
             filename = secure_filename(file.filename)
-            save_path = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + group
+            save_path = os.path.dirname(os.path.abspath(__file__)) \
+               + IMAGE_UPLOAD_FOLDER + "/" + group
             file.save(os.path.join(save_path, filename))
             response = "Success: Image saved."
             response_code = 201
@@ -210,17 +211,57 @@ def upload_image(group):
             response = "Error with request: File extension not allowed."
     return  make_response(jsonify({'message': response}), response_code)
 
-@APP.route('/<group1>/copy/<group2>/<image>', methods=['POST'])
-def copy_image(group1, group2, image):
-    old_path = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + group1 + "/" + image
-    new_path = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + group2
+@APP.route('/<group>/<image>/copy', methods=['POST'])
+def copy_image(group, image):
+    """Returns a message indicating whether copying of the specified file was successful
+
+    **Example request**:
+
+    .. sourcecode::
+
+      POST /test1/copy/blank.jpg HTTP/1.1
+      Host: 127.0.0.1
+      Content-Type: multipart/form-data; boundary=--------------------------827430006917349763475527
+      Accept-Encoding: gzip, deflate, br
+      Content-Length: 737067
+      Connection: keep-alive
+      ----------------------------827430006917349763475527
+      Content-Disposition: form-data; name="test2"
+
+      {name: "test2"}
+      ----------------------------827430006917349763475527--
+
+    **Example response**:
+
+    .. sourcecode:: http
+
+      HTTP/1.0 200 OK
+      Content-Type: application/json
+      Content-Length: 59
+      Access-Control-Allow-Origin: *
+      Server: Werkzeug/0.16.1 Python/3.8.2
+      Date: Fri, 27 Mar 2020 16:13:42 GMT
+
+      {
+        "message": "File blank.jpg was successfully copied to group 'test2'."
+      }
+
+    :status 200: image file successfully copied
+    :status 400: group with specified name could not be found
+    """
     response = ""
     response_code = 400
-    try :
-      shutil.copy(os.path.join(old_path, image), new_path)
-    except:
-      response= "An error occured. Please try again"
-      response_code = 400
+    group2 = request.form["name"]
+    image_path = os.path.dirname(os.path.abspath(__file__)) + \
+      IMAGE_UPLOAD_FOLDER + "/" + group + "/" + image
+    group_path = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + group2
+    print(image_path, file=sys.stderr)
+    if os.path.isdir(group_path):
+        shutil.copy(image_path, group_path)
+        response = "File " + image + " was successfully copied to group '" + group2 + "'."
+        response_code = 200
+    else:
+        response = "Error with request: " + group2 + "is not an existing directory"
     return  make_response(jsonify({'message': response}), response_code)
 
 @APP.route('/image/<group>/<filename>', methods=['DELETE'])
@@ -254,22 +295,22 @@ def delete_image(group, filename):
     :status 200: image file successfully deleted
     :status 400: file with specified name could not be found
     """
-<<<<<<< HEAD
-    group_filename = filename.split('/')
-    image_directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + group_filename[0]
-=======
-    image_directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + group
->>>>>>> 79d3446871cbc3385d1a59035b2cd0791f1d19c2
     response_code = 400
     response = ""
-    try:
-        os.remove(os.path.join(image_directory, filename))
-        #delete_remote_image(filename)
-        response = f"File {filename} was successfully deleted."
-        response_code = 200
-    except IsADirectoryError:
-        response = f"{filename} exists, but is a directory and not a file. Deletion failed."
-    response = f"File {filename} does not exist and so couldn't be deleted."
+    image_directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + group
+    if os.path.isdir(image_directory):
+        if filename in os.listdir(image_directory):
+            try:
+                os.remove(os.path.join(image_directory, filename))
+                #delete_remote_image(filename)
+                response = f"File {filename} was successfully deleted."
+                response_code = 200
+            except IsADirectoryError:
+                response = f"{filename} exists, but is a directory and not a file. Deletion failed."
+        else:
+            response = f"File {filename} does not exist and so couldn't be deleted."
+    else:
+        response = f"Group {group} does not exist"
     return make_response(jsonify({'message': response}), response_code)
 
 @APP.route('/<group>', methods=['GET'])
@@ -568,7 +609,7 @@ def allowed_group(name):
     """Determines whether a group exists in the directory already"""
     directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
     groups = os.listdir(directory)
-    return (name not in groups)
+    return name not in groups
 
 @APP.route('/groups', methods=['GET'])
 def list_groups():
