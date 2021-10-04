@@ -13,7 +13,6 @@ import os
 import shutil
 import subprocess
 import py_compile
-from subprocess import CalledProcessError
 from flask import request, make_response, jsonify
 from werkzeug.utils import secure_filename
 from elephant_vending_machine import APP
@@ -193,7 +192,8 @@ def upload_image(group):
             response = "Error with request: File field in body of response with no file present."
         elif file and allowed_file(file.filename, ALLOWED_IMG_EXTENSIONS):
             filename = secure_filename(file.filename)
-            save_path = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + group
+            save_path = os.path.dirname(os.path.abspath(__file__)) \
+               + IMAGE_UPLOAD_FOLDER + "/" + group
             file.save(os.path.join(save_path, filename))
             response = "Success: Image saved."
             response_code = 201
@@ -212,15 +212,12 @@ def upload_image(group):
 
 @APP.route('/<group1>/copy/<group2>/<image>', methods=['POST'])
 def copy_image(group1, group2, image):
-    old_path = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + group1 + "/" + image
+    old_path = os.path.dirname(os.path.abspath(__file__)) + \
+      IMAGE_UPLOAD_FOLDER + "/" + group1 + "/" + image
     new_path = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + group2
     response = ""
     response_code = 400
-    try :
-      shutil.copy(os.path.join(old_path, image), new_path)
-    except:
-      response= "An error occured. Please try again"
-      response_code = 400
+    shutil.copy(os.path.join(old_path, image), new_path)
     return  make_response(jsonify({'message': response}), response_code)
 
 @APP.route('/image/<group>/<filename>', methods=['DELETE'])
@@ -563,7 +560,7 @@ def allowed_group(name):
     """Determines whether a group exists in the directory already"""
     directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
     groups = os.listdir(directory)
-    return (name not in groups)
+    return name not in groups
 
 @APP.route('/groups', methods=['GET'])
 def list_groups():
