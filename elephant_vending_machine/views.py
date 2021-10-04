@@ -549,8 +549,9 @@ def list_logs():
 
 def allowed_group(name):
     """Determines whether a group exists in the directory already"""
-    directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + name
-    return name not in directory
+    directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
+    groups = os.listdir(directory)
+    return (name not in groups)
 
 @APP.route('/groups', methods=['GET'])
 def list_groups():
@@ -577,7 +578,7 @@ def create_group():
             response = "Error with request: File field in body of response with no file present."
         elif allowed_group(group_name):
             filename = secure_filename(group_name)
-            save_path=os.path.dirname(os.path.abspath(__file__))+IMAGE_UPLOAD_FOLDER+"/"+group_name
+            save_path=os.path.dirname(os.path.abspath(__file__))+IMAGE_UPLOAD_FOLDER
             folder = os.path.join(save_path, filename)
             os.makedirs(folder)
             response = "Success: Folder created."
