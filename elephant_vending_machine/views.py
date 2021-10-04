@@ -240,7 +240,7 @@ def delete_image(filename):
     :status 200: image file successfully deleted
     :status 400: file with specified name could not be found
     """
-    group_filename = filename.split(/)
+    group_filename = filename.split('/')
     image_directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + group_filename[0]
     response_code = 400
     response = ""
