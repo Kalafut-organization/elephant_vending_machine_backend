@@ -212,6 +212,35 @@ def upload_image(group):
 
 @APP.route('/<group1>/copy/<group2>/<image>', methods=['POST'])
 def copy_image(group1, group2, image):
+    """Returns a message indicating whether deletion of the specified file was successful
+
+    **Example request**:
+
+    .. sourcecode::
+
+      DELETE /image/group-name/blank.jpg HTTP/1.1
+      Host: 127.0.0.1
+      Accept-Encoding: gzip, deflate, br
+      Connection: keep-alive
+
+    **Example response**:
+
+    .. sourcecode:: http
+
+      HTTP/1.0 200 OK
+      Content-Type: application/json
+      Content-Length: 59
+      Access-Control-Allow-Origin: *
+      Server: Werkzeug/0.16.1 Python/3.8.2
+      Date: Fri, 27 Mar 2020 16:13:42 GMT
+
+      {
+        "message": "File blank.jpg was successfully deleted."
+      }
+
+    :status 200: image file successfully deleted
+    :status 400: file with specified name could not be found
+    """
     old_path = os.path.dirname(os.path.abspath(__file__)) + \
       IMAGE_UPLOAD_FOLDER + "/" + group1 + "/" + image
     new_path = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + group2
