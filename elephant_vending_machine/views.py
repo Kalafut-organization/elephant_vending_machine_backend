@@ -549,6 +549,7 @@ def list_logs():
     return make_response(jsonify({'files': full_log_paths}), response_code)
 
 def allowed_group(name):
+<<<<<<< HEAD
   """Determines whether a group exists in the directory already"""
   directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER 
   print(directory)
@@ -556,22 +557,28 @@ def allowed_group(name):
     return True
   else:
     return False
+=======
+    """Determines whether a group exists in the directory already"""
+    directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
+    groups = os.listdir(directory)
+    return (name not in groups)
+>>>>>>> 8e7af819bd8acc89f75e282fe5c6a3a6acaab3cf
 
 @APP.route('/groups', methods=['GET'])
 def list_groups():
-  """Return JSON body with message of all folders in the static/img directory"""
-  path_to_current_file = os.path.dirname(os.path.abspath(__file__))
-  images_path = os.path.join(path_to_current_file, 'static', 'img')
-  directory_list = os.listdir(images_path)
-  groups = [f for f in directory_list]
-  groups.sort()
-  if '.gitignore' in groups:
-      groups.remove('.gitignore')
-  response_code = 200
-  return make_response(jsonify({'names': groups}), response_code)
+    """Return JSON body with message of all folders in the static/img directory"""
+    path_to_current_file = os.path.dirname(os.path.abspath(__file__))
+    images_path = os.path.join(path_to_current_file, 'static', 'img')
+    groups = os.listdir(images_path)
+    groups.sort()
+    if '.gitignore' in groups:
+        groups.remove('.gitignore')
+    response_code = 200
+    return make_response(jsonify({'names': groups}), response_code)
 
 @APP.route('/groups', methods=['POST'])
 def create_group():
+<<<<<<< HEAD
   """Return JSON body with message indicating result of group creation request"""
   response = ""
   response_code = 400
@@ -588,13 +595,32 @@ def create_group():
       os.makedirs(folder)
       response = "Success: Folder created."
       response_code = 201
+=======
+    """Return JSON body with message indicating result of group creation request"""
+    response = ""
+    response_code = 400
+    if 'name' not in request.form:
+        response = "Error with request: No file field in body of request."
+>>>>>>> 8e7af819bd8acc89f75e282fe5c6a3a6acaab3cf
     else:
-      response = "Error with request: Folder already exists."
-  return make_response(jsonify({'message': response}), response_code)
+        group_name = request.form['name']
+        if group_name == '':
+            response = "Error with request: File field in body of response with no file present."
+        elif allowed_group(group_name):
+            filename = secure_filename(group_name)
+            save_path=os.path.dirname(os.path.abspath(__file__))+IMAGE_UPLOAD_FOLDER
+            folder = os.path.join(save_path, filename)
+            os.makedirs(folder)
+            response = "Success: Folder created."
+            response_code = 201
+        else:
+            response = "Error with request: Folder already exists."
+    return make_response(jsonify({'message': response}), response_code)
 
 
 @APP.route('/groups/<name>', methods=['DELETE'])
 def delete_group(name):
+<<<<<<< HEAD
   """Return JSON body with message indicating result of group deletion request"""
   directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
   print(directory)
@@ -610,3 +636,20 @@ def delete_group(name):
   else:
       response = f"Group {name} does not exist and so couldn't be deleted."
   return make_response(jsonify({'message': response}), response_code)
+=======
+    """Return JSON body with message indicating result of group deletion request"""
+    directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
+    print(directory)
+    response_code = 400
+    response = ""
+    if name in os.listdir(directory):
+        try:
+            os.rmdir(os.path.join(directory, name))
+            response = f"Group {name} was successfully deleted."
+            response_code = 200
+        except OSError as error:
+            response = error
+    else:
+        response = f"Group {name} does not exist and so couldn't be deleted."
+    return make_response(jsonify({'message': response}), response_code)
+>>>>>>> 8e7af819bd8acc89f75e282fe5c6a3a6acaab3cf
