@@ -549,7 +549,7 @@ def list_logs():
 
 def allowed_group(name):
   """Determines whether a group exists in the directory already"""
-  directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
+  directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + name
   print(directory)
   if name not in directory:
     return True
@@ -582,7 +582,7 @@ def create_group():
       response = "Error with request: File field in body of response with no file present."
     elif allowed_group(group_name):
       filename = secure_filename(group_name)
-      save_path = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
+      save_path = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + group_name
       folder = os.path.join(save_path, filename)
       os.makedirs(folder)
       response = "Success: Folder created."
@@ -595,7 +595,7 @@ def create_group():
 @APP.route('/groups/<name>', methods=['DELETE'])
 def delete_group(name):
   """Return JSON body with message indicating result of group deletion request"""
-  directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
+  directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + group_name
   print(directory)
   response_code = 400
   response = ""
