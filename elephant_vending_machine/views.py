@@ -577,7 +577,7 @@ def create_group():
             response = "Error with request: File field in body of response with no file present."
         elif allowed_group(group_name):
             filename = secure_filename(group_name)
-            save_path = os.path.dirname(os.path.abspath(__file__))+IMAGE_UPLOAD_FOLDER+"/"+group_name
+            save_path=os.path.dirname(os.path.abspath(__file__))+IMAGE_UPLOAD_FOLDER+"/"+group_name
             folder = os.path.join(save_path, filename)
             os.makedirs(folder)
             response = "Success: Folder created."
@@ -599,8 +599,8 @@ def delete_group(name):
             os.rmdir(os.path.join(directory, name))
             response = f"Group {name} was successfully deleted."
             response_code = 200
-        except OSError as Error:
-            response = Error
+        except OSError as error:
+            response = error
     else:
         response = f"Group {name} does not exist and so couldn't be deleted."
     return make_response(jsonify({'message': response}), response_code)
