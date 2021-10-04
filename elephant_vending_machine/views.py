@@ -650,16 +650,17 @@ def create_group():
 def delete_group(name):
     """Return JSON body with message indicating result of group deletion request"""
     directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
-    print(directory)
+    print(directory, file=sys.stderr)
+    print(os.path.join(directory, name), file=sys.stderr)
     response_code = 400
     response = ""
     if name in os.listdir(directory):
         try:
-            os.rmdir(os.path.join(directory, name))
+            shutil.rmtree(os.path.join(directory, name))
             response = f"Group {name} was successfully deleted."
             response_code = 200
         except OSError as error:
-            response = error
+            response = "An error has occurred and the group could not be deleted"
     else:
         response = f"Group {name} does not exist and so couldn't be deleted."
     return make_response(jsonify({'message': response}), response_code)
