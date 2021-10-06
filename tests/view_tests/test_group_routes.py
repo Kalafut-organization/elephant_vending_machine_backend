@@ -17,8 +17,8 @@ def client():
 
     with elephant_vending_machine.APP.test_client() as client:
         yield client
-        subprocess.call(["rmdir","elephant_vending_machine/static/img/test"])
-        subprocess.call(["rmdir","elephant_vending_machine/static/img/test2"])
+        subprocess.call(["rm","elephant_vending_machine/static/img/test"])
+        subprocess.call(["rm","elephant_vending_machine/static/img/test2"])
 
 def test_post_group_route_no_name(client):
     response = client.post('/groups')
@@ -42,7 +42,7 @@ def test_post_group_route_copying_exception(monkeypatch, client):
     monkeypatch.setattr('subprocess.run', lambda command, check, shell: CompletedProcess(['some_command'], returncode=0))
     data = 'test'
     response = client.post('/groups', data=data)
-    assert response.status_code == 500
+    assert response.status_code == 400
     assert b'Error: Failed to create group on hosts. ", \
         "Group not created, please try again' in response.data
 
