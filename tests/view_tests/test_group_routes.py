@@ -17,8 +17,8 @@ def client():
 
     with elephant_vending_machine.APP.test_client() as client:
         yield client
-        subprocess.call(["rmdir","elephant_vending_machine/static/img/test"], shell=True)
-        subprocess.call(["rmdir","elephant_vending_machine/static/img/test2"], shell=True)
+        subprocess.call(["rmdir","elephant_vending_machine/static/img/test"])
+        subprocess.call(["rmdir","elephant_vending_machine/static/img/test2"])
 
 def test_post_group_route_no_name(client):
     response = client.post('/groups')
@@ -32,7 +32,7 @@ def test_post_group_route_empty_name(client):
     assert json.loads(response.data)['message'] == 'Error with request: Group name must not be empty.'
 
 def test_post_group_route_duplicate(client):
-    subprocess.call(["mkdir", "elephant_vending_machine/static/img/test"], shell=True)
+    subprocess.call(["mkdir", "elephant_vending_machine/static/img/test"])
     data = 'test'
     response = client.post('/groups', data=data)
     assert response.status_code == 400
@@ -60,14 +60,14 @@ def test_delete_group_route_not_exist(client):
 
 def test_delete_group_route_os_error(monkeypatch, client):
     monkeypatch.setattr('shutil.rmtree', lambda path: raise_(OSError))
-    subprocess.call(["mkdir", "elephant_vending_machine/static/img/test"], shell=True)
+    subprocess.call(["mkdir", "elephant_vending_machine/static/img/test"])
     response = client.delete('/groups/test')
     assert response.status_code == 400
     assert b'An error has occurred and the group could not be deleted' in response.data
 
 def test_get_group_route(client):
-    subprocess.call(["mkdir", "elephant_vending_machine/static/img/test"], shell=True)
-    subprocess.call(["mkdir", "elephant_vending_machine/static/img/test2"], shell=True)
+    subprocess.call(["mkdir", "elephant_vending_machine/static/img/test"])
+    subprocess.call(["mkdir", "elephant_vending_machine/static/img/test2"])
     response = client.get('/groups')
     response_json_files = json.loads(response.data)['names']
     min_elements_expected = ["test","test2"]
