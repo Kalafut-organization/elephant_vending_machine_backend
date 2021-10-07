@@ -264,7 +264,6 @@ def copy_image(group, image):
         response = "File " + image + " was successfully copied to group '" + group2 + "'."
         response_code = 200
 
-        
         try:
             add_remote_image(old_group, group2, image)
         except CalledProcessError:
