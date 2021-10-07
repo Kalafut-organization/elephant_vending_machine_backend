@@ -43,8 +43,7 @@ def test_post_group_route_copying_exception(monkeypatch, client):
     data = {'name': 'test'}
     response = client.post('/groups', data=data)
     assert response.status_code == 500
-    assert json.loads(response.data)['message'] == 'Error: Failed to create group on hosts. ', \
-        'Group not created, please try again'
+    assert json.loads(response.data)['message'] == 'Error: Failed to create group on hosts.'
 
 def test_post_group_route_happy_path(monkeypatch, client):
     monkeypatch.setattr('subprocess.run', lambda command, check, shell: CompletedProcess(['some_command'], returncode=0))

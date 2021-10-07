@@ -679,8 +679,7 @@ def create_group():
                 response = "Success: Group created."
                 response_code = 201
             except CalledProcessError:
-                response = "Error: Failed to create group on hosts. ", \
-                  "Group not created, please try again"
+                response = "Error: Failed to create group on hosts."
                 response_code = 500
         else:
             response = "Error with request: Group already exists."
