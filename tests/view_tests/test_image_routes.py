@@ -44,13 +44,6 @@ def client():
 #    assert response.status_code == 201
 #    assert b'Success: Image saved.' in response.data
 
-#def test_post_image_route_with_file(client):
-#   data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.png')}
-#    response = client.post('/image', data=data) 
-#    assert response.status_code == 500
-#    assert b"Error: Failed to copy file to hosts. ", \
-#        "Image not saved, please try again" in response.data
-
 #def test_post_image_route_copying_exception(monkeypatch, client):
 #    monkeypatch.setattr('subprocess.run', lambda command, check, shell: raise_(CalledProcessError(1, ['ssh'])))
 #    subprocess.call(["touch", "elephant_vending_machine/static/img/test_delete.jpg"])

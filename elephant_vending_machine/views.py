@@ -13,6 +13,7 @@ import os
 import sys
 import shutil
 import subprocess
+from subprocess import CalledProcessError
 import py_compile
 from flask import request, make_response, jsonify
 from werkzeug.utils import secure_filename
@@ -91,7 +92,7 @@ def run_experiment(filename):
     response_body['message'] = response_message
     return make_response(jsonify(response_body), response_code)
 
-def add_remote_image(local_image_path, filename):
+def add_remote_image(local_image_path, group, filename):
     """Adds an image to the remote hosts defined in flask config.
 
     Parameters:
@@ -103,14 +104,14 @@ def add_remote_image(local_image_path, filename):
     """
     for host in APP.config['REMOTE_HOSTS']:
         user = APP.config['REMOTE_HOST_USERNAME']
-        directory = APP.config['REMOTE_IMAGE_DIRECTORY']
+        directory = APP.config['REMOTE_IMAGE_DIRECTORY'] + '/' + group
         ssh_command = f'''ssh -oStrictHostKeyChecking=accept-new -i /root/.ssh/id_rsa \
             {user}@{host} mkdir -p {directory}'''
         subprocess.run(ssh_command, check=True, shell=True)
         scp_command = f"scp {local_image_path}/{filename} {user}@{host}:{directory}/{filename}"
         subprocess.run(scp_command, check=True, shell=True)
 
-def delete_remote_image(filename):
+def delete_remote_image(group, filename):
     """Deletes an image from the remote hosts defined in flask config.
 
     Parameters:
@@ -121,7 +122,7 @@ def delete_remote_image(filename):
     """
     for host in APP.config['REMOTE_HOSTS']:
         user = APP.config['REMOTE_HOST_USERNAME']
-        directory = APP.config['REMOTE_IMAGE_DIRECTORY']
+        directory = APP.config['REMOTE_IMAGE_DIRECTORY'] + '/' + group
         ssh_command = f'''ssh -oStrictHostKeyChecking=accept-new -i /root/.ssh/id_rsa \
             {user}@{host} rm {directory}/{filename}'''
         subprocess.run(ssh_command, check=True, shell=True)
@@ -199,14 +200,14 @@ def upload_image(group):
             response = "Success: Image saved."
             response_code = 201
 
-            #try:
-            #    add_remote_image(save_path, filename)
-            #except CalledProcessError:
-            #    if filename in os.listdir(save_path):
-            #        os.remove(os.path.join(save_path, filename))
-            #    response = "Error: Failed to copy file to hosts. ", \
-            #      "Image not saved, please try again"
-            #    response_code = 500
+            try:
+                add_remote_image(save_path, group, filename)
+            except CalledProcessError:
+                if filename in os.listdir(save_path):
+                    os.remove(os.path.join(save_path, filename))
+                response = "Error: Failed to copy file to hosts. ", \
+                  "Image not saved, please try again"
+                response_code = 500
         else:
             response = "Error with request: File extension not allowed."
     return  make_response(jsonify({'message': response}), response_code)
@@ -252,6 +253,8 @@ def copy_image(group, image):
     response = ""
     response_code = 400
     group2 = request.form["name"]
+    old_group = image_path = os.path.dirname(os.path.abspath(__file__)) + \
+      IMAGE_UPLOAD_FOLDER + "/" + group
     image_path = os.path.dirname(os.path.abspath(__file__)) + \
       IMAGE_UPLOAD_FOLDER + "/" + group + "/" + image
     group_path = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + group2
@@ -260,6 +263,15 @@ def copy_image(group, image):
         shutil.copy(image_path, group_path)
         response = "File " + image + " was successfully copied to group '" + group2 + "'."
         response_code = 200
+
+        try:
+            add_remote_image(old_group, group2, image)
+        except CalledProcessError:
+            if os.path.exists(group_path + "/" + image):
+                os.remove(group_path + "/" + image)
+            response = "Error: Failed to copy file to hosts. ", \
+              "Image not copied, please try again"
+            response_code = 500
     else:
         response = "Error with request: " + group2 + "is not an existing directory"
     return  make_response(jsonify({'message': response}), response_code)
@@ -302,7 +314,7 @@ def delete_image(group, filename):
         if filename in os.listdir(image_directory):
             try:
                 os.remove(os.path.join(image_directory, filename))
-                #delete_remote_image(filename)
+                delete_remote_image(group, filename)
                 response = f"File {filename} was successfully deleted."
                 response_code = 200
             except IsADirectoryError:
@@ -611,6 +623,41 @@ def allowed_group(name):
     groups = os.listdir(directory)
     return name not in groups
 
+def add_remote_group(group_name):
+    """Adds a group to the remote hosts defined in flask config.
+
+    Parameters:
+        group_name (str): The filename of the local group to be copied
+
+    Raises:
+        CalledProcessError: If scp or ssh calls fail for one of the hosts
+    """
+    for host in APP.config['REMOTE_HOSTS']:
+        user = APP.config['REMOTE_HOST_USERNAME']
+        directory = APP.config['REMOTE_IMAGE_DIRECTORY']
+        ssh_command = f'''ssh -oStrictHostKeyChecking=accept-new -i /root/.ssh/id_rsa \
+            {user}@{host} mkdir -p {directory}'''
+        subprocess.run(ssh_command, check=True, shell=True)
+        mkdir_command = f'''ssh -oStrictHostKeyChecking=accept-new -i /root/.ssh/id_rsa \
+            {user}@{host} mkdir -p {directory}/{group_name}'''
+        subprocess.run(mkdir_command, check=True, shell=True)
+
+def delete_remote_group(group_name):
+    """Deletes a group from the remote hosts defined in flask config.
+
+    Parameters:
+        group_name (str): The name of the remote group to be deleted
+
+    Raises:
+        CalledProcessError: If scp or ssh calls fail for one of the hosts
+    """
+    for host in APP.config['REMOTE_HOSTS']:
+        user = APP.config['REMOTE_HOST_USERNAME']
+        directory = APP.config['REMOTE_IMAGE_DIRECTORY']
+        ssh_command = f'''ssh -oStrictHostKeyChecking=accept-new -i /root/.ssh/id_rsa \
+            {user}@{host} rm -r {directory}/{group_name}'''
+        subprocess.run(ssh_command, check=True, shell=True)
+
 @APP.route('/groups', methods=['GET'])
 def list_groups():
     """Return JSON body with message of all folders in the static/img directory"""
@@ -629,20 +676,25 @@ def create_group():
     response = ""
     response_code = 400
     if 'name' not in request.form:
-        response = "Error with request: No file field in body of request."
+        response = "Error with request: No name field in body of request."
     else:
         group_name = request.form['name']
         if group_name == '':
-            response = "Error with request: File field in body of response with no file present."
+            response = "Error with request: Group name must not be empty."
         elif allowed_group(group_name):
             filename = secure_filename(group_name)
-            save_path = os.path.dirname(os.path.abspath(__file__))+IMAGE_UPLOAD_FOLDER
-            folder = os.path.join(save_path, filename)
-            os.makedirs(folder)
-            response = "Success: Folder created."
-            response_code = 201
+            try:
+                add_remote_group(filename)
+                save_path = os.path.dirname(os.path.abspath(__file__))+IMAGE_UPLOAD_FOLDER
+                folder = os.path.join(save_path, filename)
+                os.makedirs(folder)
+                response = "Success: Group created."
+                response_code = 201
+            except CalledProcessError:
+                response = "Error: Failed to create group on hosts."
+                response_code = 500
         else:
-            response = "Error with request: Folder already exists."
+            response = "Error with request: Group already exists."
     return make_response(jsonify({'message': response}), response_code)
 
 
@@ -650,16 +702,16 @@ def create_group():
 def delete_group(name):
     """Return JSON body with message indicating result of group deletion request"""
     directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
-    print(directory)
     response_code = 400
     response = ""
     if name in os.listdir(directory):
         try:
-            os.rmdir(os.path.join(directory, name))
+            shutil.rmtree(os.path.join(directory, name))
+            delete_remote_group(name)
             response = f"Group {name} was successfully deleted."
             response_code = 200
-        except OSError as error:
-            response = error
+        except OSError:
+            response = "An error has occurred and the group could not be deleted"
     else:
         response = f"Group {name} does not exist and so couldn't be deleted."
     return make_response(jsonify({'message': response}), response_code)
