@@ -42,7 +42,7 @@ def test_post_group_route_copying_exception(monkeypatch, client):
     monkeypatch.setattr('subprocess.run', lambda command, check, shell: raise_(CalledProcessError(1, ['ssh'])))
     data = {'name': 'test'}
     response = client.post('/groups', data=data)
-    assert response.status_code == 400
+    assert response.status_code == 500
     assert b'Error: Failed to create group on hosts. ", \
         "Group not created, please try again' in response.data
 
