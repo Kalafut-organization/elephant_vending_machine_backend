@@ -200,14 +200,14 @@ def upload_image(group):
             response = "Success: Image saved."
             response_code = 201
 
-            try:
-                add_remote_image(save_path, group, filename)
-            except CalledProcessError:
-                if filename in os.listdir(save_path):
-                    os.remove(os.path.join(save_path, filename))
-                response = "Error: Failed to copy file to hosts. ", \
-                  "Image not saved, please try again"
-                response_code = 500
+            # try:
+            #     add_remote_image(save_path, group, filename)
+            # except CalledProcessError:
+            #     if filename in os.listdir(save_path):
+            #         os.remove(os.path.join(save_path, filename))
+            #     response = "Error: Failed to copy file to hosts. ", \
+            #       "Image not saved, please try again"
+            #     response_code = 500
         else:
             response = "Error with request: File extension not allowed."
     return  make_response(jsonify({'message': response}), response_code)
@@ -264,14 +264,14 @@ def copy_image(group, image):
         response = "File " + image + " was successfully copied to group '" + group2 + "'."
         response_code = 200
 
-        try:
-            add_remote_image(old_group, group2, image)
-        except CalledProcessError:
-            if os.path.exists(group_path + "/" + image):
-                os.remove(group_path + "/" + image)
-            response = "Error: Failed to copy file to hosts. ", \
-              "Image not copied, please try again"
-            response_code = 500
+        # try:
+        #     add_remote_image(old_group, group2, image)
+        # except CalledProcessError:
+        #     if os.path.exists(group_path + "/" + image):
+        #         os.remove(group_path + "/" + image)
+        #     response = "Error: Failed to copy file to hosts. ", \
+        #       "Image not copied, please try again"
+        #     response_code = 500
     else:
         response = "Error with request: " + group2 + "is not an existing directory"
     return  make_response(jsonify({'message': response}), response_code)
@@ -314,7 +314,7 @@ def delete_image(group, filename):
         if filename in os.listdir(image_directory):
             try:
                 os.remove(os.path.join(image_directory, filename))
-                delete_remote_image(group, filename)
+                # delete_remote_image(group, filename)
                 response = f"File {filename} was successfully deleted."
                 response_code = 200
             except IsADirectoryError:
@@ -684,7 +684,7 @@ def create_group():
         elif allowed_group(group_name):
             filename = secure_filename(group_name)
             try:
-                add_remote_group(filename)
+                # add_remote_group(filename)
                 save_path = os.path.dirname(os.path.abspath(__file__))+IMAGE_UPLOAD_FOLDER
                 folder = os.path.join(save_path, filename)
                 os.makedirs(folder)
@@ -715,3 +715,12 @@ def delete_group(name):
     else:
         response = f"Group {name} does not exist and so couldn't be deleted."
     return make_response(jsonify({'message': response}), response_code)
+
+@APP.route('/template', methods=['GET'])
+def download_example_path(filename="form_template.py"):
+    """Return file to be downloaded"""
+    resource_route = "/static/templates/"
+    file_request_path = request.base_url[:request.base_url.rfind('/')] + resource_route
+    sample_path = file_request_path + filename
+    response_code = 200
+    return make_response(jsonify({'files': [sample_path]}), response_code)
