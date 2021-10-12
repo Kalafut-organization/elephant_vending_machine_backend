@@ -253,8 +253,8 @@ def copy_image(group, image):
     response = ""
     response_code = 400
     group2 = request.form["name"]
-    old_group = image_path = os.path.dirname(os.path.abspath(__file__)) + \
-      IMAGE_UPLOAD_FOLDER + "/" + group
+    #old_group = image_path = os.path.dirname(os.path.abspath(__file__)) + \
+    #  IMAGE_UPLOAD_FOLDER + "/" + group
     image_path = os.path.dirname(os.path.abspath(__file__)) + \
       IMAGE_UPLOAD_FOLDER + "/" + group + "/" + image
     group_path = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + group2

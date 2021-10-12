@@ -14,14 +14,17 @@ STIMULI_OUTCOMES = []
 USED_STIMULI = []
 BLANK_SCREEN = 'all_black_screen.png'
 
+def list_full_paths(directory):
+    return [os.path.join(directory, file) for file in os.listdir(directory)]
+
 def random_image(group_path):
-    files = os.listdir(group_path)
+    files = list_full_paths(group_path)
     image = random.choice(files)
     if REPLACEMENT:
         while USED_STIMULI.count(image) > 0:
             image = random.choice(files)
         USED_STIMULI.append(image)
-    return image
+    return os.sep.join(os.path.normpath(image).split(os.sep)[-2:])
 
 
 def run_experiment(experiment_logger, vending_machine):
