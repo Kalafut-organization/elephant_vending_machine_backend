@@ -20,19 +20,19 @@ def client():
         subprocess.call(["rm", "elephant_vending_machine/static/img/GRP_TST/blank.jpg"])
 
 def test_post_image_route_no_file(client):
-    response = client.post('/image')
+    response = client.post('/image/GRP_TST')
     assert response.status_code == 400
     assert b'Error with request: No file field in body of request.' in response.data
 
 def test_post_image_route_empty_filename(client):
     data = {'file': (BytesIO(b"Testing: \x00\x01"), '')}
-    response = client.post('/image', data=data) 
+    response = client.post('/image/GRP_TST', data=data) 
     assert response.status_code == 400
     assert b'Error with request: File field in body of response with no file present.' in response.data
 
 def test_post_image_route_with_file_bad_extension(client):
     data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.sh')}
-    response = client.post('/image', data=data) 
+    response = client.post('/image/GRP_TST', data=data) 
     assert response.status_code == 400
     assert b'Error with request: File extension not allowed.' in response.data
 
@@ -40,7 +40,7 @@ def test_post_image_route_with_file(monkeypatch, client):
     monkeypatch.setattr('werkzeug.datastructures.FileStorage.save', lambda save_path, filename: "" )
     monkeypatch.setattr('subprocess.run', lambda command, check, shell: CompletedProcess(['some_command'], returncode=0))
     data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_file.png')}
-    response = client.post('/image', data=data) 
+    response = client.post('/image/GRP_TST', data=data) 
     assert response.status_code == 201
     assert b'Success: Image saved.' in response.data
 
@@ -48,7 +48,7 @@ def test_post_image_route_copying_exception(monkeypatch, client):
     monkeypatch.setattr('subprocess.run', lambda command, check, shell: raise_(CalledProcessError(1, ['ssh'])))
     subprocess.call(["touch", "elephant_vending_machine/static/img/GRP_TST/test_delete.jpg"])
     data = {'file': (BytesIO(b"Testing: \x00\x01"), 'test_delete.png')}
-    response = client.post('/image', data=data) 
+    response = client.post('/image/GRP_TST', data=data) 
     assert response.status_code == 500
     assert b"Error: Failed to copy file to hosts. ", \
         "Image not saved, please try again" in response.data
@@ -56,7 +56,7 @@ def test_post_image_route_copying_exception(monkeypatch, client):
 def test_get_image_endpoint(client):
     subprocess.call(["touch", "elephant_vending_machine/static/img/GRP_TST/test_file.png"])
     subprocess.call(["touch", "elephant_vending_machine/static/img/GRP_TST/test_file2.jpg"])
-    response = client.get('/image')
+    response = client.get('/image/GRP_TST')
     response_json_files = json.loads(response.data)['files']
     min_elements_expected = ["http://localhost/static/img/GRP_TST/test_file.png","http://localhost/static/img/GRP_TST/test_file2.jpg"]
     assert all(elem in response_json_files for elem in min_elements_expected)
