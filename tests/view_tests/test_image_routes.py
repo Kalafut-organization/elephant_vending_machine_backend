@@ -19,6 +19,7 @@ def client():
         subprocess.call(["rm", "elephant_vending_machine/static/img/GRP_TST/test_file2.jpg"])
         subprocess.call(["rm", "elephant_vending_machine/static/img/GRP_TST/blank.jpg"])
         subprocess.call(["rm", "-rf", "elephant_vending_machine/static/img/GRP_TST"])
+        subprocess.call(["rm", "-rf", "elephant_vending_machine/static/img/GRP_TST2"])
 
 def test_post_image_route_no_file(client):
     subprocess.call(["mkdir", "elephant_vending_machine/static/img/GRP_TST"])
@@ -77,6 +78,15 @@ def test_delete_image_happy_path(monkeypatch, client):
     assert response.status_code == 200
     assert json.loads(response.data)['message'] == 'File blank.jpg was successfully deleted.'
     
+def test_delete_image_route_copying_exception(monkeypatch, client):
+    subprocess.call(["mkdir", "elephant_vending_machine/static/img/GRP_TST"])
+    monkeypatch.setattr('subprocess.run', lambda command, check, shell: raise_(CalledProcessError(1, ['ssh'])))
+    subprocess.call(["touch", "elephant_vending_machine/static/img/GRP_TST/test_delete.jpg"])
+    response = client.delete('/image/GRP_TST/test_delete.jpg')
+    assert b"Error: Failed to delete file from hosts. ", \
+        "Image not deleted, please try again" in response.data
+    assert response.status_code == 500
+    
 def test_delete_image_no_group(monkeypatch, client):
     monkeypatch.setattr('subprocess.run', lambda command, check, shell: CompletedProcess(['some_command'], returncode=0))
     response = client.delete('/image/GRP_TST/blank.jpg')
@@ -92,9 +102,41 @@ def test_delete_image_file_not_found(client):
 def test_delete_image_is_a_directory_exception(client, monkeypatch):
     subprocess.call(["mkdir", "elephant_vending_machine/static/img/GRP_TST"])
     subprocess.call(["touch", "elephant_vending_machine/static/img/GRP_TST/blank.jpg"])
+    monkeypatch.setattr('subprocess.run', lambda command, check, shell: CompletedProcess(['some_command'], returncode=0))
     monkeypatch.setattr('os.remove', lambda file: (_ for _ in ()).throw(IsADirectoryError))
     response = client.delete('/image/GRP_TST/blank.jpg')
     assert response.status_code == 400
     assert json.loads(response.data)['message'] == 'blank.jpg exists, but is a directory and not a file. Deletion failed.'
 
-    #maybe add tests for group copying and deleting from one group and maintaining in another group  
+def test_image_copy_to_group_happy_path(client, monkeypatch):
+    subprocess.call(["mkdir", "elephant_vending_machine/static/img/GRP_TST"])
+    subprocess.call(["mkdir", "elephant_vending_machine/static/img/GRP_TST2"])
+    subprocess.call(["touch", "elephant_vending_machine/static/img/GRP_TST/blank.jpg"])
+    monkeypatch.setattr('subprocess.run', lambda command, check, shell: CompletedProcess(['some_command'], returncode=0))
+    data = {"name": "GRP_TST2"}
+    response = client.post("/GRP_TST/blank.jpg/copy", data=data)
+    assert response.status_code == 200
+    assert json.loads(response.data)['message'] == "File blank.jpg was successfully copied to group 'GRP_TST2'."
+
+def test_image_copy_to_group_no_group2(client):
+    data = {"name": "GRP_TST2"}
+    response = client.post("/GRP_TST1/blank.jpg/copy", data=data)
+    assert response.status_code == 400
+    assert json.loads(response.data)['message'] == 'Error with request: GRP_TST2 is not an existing directory'
+    
+def test_image_copy_to_group_no_image(client):
+    subprocess.call(["mkdir", "elephant_vending_machine/static/img/GRP_TST"])
+    data = {"name": "GRP_TST"}
+    response = client.post("/GRP_TST1/blank.jpg/copy", data=data)
+    assert response.status_code == 400
+    assert json.loads(response.data)['message'] == 'Error with request: blank.jpg does not exist'
+
+def test_image_copy_to_group_copying_exception(client, monkeypatch):
+    subprocess.call(["mkdir", "elephant_vending_machine/static/img/GRP_TST"])
+    subprocess.call(["mkdir", "elephant_vending_machine/static/img/GRP_TST2"])
+    subprocess.call(["touch", "elephant_vending_machine/static/img/GRP_TST/blank.jpg"])
+    monkeypatch.setattr('subprocess.run', lambda command, check, shell: raise_(CalledProcessError(1, ['ssh'])))
+    data = {"name": "GRP_TST2"}
+    response = client.post("/GRP_TST/blank.jpg/copy", data=data)
+    assert response.status_code == 500
+    assert json.loads(response.data)['message'] == ['Error: Failed to copy file to hosts. ', 'Image not copied, please try again'] 
