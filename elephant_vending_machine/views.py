@@ -377,6 +377,28 @@ def list_images(group):
     response_code = 200
     return make_response(jsonify({'files': full_image_paths}), response_code)
 
+def create_experiment_from_form(name,fixation,fix_dur,int_fix_dur,stim_dur,trials,trial_int,intertrial,replacement,groups):
+    """pull template file"""
+    with open('elephant_vending_machine_backend/elephant_vending_machine/static/templates/form_template.py', 'r') as file :
+    filedata = file.read()
+    """Replace variables with form data"""
+    filedata = filedata.replace("_fixation_stimuli",fixation)
+    filedata = filedata.replace("_fixation_duration",fix_dur)
+    filedata = filedata.replace("_inter_fixation_duration",int_fix_dur)
+    filedata = filedata.replace("_stimuli_duration",stim_dur)
+    filedata = filedata.replace("_num_trials",trials)
+    filedata = filedata.replace("_intertrial_interval",trial_int)
+    filedata = filedata.replace("_replacement",replacement)
+    """preconfigure string with array"""
+    stim_groups = "STIMULI_GROUPS = " + groups 
+    filedata = filedata.replace("STIMULI_GROUPS = []",stim_groups)
+    """save new experiment file in experiments and overwite"""
+    filepath = "elephant_vending_machine_backend/elephant_vending_machine/static/experiment/" + name + ".py"
+    with open( filepath , 'w') as file :
+    file.write(filedata)
+    """Upload experiment"""
+    file.upload_experiment()
+
 @APP.route('/experiment', methods=['POST'])
 def upload_experiment():
     """Return JSON body with message indicating result of experiment upload request
