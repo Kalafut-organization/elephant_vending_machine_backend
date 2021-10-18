@@ -9,6 +9,7 @@ STIMULI_DURATION = _stimuli_duration
 NUM_TRIALS = _num_trials
 INTERTRIAL_INTERVAL = _intertrial_interval
 REPLACEMENT = _replacement
+MONITOR_COUNT = _monitor_count
 STIMULI_GROUPS = []
 STIMULI_OUTCOMES = []
 USED_STIMULI = []
@@ -61,10 +62,15 @@ def run_experiment(experiment_logger, vending_machine):
             else:
                 experiment_logger.info("Trial %s timed out when waiting to select fixation cross", trial_num)
 
+        # Blank out screens
+        vending_machine.left_group.display_on_screen(BLANK_SCREEN)
+        vending_machine.middle_group.display_on_screen(BLANK_SCREEN)
+        vending_machine.right_group.display_on_screen(BLANK_SCREEN)
+
         #Wait for interval between fixation and stimuli
         time.sleep(INTER_FIXATION_DURATION)
 
-        if(len(STIMULI_GROUPS) == 3):
+        if(MONITOR_COUNT == 3):
             # Randomly get order of groups on screens
             order = random.sample(range(3), 3)
             # Assign orders to groups
@@ -127,6 +133,11 @@ def run_experiment(experiment_logger, vending_machine):
 		
         experiment_logger.info("Start of intertrial interval")
 		
+        # Blank out screens
+        vending_machine.left_group.display_on_screen(BLANK_SCREEN)
+        vending_machine.middle_group.display_on_screen(BLANK_SCREEN)
+        vending_machine.right_group.display_on_screen(BLANK_SCREEN)
+
 		# Wait for intertrial interval
         time.sleep(INTERTRIAL_INTERVAL)
 		
