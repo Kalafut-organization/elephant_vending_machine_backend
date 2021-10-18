@@ -377,27 +377,129 @@ def list_images(group):
     response_code = 200
     return make_response(jsonify({'files': full_image_paths}), response_code)
 
+@APP.route('/experiment', methods=['POST'])
 def create_experiment_from_form(name,fixation,fix_dur,int_fix_dur,stim_dur,trials,trial_int,intertrial,replacement,groups):
+    """Return JSON body with message indicating result of group creation request"""
+    response = ""
+    response_code = 400
     """pull template file"""
     with open('elephant_vending_machine_backend/elephant_vending_machine/static/templates/form_template.py', 'r') as file :
     filedata = file.read()
     """Replace variables with form data"""
-    filedata = filedata.replace("_fixation_stimuli",fixation)
-    filedata = filedata.replace("_fixation_duration",fix_dur)
-    filedata = filedata.replace("_inter_fixation_duration",int_fix_dur)
-    filedata = filedata.replace("_stimuli_duration",stim_dur)
-    filedata = filedata.replace("_num_trials",trials)
-    filedata = filedata.replace("_intertrial_interval",trial_int)
-    filedata = filedata.replace("_replacement",replacement)
-    """preconfigure string with array"""
-    stim_groups = "STIMULI_GROUPS = " + groups 
-    filedata = filedata.replace("STIMULI_GROUPS = []",stim_groups)
+    if 'fixation' not in request.form:
+        response = "Error with request: No Fixation Stimuli field in body of request."
+    else:
+        fixation = request.form['fixation']
+        if fixation == '':
+            response = "Error with request: Fixation Stimuli must not be empty."
+        else
+             try:
+                filedata = filedata.replace("_fixation_stimuli",fixation)
+                response = "Success: fixation Stimuli added."
+                response_code = 201
+            except CalledProcessError:
+                response = "Error: Failed to add fixation stimuli to form."
+                response_code = 500
+    if 'fixation_duration' not in request.form:
+        response = "Error with request: No Fixation Duration field in body of request."
+    else:
+        fix_dur = request.form['fixation_duration']
+        if fix_dur == '':
+            response = "Error with request: Fixation Duration must not be empty."
+        else
+             try:
+               filedata = filedata.replace("_fixation_duration",fix_dur)
+                response = "Success: Fixation Duration added."
+                response_code = 201
+            except CalledProcessError:
+                response = "Error: Failed to add fixation duration to form."
+                response_code = 500
+    if 'intermediate_duration' not in request.form:
+        response = "Error with request: No Intermediatet Fixation Duration field in body of request."
+    else:
+        int_fix_dur = request.form['intermediate_duration']
+        if int_fix_dur == '':
+            response = "Error with request: Intermediate Fixation Duration must not be empty."
+        else
+             try:
+                filedata = filedata.replace("_inter_fixation_duration",int_fix_dur)
+                response = "Success: Intermediate Fixation Duration added."
+                response_code = 201
+            except CalledProcessError:
+                response = "Error: Failed to add intermediate fixation duration to form."
+                response_code = 500
+    if 'stimuli_duration' not in request.form:
+        response = "Error with request: No Stimuli Duration field in body of request."
+    else:
+        stim_dur = request.form['stimuli_duration']
+        if stim_dur == '':
+            response = "Error with request: Stimuli Duration must not be empty."
+        else
+             try:
+                filedata = filedata.replace("_stimuli_duration",stim_dur)
+                response = "Success: Stimuli Duration added."
+                response_code = 201
+            except CalledProcessError:
+                response = "Error: Failed to add stimuli duration to form."
+                response_code = 500
+    if 'trials' not in request.form:
+        response = "Error with request: No Number of Trials field in body of request."
+    else:
+        trials = request.form['trials']
+        if trials == '':
+            response = "Error with request: Number of Trials must not be empty."
+        else
+             try:
+                filedata = filedata.replace("_num_trials",trials)
+                response = "Success: Number of Trials added."
+                response_code = 201
+            except CalledProcessError:
+                response = "Error: Failed to add number of trials to form."
+                response_code = 500
+    
+    """Add replacement for intertrial interval"""
+    """filedata = filedata.replace("_intertrial_interval",trial_int)"""
+
+    if 'replacement' not in request.form:
+        response = "Error with request: Replacement option field in body of request."
+    else:
+        replacement = request.form['replacement']
+        if replacement == '':
+            response = "Error with request: Replacement option must not be empty."
+        else
+             try:
+                filedata = filedata.replace("_replacement",replacement)
+                response = "Success: Replacement option added."
+                response_code = 201
+            except CalledProcessError:
+                response = "Error: Failed to add Replacement option to form."
+                response_code = 500
+   
+    if 'selectedGroups' not in request.form:
+        response = "Error with request: Image groups field in body of request."
+    else:
+        groups = request.form['selectedGroups']
+        if groups == '':
+            response = "Error with request: No groups chosen."
+        else
+             try:
+                """preconfigure string with array for groups"""
+                stim_groups = "STIMULI_GROUPS = " + groups 
+                filedata = filedata.replace("STIMULI_GROUPS = []",stim_groups)
+                response = "Success: Replacement option added."
+                response_code = 201
+            except CalledProcessError:
+                response = "Error: Failed to add Replacement option to form."
+                response_code = 500
+    
     """save new experiment file in experiments and overwite"""
     filepath = "elephant_vending_machine_backend/elephant_vending_machine/static/experiment/" + name + ".py"
     with open( filepath , 'w') as file :
     file.write(filedata)
     """Upload experiment"""
     file.upload_experiment()
+    
+    return make_response(jsonify({'message': response}), response_code)
 
 @APP.route('/experiment', methods=['POST'])
 def upload_experiment():
