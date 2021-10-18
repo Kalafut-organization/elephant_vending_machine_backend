@@ -382,10 +382,12 @@ def create_experiment_from_form():
     """Return JSON body with message indicating result of group creation request"""
     response = ""
     response_code = 400
-    """pull template file"""
-    with open('elephant_vending_machine_backend/elephant_vending_machine/static/templates/form_template.py', 'r') as file:
+    #pull template file
+    with open( \
+    'elephant_vending_machine_backend/elephant_vending_machine/static/templates/form_template.py', \
+    'r') as file:
         filedata = file.read()
-    """Replace variables with form data"""
+    #Replace variables with form data
     if 'fixation' not in request.form:
         response = "Error with request: No Fixation Stimuli field in body of request."
     else:
@@ -405,7 +407,8 @@ def create_experiment_from_form():
             filedata = filedata.replace("_fixation_duration", fix_dur)
             response = "Success: Fixation Duration added."
     if 'intermediate_duration' not in request.form:
-        response = "Error with request: No Intermediatet Fixation Duration field in body of request."
+        response = "Error with request: No Intermediate \
+        Fixation Duration field in body of request."
     else:
         int_fix_dur = request.form['intermediate_duration']
         if int_fix_dur == '':
@@ -431,8 +434,8 @@ def create_experiment_from_form():
         else:
             filedata = filedata.replace("_num_trials", trials)
             response = "Success: Number of Trials added."
-    """Add replacement for intertrial interval"""
-    """filedata = filedata.replace("_intertrial_interval",trial_int)"""
+    #Add replacement for intertrial interval
+    #filedata = filedata.replace("_intertrial_interval",trial_int)
     if 'replacement' not in request.form:
         response = "Error with request: Replacement option field in body of request."
     else:
@@ -458,7 +461,7 @@ def create_experiment_from_form():
         if groups == '':
             response = "Error with request: No groups chosen."
         else:
-            """preconfigure string with array for groups"""
+            #preconfigure string with array for groups
             stim_groups = "STIMULI_GROUPS = " + groups
             filedata = filedata.replace("STIMULI_GROUPS = []", stim_groups)
     if 'outcomes' not in request.form:
@@ -468,10 +471,10 @@ def create_experiment_from_form():
         if groups == '':
             response = "Error with request: No groups chosen."
         else:
-            """preconfigure string with array for groups"""
+            #preconfigure string with array for groups
             outcome_trays = "STIMULI_OUTCOMES = " + outcomes
             filedata = filedata.replace("STIMULI_OUTCOMES = []", outcome_trays)
-    """save new experiment file in experiments and overwite"""
+    #save new experiment file in experiments and overwite
     if 'name' not in request.form:
         response = "Error with request: No name in body of request."
     else:
@@ -479,11 +482,13 @@ def create_experiment_from_form():
         if groups == '':
             response = "Error with request: No name inputed."
         else:
-            filepath = "elephant_vending_machine_backend/elephant_vending_machine/static/experiment/" + name + ".py"
+            filepath = ( \
+                "elephant_vending_machine_backend/elephant_vending_machine/static/experiment/" \
+                + name + ".py")
             response = "Success: File path created."
     with open(filepath, 'w') as file:
         file.write(filedata)
-    """Upload experiment"""
+    #Upload experiment
     file.upload_experiment()
     return make_response(jsonify({'message':response}), response_code)
 
