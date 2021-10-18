@@ -460,7 +460,6 @@ def create_experiment_from_form():
     """Add replacement for intertrial interval"""
     """filedata = filedata.replace("_intertrial_interval",trial_int)"""
 
-    """Add randomness once template is updated"""
 
     if 'replacement' not in request.form:
         response = "Error with request: Replacement option field in body of request."
