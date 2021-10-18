@@ -378,7 +378,7 @@ def list_images(group):
     return make_response(jsonify({'files': full_image_paths}), response_code)
 
 @APP.route('/experiment', methods=['POST'])
-def create_experiment_from_form(name,fixation,fix_dur,int_fix_dur,stim_dur,trials,trial_int,intertrial,replacement,groups):
+def create_experiment_from_form():
     """Return JSON body with message indicating result of group creation request"""
     response = ""
     response_code = 400
@@ -460,6 +460,8 @@ def create_experiment_from_form(name,fixation,fix_dur,int_fix_dur,stim_dur,trial
     """Add replacement for intertrial interval"""
     """filedata = filedata.replace("_intertrial_interval",trial_int)"""
 
+    """Add randomness once template is updated"""
+
     if 'replacement' not in request.form:
         response = "Error with request: Replacement option field in body of request."
     else:
@@ -473,6 +475,21 @@ def create_experiment_from_form(name,fixation,fix_dur,int_fix_dur,stim_dur,trial
                 response_code = 201
             except CalledProcessError:
                 response = "Error: Failed to add Replacement option to form."
+                response_code = 500
+    
+    if 'monitors' not in request.form:
+        response = "Error with request: No Monitor count in body of request."
+    else:
+        monitors = request.form['monitors']
+        if monitors == '':
+            response = "Error with request: Number of Monitors must not be empty."
+        else
+             try:
+                filedata = filedata.replace("_monitor_count",monitors)
+                response = "Success: MOnitor count added."
+                response_code = 201
+            except CalledProcessError:
+                response = "Error: Failed to add Monitor count to form."
                 response_code = 500
    
     if 'selectedGroups' not in request.form:
@@ -491,9 +508,38 @@ def create_experiment_from_form(name,fixation,fix_dur,int_fix_dur,stim_dur,trial
             except CalledProcessError:
                 response = "Error: Failed to add Replacement option to form."
                 response_code = 500
+    if 'outcomes' not in request.form:
+        response = "Error with request: No outcomes in body of request."
+    else:
+        outcomes = request.form['outcomes']
+        if groups == '':
+            response = "Error with request: No groups chosen."
+        else
+             try:
+                """preconfigure string with array for groups"""
+                outcome_trays = "STIMULI_OUTCOMES = " + outcomes
+                filedata = filedata.replace("STIMULI_OUTCOMES = []",outcome_trays)
+                response = "Success: Outcomes added."
+                response_code = 201
+            except CalledProcessError:
+                response = "Error: Failed to add Outcomes to form."
+                response_code = 500
     
     """save new experiment file in experiments and overwite"""
-    filepath = "elephant_vending_machine_backend/elephant_vending_machine/static/experiment/" + name + ".py"
+    if 'name' not in request.form:
+        response = "Error with request: No name in body of request."
+    else:
+        name = request.form['name']
+        if groups == '':
+            response = "Error with request: No name inputed."
+        else
+             try:
+                filepath = "elephant_vending_machine_backend/elephant_vending_machine/static/experiment/" + name + ".py"
+                response = "Success: File path created."
+                response_code = 201
+            except CalledProcessError:
+                response = "Error: Failed to create save path for experiment file."
+                response_code = 500
     with open( filepath , 'w') as file :
     file.write(filedata)
     """Upload experiment"""
