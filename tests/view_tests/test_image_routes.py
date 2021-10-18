@@ -86,7 +86,7 @@ def test_delete_image_route_copying_exception(monkeypatch, client):
     assert b"Error: Failed to delete file from hosts. ", \
         "Image not deleted, please try again" in response.data
     assert response.status_code == 500
-    
+
 def test_delete_image_no_group(monkeypatch, client):
     monkeypatch.setattr('subprocess.run', lambda command, check, shell: CompletedProcess(['some_command'], returncode=0))
     response = client.delete('/image/GRP_TST/blank.jpg')
