@@ -388,104 +388,35 @@ def create_experiment_from_form():
     'r') as file:
         filedata = file.read()
     #Replace variables with form data
-    if 'fixation' not in request.form:
-        response = "Error with request: No Fixation Stimuli field in body of request."
-    else:
-        fixation = request.form['fixation']
-        if fixation == '':
-            response = "Error with request: Fixation Stimuli must not be empty."
-        else:
-            filedata = filedata.replace("_fixation_stimuli", fixation)
-            response = "Success: fixation Stimuli added."
-    if 'fixation_duration' not in request.form:
-        response = "Error with request: No Fixation Duration field in body of request."
-    else:
-        fix_dur = request.form['fixation_duration']
-        if fix_dur == '':
-            response = "Error with request: Fixation Duration must not be empty."
-        else:
-            filedata = filedata.replace("_fixation_duration", fix_dur)
-            response = "Success: Fixation Duration added."
-    if 'intermediate_duration' not in request.form:
-        response = "Error with request: No Intermediate \
-        Fixation Duration field in body of request."
-    else:
-        int_fix_dur = request.form['intermediate_duration']
-        if int_fix_dur == '':
-            response = "Error with request: Intermediate Fixation Duration must not be empty."
-        else:
-            filedata = filedata.replace("_inter_fixation_duration", int_fix_dur)
-            response = "Success: Intermediate Fixation Duration added."
-    if 'stimuli_duration' not in request.form:
-        response = "Error with request: No Stimuli Duration field in body of request."
-    else:
-        stim_dur = request.form['stimuli_duration']
-        if stim_dur == '':
-            response = "Error with request: Stimuli Duration must not be empty."
-        else:
-            filedata = filedata.replace("_stimuli_duration", stim_dur)
-            response = "Success: Stimuli Duration added."
-    if 'trials' not in request.form:
-        response = "Error with request: No Number of Trials field in body of request."
-    else:
-        trials = request.form['trials']
-        if trials == '':
-            response = "Error with request: Number of Trials must not be empty."
-        else:
-            filedata = filedata.replace("_num_trials", trials)
-            response = "Success: Number of Trials added."
-    #Add replacement for intertrial interval
+    fixation = request.form['fixation']
+    filedata = filedata.replace("_fixation_stimuli", fixation)
+    fix_dur = request.form['fixation_duration']
+    filedata = filedata.replace("_fixation_duration", fix_dur)
+    int_fix_dur = request.form['intermediate_duration']
+    filedata = filedata.replace("_inter_fixation_duration", int_fix_dur)
+    stim_dur = request.form['stimuli_duration']
+    filedata = filedata.replace("_stimuli_duration", stim_dur)
+    trials = request.form['trials']
+    filedata = filedata.replace("_num_trials", trials)
+    #trial_int = request.form['trial_interval']
     #filedata = filedata.replace("_intertrial_interval",trial_int)
-    if 'replacement' not in request.form:
-        response = "Error with request: Replacement option field in body of request."
-    else:
-        replacement = request.form['replacement']
-        if replacement == '':
-            response = "Error with request: Replacement option must not be empty."
-        else:
-            filedata = filedata.replace("_replacement", replacement)
-            response = "Success: Replacement option added."
-    if 'monitors' not in request.form:
-        response = "Error with request: No Monitor count in body of request."
-    else:
-        monitors = request.form['monitors']
-        if monitors == '':
-            response = "Error with request: Number of Monitors must not be empty."
-        else:
-            filedata = filedata.replace("_monitor_count", monitors)
-            response = "Success: MOnitor count added."
-    if 'selectedGroups' not in request.form:
-        response = "Error with request: Image groups field in body of request."
-    else:
-        groups = request.form['selectedGroups']
-        if groups == '':
-            response = "Error with request: No groups chosen."
-        else:
-            #preconfigure string with array for groups
-            stim_groups = "STIMULI_GROUPS = " + groups
-            filedata = filedata.replace("STIMULI_GROUPS = []", stim_groups)
-    if 'outcomes' not in request.form:
-        response = "Error with request: No outcomes in body of request."
-    else:
-        outcomes = request.form['outcomes']
-        if groups == '':
-            response = "Error with request: No groups chosen."
-        else:
-            #preconfigure string with array for groups
-            outcome_trays = "STIMULI_OUTCOMES = " + outcomes
-            filedata = filedata.replace("STIMULI_OUTCOMES = []", outcome_trays)
+    replacement = request.form['replacement']
+    filedata = filedata.replace("_replacement", replacement)
+    monitors = request.form['monitors']
+    filedata = filedata.replace("_monitor_count", monitors)
+    groups = request.form['selectedGroups']
+    #preconfigure string with array for groups
+    stim_groups = "STIMULI_GROUPS = " + groups
+    filedata = filedata.replace("STIMULI_GROUPS = []", stim_groups)
+    outcomes = request.form['outcomes']
+    #preconfigure string with array for groups
+    outcome_trays = "STIMULI_OUTCOMES = " + outcomes
+    filedata = filedata.replace("STIMULI_OUTCOMES = []", outcome_trays)
     #save new experiment file in experiments and overwite
-    if 'name' not in request.form:
-        response = "Error with request: No name in body of request."
-    else:
-        name = request.form['name']
-        if groups == '':
-            response = "Error with request: No name inputed."
-        else:
-            filepath = ( \
-                "elephant_vending_machine_backend/elephant_vending_machine/static/experiment/" \
-                + name + ".py")
-            response = "Success: File path created."
+    name = request.form['name']
+    filepath = ( \
+        "elephant_vending_machine_backend/elephant_vending_machine/static/experiment/" \
+        + name + ".py")
     with open(filepath, 'w') as file:
         file.write(filedata)
     #Upload experiment
