@@ -98,6 +98,8 @@ def run_experiment(filename):
 
 @APP.route('/signal', methods=['POST'])
 def get_signal():
+    """Receives a signal from monitor pi, and sets the vending machine's signal_sender variable
+    """
     response_message = ""
     response_code = 400
     response_body = {}
