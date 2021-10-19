@@ -7,15 +7,10 @@ and detecting motion sensor input on the machine.
 import time
 import subprocess
 import spur
-import maestro
 
 LEFT_SCREEN = 1
 MIDDLE_SCREEN = 2
 RIGHT_SCREEN = 3
-SENSOR_THRESHOLD = 20
-LEFT_SENSOR_PIN = 0
-MIDDLE_SENSOR_PIN = 1
-RIGHT_SENSOR_PIN = 2
 
 def get_current_time_milliseconds():
     """Timeouts will be handled in milliseconds.
@@ -40,14 +35,10 @@ class VendingMachine:
             REMOTE_LED_SCRIPT_DIRECTORY: a string representing the absolute path
             to the directory on the remote pis where the LED scripts are stored,
             REMOTE_IMAGE_DIRECTORY: a string representing the absolute path
-            to where stimuli images are stored on the remote pis, SENSOR_THRESHOLD:
-            the minimum sensor reading that will not count as motion detected.
-            LEFT_SENSOR_PIN: an integer in the range 0-5 indicating which pin on
-            the maestro board the left sensor pin is wired to. There will also be
-            MIDDLE_SENSOR_PIN and RIGHT_SENSOR_PIN, with corresponding purposes.
-            In the event these values are not passed in, defaults will be assigned
-            as a fallback.
+            to where stimuli images are stored on the remote pis
     """
+
+    signal_sender = ''
 
     def __init__(self, addresses, config=None):
         self.addresses = addresses
@@ -59,25 +50,17 @@ class VendingMachine:
             self.config['REMOTE_IMAGE_DIRECTORY'] = '/home/pi/elephant_vending_machine/images'
         if 'REMOTE_LED_SCRIPT_DIRECTORY' not in self.config:
             self.config['REMOTE_LED_SCRIPT_DIRECTORY'] = '/home/pi/rpi_ws281x/python'
-        if 'LEFT_SENSOR_PIN' not in self.config:
-            self.config['LEFT_SENSOR_PIN'] = LEFT_SENSOR_PIN
-        if 'MIDDLE_SENSOR_PIN' not in self.config:
-            self.config['MIDDLE_SENSOR_PIN'] = MIDDLE_SENSOR_PIN
-        if 'RIGHT_SENSOR_PIN' not in self.config:
-            self.config['RIGHT_SENSOR_PIN'] = RIGHT_SENSOR_PIN
-        if 'SENSOR_THRESHOLD' not in self.config:
-            self.config['SENSOR_THRESHOLD'] = SENSOR_THRESHOLD
         self.left_group = SensorGrouping(
-            addresses[0], LEFT_SCREEN, self.config['LEFT_SENSOR_PIN'], self.config)
+            addresses[0], LEFT_SCREEN, self.config)
         self.middle_group = SensorGrouping(
-            addresses[1], MIDDLE_SCREEN, self.config['MIDDLE_SENSOR_PIN'], self.config)
+            addresses[1], MIDDLE_SCREEN, self.config)
         self.right_group = SensorGrouping(
-            addresses[2], RIGHT_SCREEN, self.config['RIGHT_SENSOR_PIN'], self.config)
+            addresses[2], RIGHT_SCREEN, self.config)
         self.result = None
 
     @staticmethod
-    def wait_for_input(groups, timeout):
-        """Waits for input on the motion sensors. If no motion is detected by the specified
+    def wait_for_input(self, groups, timeout):
+        """Waits for signal from the monitor pis. If no signal is received by the specified
         time to wait, returns with a result to indicate this.
 
         Parameters:
@@ -88,32 +71,25 @@ class VendingMachine:
             String: A string with value 'left', 'middle', 'right', or 'timeout', indicating
             the selection or lack thereof.
         """
-        reader = maestro.Controller()
         selection = 'timeout'
+        accepted_addresses = []
+        for i in groups:
+            accepted_addresses.append(i.address)
+
         start_time = get_current_time_milliseconds()
         elapsed_time = get_current_time_milliseconds() - start_time
-        readings = [1000] * len(groups)
-        while (all(reading >= SENSOR_THRESHOLD or reading == 0 for reading in readings) and
-               elapsed_time < timeout):
-            # range(len()) has less overhead than enumerate
-            # pylint: disable=consider-using-enumerate
-            for i in range(len(groups)):
-                readings[i] = reader.getPosition(groups[i].sensor_pin)
+
+        while self.signal_sender not in accepted_addresses and elapsed_time < timeout:
             elapsed_time = get_current_time_milliseconds() - start_time
-        selection_index = None
-        # range(len()) has less overhead than enumerate
-        # pylint: disable=consider-using-enumerate
-        for i in range(len(readings)):
-            if SENSOR_THRESHOLD > readings[i] > 0:
-                selection_index = i
-                break
-        if selection_index is not None:
-            if groups[selection_index].group_id == LEFT_SCREEN:
-                selection = 'left'
-            elif groups[selection_index].group_id == MIDDLE_SCREEN:
-                selection = 'middle'
-            else:
-                selection = 'right'
+
+        if self.signal_sender == self.addresses[0]:
+            selection = 'left'
+        elif self.signal_sender == self.addresses[1]:
+            selection = 'middle'
+        elif self.signal_sender == self.addresses[2]:
+            selection = 'right'
+
+        self.signal_sender = ''
         return selection
 
 
@@ -133,10 +109,9 @@ class SensorGrouping:
             values are not passed in, defaults will be assigned as a fallback.
     """
 
-    def __init__(self, address, screen_identifier, sensor_pin, config):
+    def __init__(self, address, screen_identifier, config):
         self.group_id = screen_identifier
         self.address = address
-        self.sensor_pin = sensor_pin
         self.config = config
         self.pid_of_previous_display_command = None
 

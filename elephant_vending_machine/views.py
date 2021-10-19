@@ -26,6 +26,7 @@ ALLOWED_EXPERIMENT_EXTENSIONS = {'py'}
 IMAGE_UPLOAD_FOLDER = '/static/img'
 EXPERIMENT_UPLOAD_FOLDER = '/static/experiment'
 LOG_FOLDER = '/static/log'
+vending_machine_obj = None
 
 @APP.route('/run-experiment/<filename>', methods=['POST'])
 def run_experiment(filename):
@@ -80,6 +81,8 @@ def run_experiment(filename):
         spec.loader.exec_module(module)
 
         vending_machine = VendingMachine(APP.config['REMOTE_HOSTS'], {})
+        global vending_machine_obj
+        vending_machine_obj = vending_machine
         module.run_experiment(exp_logger, vending_machine)
 
         response_message = 'Running ' + str(filename)
@@ -89,6 +92,22 @@ def run_experiment(filename):
         response_message = f"No experiment named {filename}"
         response_code = 400
 
+    response_body['message'] = response_message
+    return make_response(jsonify(response_body), response_code)
+
+@APP.route('/signal', methods=['POST'])
+def get_signal():
+    response_message = ""
+    response_code = 400
+    response_body = {}
+    global vending_machine_obj
+    if(vending_machine_obj):
+        vending_machine_obj.signal_sender = request.form['address']
+        response_code = 200
+        response_body = {}
+        response_message = "Success: Signal sent"
+    else:
+        response_message= "Error: There is currently no running experiment"
     response_body['message'] = response_message
     return make_response(jsonify(response_body), response_code)
 
