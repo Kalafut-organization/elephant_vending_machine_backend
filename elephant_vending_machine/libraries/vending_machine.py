@@ -58,7 +58,6 @@ class VendingMachine:
             addresses[2], RIGHT_SCREEN, self.config)
         self.result = None
 
-    @staticmethod
     def wait_for_input(self, groups, timeout):
         """Waits for signal from the monitor pis. If no signal is received by the specified
         time to wait, returns with a result to indicate this.

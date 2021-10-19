@@ -49,7 +49,7 @@ def run_experiment(experiment_logger, vending_machine):
 		
         while not correct_response:
             # Wait for choice on left, middle, or right screens. Timeout if no selection after FIXATION_DURATION
-            selection = vending_machine.wait_for_input(vending_machine, [vending_machine.left_group, vending_machine.middle_group, vending_machine.right_group], FIXATION_DURATION * 1000)
+            selection = vending_machine.wait_for_input([vending_machine.left_group, vending_machine.middle_group, vending_machine.right_group], FIXATION_DURATION * 1000)
 
             if selection == 'middle':
                 experiment_logger.info("Trial %s picked middle when selecting fixation cross", trial_num)
@@ -92,7 +92,7 @@ def run_experiment(experiment_logger, vending_machine):
             experiment_logger.info("Trial %s, '%s' stimuli displayed on right", trial_num, right_image)
 
             # Wait for input for STIMULI_DURATION
-            selection = vending_machine.wait_for_input(vending_machine, [vending_machine.left_group, vending_machine.middle_group, vending_machine.right_group], STIMULI_DURATION * 1000)
+            selection = vending_machine.wait_for_input([vending_machine.left_group, vending_machine.middle_group, vending_machine.right_group], STIMULI_DURATION * 1000)
 
             if selection == 'timeout':
                 experiment_logger.info("Trial %s no selection made.", trial_num)
@@ -121,7 +121,7 @@ def run_experiment(experiment_logger, vending_machine):
             experiment_logger.info("Trial %s, '%s' stimuli displayed on right", trial_num, right_image)
 
             # Wait for input for STIMULI_DURATION
-            selection = vending_machine.wait_for_input(vending_machine, [vending_machine.left_group, vending_machine.right_group], STIMULI_DURATION * 1000)
+            selection = vending_machine.wait_for_input([vending_machine.left_group, vending_machine.right_group], STIMULI_DURATION * 1000)
 
             if selection == 'timeout':
                 experiment_logger.info("Trial %s no selection made.", trial_num)
