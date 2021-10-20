@@ -15,7 +15,7 @@ def raise_(ex):
     raise ex
 
 def test_wait_for_input(monkeypatch):
-    monkeypatch.setattr('VendingMachine.signal_sender', '1')
+    monkeypatch.setattr('vending_machine.VendingMachine.signal_sender', '1')
     vending_machine = VendingMachine(['1', '2', '3'])
     result = vending_machine.wait_for_input(
         [vending_machine.left_group, vending_machine.right_group], 5000)
@@ -23,7 +23,7 @@ def test_wait_for_input(monkeypatch):
 
 
 def test_wait_for_input_timeout(monkeypatch):
-    monkeypatch.setattr('VendingMachine.signal_sender', '')
+    monkeypatch.setattr('vending_machine.VendingMachine.signal_sender', '')
     vending_machine = VendingMachine(['1', '2', '3'])
     result = vending_machine.wait_for_input(
         [vending_machine.left_group, vending_machine.right_group], 1000)
