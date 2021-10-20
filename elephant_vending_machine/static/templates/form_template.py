@@ -11,7 +11,6 @@ INTERTRIAL_INTERVAL = _intertrial_interval
 REPLACEMENT = _replacement
 MONITOR_COUNT = _monitor_count
 STIMULI_GROUPS = []
-STIMULI_OUTCOMES = []
 USED_STIMULI = []
 BLANK_SCREEN = 'all_black_screen.png'
 
@@ -68,7 +67,9 @@ def run_experiment(experiment_logger, vending_machine):
         vending_machine.right_group.display_on_screen(BLANK_SCREEN)
 
         #Wait for interval between fixation and stimuli
+        experiment_logger.info("Trial %s start of interfixation duration", trial_num)
         time.sleep(INTER_FIXATION_DURATION)
+        experiment_logger.info("Trial %s end of interfixation duration", trial_num)
 
         if(MONITOR_COUNT == 3):
             # Randomly get order of groups on screens
