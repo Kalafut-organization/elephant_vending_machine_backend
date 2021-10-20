@@ -398,8 +398,8 @@ def create_experiment_from_form():
     filedata = filedata.replace("_stimuli_duration", stim_dur)
     trials = request.form['trials']
     filedata = filedata.replace("_num_trials", trials)
-    #trial_int = request.form['trial_interval']
-    #filedata = filedata.replace("_intertrial_interval",trial_int)
+    trial_int = request.form['trial_interval']
+    filedata = filedata.replace("_intertrial_interval",trial_int)
     replacement = request.form['replacement']
     filedata = filedata.replace("_replacement", replacement)
     monitors = request.form['monitors']
