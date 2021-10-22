@@ -27,7 +27,6 @@ def kill_processes():
     for host in APP.config['REMOTE_HOSTS']:
         user = APP.config['REMOTE_HOST_USERNAME']
         subprocess.Popen(['ssh', f'''{user}@{host}''', 'pkill', '-f', 'button.py'])
-    print("Test")
 
 atexit.register(kill_processes)
 

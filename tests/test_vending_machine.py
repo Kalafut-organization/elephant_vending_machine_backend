@@ -14,13 +14,26 @@ def new_init_timeout(self):
 def raise_(ex):
     raise ex
 
-def test_wait_for_input(monkeypatch):
+def test_wait_for_input_left(monkeypatch):
     monkeypatch.setattr('elephant_vending_machine.libraries.vending_machine.VendingMachine.signal_sender', '1')
     vending_machine = VendingMachine(['1', '2', '3'])
     result = vending_machine.wait_for_input(
         [vending_machine.left_group, vending_machine.right_group], 5000)
     assert result == 'left'
 
+def test_wait_for_input_right(monkeypatch):
+    monkeypatch.setattr('elephant_vending_machine.libraries.vending_machine.VendingMachine.signal_sender', '3')
+    vending_machine = VendingMachine(['1', '2', '3'])
+    result = vending_machine.wait_for_input(
+        [vending_machine.left_group, vending_machine.right_group], 5000)
+    assert result == 'right'
+
+def test_wait_for_input_middle(monkeypatch):
+    monkeypatch.setattr('elephant_vending_machine.libraries.vending_machine.VendingMachine.signal_sender', '2')
+    vending_machine = VendingMachine(['1', '2', '3'])
+    result = vending_machine.wait_for_input(
+        [vending_machine.left_group, vending_machine.middle_group, vending_machine.right_group], 5000)
+    assert result == 'middle'
 
 def test_wait_for_input_timeout(monkeypatch):
     monkeypatch.setattr('elephant_vending_machine.libraries.vending_machine.VendingMachine.signal_sender', '')
