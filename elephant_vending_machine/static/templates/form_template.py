@@ -11,6 +11,7 @@ INTERTRIAL_INTERVAL = _intertrial_interval
 REPLACEMENT = _replacement
 MONITOR_COUNT = _monitor_count
 STIMULI_GROUPS = []
+SCREEN_SELECTION = []
 USED_STIMULI = []
 BLANK_SCREEN = 'all_black_screen.png'
 
@@ -26,6 +27,29 @@ def random_image(group_path):
         USED_STIMULI.append(image)
     return os.sep.join(os.path.normpath(image).split(os.sep)[-2:])
 
+def assign_groups():
+    left_group = None
+    middle_group = None
+    right_group = None
+    groups = [left_group, middle_group, right_group]
+    # Randomly get order of groups on screens
+    order = random.sample(range(2), 2)
+    k = 0
+    for i in range(len(SCREEN_SELECTION)):
+        if SCREEN_SELECTION[i] != 0: 
+            groups[i] = STIMULI_GROUPS[order[k]]
+            k += 1
+    return groups
+
+def assign_images(groups):
+    left_image = BLANK_SCREEN
+    middle_image = BLANK_SCREEN
+    right_image = BLANK_SCREEN
+    images = [left_image, middle_image, right_image]
+    for i in range(len(SCREEN_SELECTION)):
+        if SCREEN_SELECTION[i] != 0: 
+            images[i] = random_image(groups[i][0])
+    return images
 
 def run_experiment(experiment_logger, vending_machine):
     """This is an experiment template to be used by the creation form.
@@ -104,31 +128,34 @@ def run_experiment(experiment_logger, vending_machine):
                 experiment_logger.info("Trial %s picked right, Tray %d dispenses treat: %s", trial_num, right_group[1], right_group[2])
 
         else:
-            # Randomly get order of groups on screens
-            order = random.sample(range(2), 2)
-            # Assign orders to groups
-            left_group = STIMULI_GROUPS[order[0]]
-            right_group = STIMULI_GROUPS[order[1]]
-            # Get random images from each group
-            left_image = random_image(left_group[0])
-            right_image = random_image(right_group[0])
+            groups = assign_groups()
+            images = assign_images(groups)
+            accepted_groups = []
+            if SCREEN_SELECTION[0] != 0:
+                accepted_groups.append(vending_machine.left_group)
+            if SCREEN_SELECTION[1] != 0:
+                accepted_groups.append(vending_machine.middle_group)
+            if SCREEN_SELECTION[2] != 0:
+                accepted_groups.append(vending_machine.right_group)
             # Display random images from each group
-            vending_machine.left_group.display_on_screen(left_image)
-            vending_machine.middle_group.display_on_screen(BLANK_SCREEN)
-            vending_machine.right_group.display_on_screen(right_image)
+            vending_machine.left_group.display_on_screen(images[0])
+            vending_machine.middle_group.display_on_screen(images[1])
+            vending_machine.right_group.display_on_screen(images[2])
             # Log images displayed
-            experiment_logger.info("Trial %s, '%s' stimuli displayed on left", trial_num, left_image)
-            experiment_logger.info("Trial %s, '%s' stimuli displayed on right", trial_num, right_image)
-
+            experiment_logger.info("Trial %s, '%s' stimuli displayed on left", trial_num, images[0])
+            experiment_logger.info("Trial %s, '%s' stimuli displayed on middle", trial_num, images[1])
+            experiment_logger.info("Trial %s, '%s' stimuli displayed on right", trial_num, images[2])
             # Wait for input for STIMULI_DURATION
-            selection = vending_machine.wait_for_input([vending_machine.left_group, vending_machine.right_group], STIMULI_DURATION * 1000)
+            selection = vending_machine.wait_for_input(accepted_groups, STIMULI_DURATION * 1000)
 
             if selection == 'timeout':
                 experiment_logger.info("Trial %s no selection made.", trial_num)
             elif selection == 'left':
-                experiment_logger.info("Trial %s picked left, Tray %d dispenses treat: %s", trial_num, left_group[1], left_group[2])
+                experiment_logger.info("Trial %s picked left, Tray %d dispenses treat: %s", trial_num, groups[0][1], groups[0][2])
+            elif selection == 'middle':
+                experiment_logger.info("Trial %s picked middle, Tray %d dispenses treat: %s", trial_num, groups[1][1], groups[1][2])
             else:
-                experiment_logger.info("Trial %s picked right, Tray %d dispenses treat: %s", trial_num, right_group[1], right_group[2])
+                experiment_logger.info("Trial %s picked right, Tray %d dispenses treat: %s", trial_num, groups[2][1], groups[2][2])
 
         experiment_logger.info("Trial %s finished", trial_num)
 		
