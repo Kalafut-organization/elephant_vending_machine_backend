@@ -398,6 +398,52 @@ def list_images(group):
     response_code = 200
     return make_response(jsonify({'files': full_image_paths}), response_code)
 
+@APP.route('/experiment/create', methods=['POST'])
+def create_experiment_from_form():
+    """Return JSON body with message indicating result of group creation request"""
+    response = ""
+    response_code = 400
+    #pull template file
+    with open( \
+    'elephant_vending_machine_backend/elephant_vending_machine/static/templates/form_template.py', \
+    'r') as file:
+        filedata = file.read()
+    #Replace variables with form data
+    fixation = request.form['fixation']
+    filedata = filedata.replace("_fixation_stimuli", fixation)
+    fix_dur = request.form['fixation_duration']
+    filedata = filedata.replace("_fixation_duration", fix_dur)
+    int_fix_dur = request.form['intermediate_duration']
+    filedata = filedata.replace("_inter_fixation_duration", int_fix_dur)
+    stim_dur = request.form['stimuli_duration']
+    filedata = filedata.replace("_stimuli_duration", stim_dur)
+    trials = request.form['trials']
+    filedata = filedata.replace("_num_trials", trials)
+    trial_int = request.form['trial_interval']
+    filedata = filedata.replace("_intertrial_interval",trial_int)
+    replacement = request.form['replacement']
+    filedata = filedata.replace("_replacement", replacement)
+    monitors = request.form['monitors']
+    filedata = filedata.replace("_monitor_count", monitors)
+    groups = request.form['selectedGroups']
+    #preconfigure string with array for groups
+    stim_groups = "STIMULI_GROUPS = " + groups
+    filedata = filedata.replace("STIMULI_GROUPS = []", stim_groups)
+    outcomes = request.form['outcomes']
+    #preconfigure string with array for groups
+    outcome_trays = "STIMULI_OUTCOMES = " + outcomes
+    filedata = filedata.replace("STIMULI_OUTCOMES = []", outcome_trays)
+    #save new experiment file in experiments and overwite
+    name = request.form['name']
+    filepath = ( \
+        "elephant_vending_machine_backend/elephant_vending_machine/static/experiment/" \
+        + name + ".py")
+    with open(filepath, 'w') as file:
+        file.write(filedata)
+    #Upload experiment
+    file.upload_experiment()
+    return make_response(jsonify({'message':response}), response_code)
+
 @APP.route('/experiment', methods=['POST'])
 def upload_experiment():
     """Return JSON body with message indicating result of experiment upload request
