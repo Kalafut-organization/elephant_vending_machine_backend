@@ -9,7 +9,6 @@ STIMULI_DURATION = _stimuli_duration
 NUM_TRIALS = _num_trials
 INTERTRIAL_INTERVAL = _intertrial_interval
 REPLACEMENT = _replacement
-MONITOR_COUNT = _monitor_count
 STIMULI_GROUPS = []
 SCREEN_SELECTION = []
 USED_STIMULI = []
@@ -36,7 +35,7 @@ def assign_groups():
     order = random.sample(range(2), 2)
     k = 0
     for i in range(len(SCREEN_SELECTION)):
-        if SCREEN_SELECTION[i] != 0: 
+        if SCREEN_SELECTION[i]: 
             groups[i] = STIMULI_GROUPS[order[k]]
             k += 1
     return groups
@@ -47,7 +46,7 @@ def assign_images(groups):
     right_image = BLANK_SCREEN
     images = [left_image, middle_image, right_image]
     for i in range(len(SCREEN_SELECTION)):
-        if SCREEN_SELECTION[i] != 0: 
+        if SCREEN_SELECTION[i]: 
             images[i] = random_image(groups[i][0])
     return images
 
@@ -95,7 +94,7 @@ def run_experiment(experiment_logger, vending_machine):
         time.sleep(INTER_FIXATION_DURATION)
         experiment_logger.info("Trial %s end of interfixation duration", trial_num)
 
-        if(MONITOR_COUNT == 3):
+        if(all(SCREEN_SELECTION)):
             # Randomly get order of groups on screens
             order = random.sample(range(3), 3)
             # Assign orders to groups
@@ -131,11 +130,11 @@ def run_experiment(experiment_logger, vending_machine):
             groups = assign_groups()
             images = assign_images(groups)
             accepted_groups = []
-            if SCREEN_SELECTION[0] != 0:
+            if SCREEN_SELECTION[0]:
                 accepted_groups.append(vending_machine.left_group)
-            if SCREEN_SELECTION[1] != 0:
+            if SCREEN_SELECTION[1]:
                 accepted_groups.append(vending_machine.middle_group)
-            if SCREEN_SELECTION[2] != 0:
+            if SCREEN_SELECTION[2]:
                 accepted_groups.append(vending_machine.right_group)
             # Display random images from each group
             vending_machine.left_group.display_on_screen(images[0])
