@@ -398,6 +398,12 @@ def list_images(group):
     response_code = 200
     return make_response(jsonify({'files': full_image_paths}), response_code)
 
+def allowed_experiment(name):
+    """Determines whether a group exists in the directory already"""
+    directory = os.path.dirname(os.path.abspath(__file__)) + EXPERIMENT_UPLOAD_FOLDER
+    expr = os.listdir(directory)
+    return name not in expr
+
 @APP.route('/experiment/create', methods=['POST'])
 def create_experiment_from_form():
     """Return JSON body with message indicating result of group creation request"""
@@ -409,22 +415,14 @@ def create_experiment_from_form():
     'r') as file:
         filedata = file.read()
     #Replace variables with form data
-    fixation = request.form['fixation']
-    filedata = filedata.replace("_fixation_stimuli", fixation)
-    fix_dur = request.form['fixation_duration']
-    filedata = filedata.replace("_fixation_duration", fix_dur)
-    int_fix_dur = request.form['intermediate_duration']
-    filedata = filedata.replace("_inter_fixation_duration", int_fix_dur)
-    stim_dur = request.form['stimuli_duration']
-    filedata = filedata.replace("_stimuli_duration", stim_dur)
-    trials = request.form['trials']
-    filedata = filedata.replace("_num_trials", trials)
-    trial_int = request.form['trial_interval']
-    filedata = filedata.replace("_intertrial_interval", trial_int)
-    replacement = request.form['replacement']
-    filedata = filedata.replace("_replacement", replacement)
-    monitors = request.form['monitors']
-    filedata = filedata.replace("_monitor_count", monitors)
+    filedata = filedata.replace("_fixation_stimuli", request.form['fixation'])
+    filedata = filedata.replace("_fixation_duration", request.form['fixation_duration'])
+    filedata = filedata.replace("_inter_fixation_duration", request.form['intermediate_duration'])
+    filedata = filedata.replace("_stimuli_duration", request.form['stimuli_duration'])
+    filedata = filedata.replace("_num_trials", request.form['trials'])
+    filedata = filedata.replace("_intertrial_interval", request.form['trial_interval'])
+    filedata = filedata.replace("_replacement", request.form['replacement'])
+    filedata = filedata.replace("_monitor_count", request.form['monitors'])
     groups = request.form['selectedGroups']
     #preconfigure string with array for groups
     stim_groups = "STIMULI_GROUPS = " + groups
@@ -435,13 +433,16 @@ def create_experiment_from_form():
     filedata = filedata.replace("STIMULI_OUTCOMES = []", outcome_trays)
     #save new experiment file in experiments and overwite
     name = request.form['name']
-    filepath = ( \
-        "elephant_vending_machine_backend/elephant_vending_machine/static/experiment/" \
-        + name + ".py")
-    with open(filepath, 'w') as file:
-        file.write(filedata)
-    #Upload experiment
-    file.upload_experiment()
+    if(allowed_experiment(name))
+        filepath = ( \
+            "elephant_vending_machine_backend/elephant_vending_machine/static/experiment/" \
+            + name + ".py")
+        with open(filepath, 'w') as file:
+            file.write(filedata)
+        #Upload experiment
+        file.upload_experiment()
+    else
+         response = "Error with request: File extension not allowed."
     return make_response(jsonify({'message':response}), response_code)
 
 @APP.route('/experiment', methods=['POST'])
