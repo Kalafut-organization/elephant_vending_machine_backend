@@ -140,13 +140,13 @@ class SensorGrouping:
         Parameters:
             stimuli_name (str): The name of the file corresponding to the desired
                                 stimuli to be displayed.
-            default (bool): Whether the file is in the remote image 
+            default (bool): Whether the file is in the remote image
                                 directory or the default image directory
         """
         path = ''
         if default:
             path = f'''/home/pi/elephant_vending_machine/default_imgs/{stimuli_name}'''
-        else: 
+        else:
             path = f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{stimuli_name}'''
 
         shell = spur.SshShell(

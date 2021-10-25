@@ -442,7 +442,7 @@ def create_experiment_from_form():
         #Upload experiment
         file.upload_experiment()
     else:
-         response = "Error with request: File extension not allowed."
+        response = "Error with request: File extension not allowed."
     return make_response(jsonify({'message':response}), response_code)
 
 @APP.route('/experiment', methods=['POST'])
