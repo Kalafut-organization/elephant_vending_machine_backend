@@ -433,7 +433,7 @@ def create_experiment_from_form():
     filedata = filedata.replace("STIMULI_OUTCOMES = []", outcome_trays)
     #save new experiment file in experiments and overwite
     name = request.form['name']
-    if(allowed_experiment(name))
+    if allowed_experiment(name):
         filepath = ( \
             "elephant_vending_machine_backend/elephant_vending_machine/static/experiment/" \
             + name + ".py")
@@ -441,8 +441,8 @@ def create_experiment_from_form():
             file.write(filedata)
         #Upload experiment
         file.upload_experiment()
-    else
-         response = "Error with request: File extension not allowed."
+    else:
+        response = "Error with request: File extension not allowed."
     return make_response(jsonify({'message':response}), response_code)
 
 @APP.route('/experiment', methods=['POST'])
