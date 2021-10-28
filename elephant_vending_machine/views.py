@@ -411,7 +411,7 @@ def create_experiment_from_form():
     response_code = 400
     #pull template file
     print(request.form)
-    with open( os.path.dirname(os.path.abspath(__file__))+\
+    with open(os.path.dirname(os.path.abspath(__file__))+\
     '/static/templates/form_template.py', \
     'r') as file:
         filedata = file.read()
