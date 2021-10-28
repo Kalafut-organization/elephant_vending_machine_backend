@@ -17,18 +17,31 @@ BLANK_SCREEN = 'all_black_screen.png'
 WHITE_SCREEN = 'all_white_screen.png'
 
 def list_full_paths(directory):
+    """Returns absolute paths to all images in given group
+        
+    Parameters:
+        directory: path to a group of images
+    """
     return [os.path.join(directory, file) for file in os.listdir(directory)]
 
 def random_image(group_path):
+    """Returns path to randomly chosen image in given group
+    
+    Parameters:
+        group_path: path to a group of images
+    """
     files = list_full_paths(group_path)
     image = random.choice(files)
+    # If replacement is true, do not accept stimuli that have already been used
     if REPLACEMENT:
+        # While chosen image exists in USED_STIMULI, choose new one
         while USED_STIMULI.count(image) > 0:
             image = random.choice(files)
         USED_STIMULI.append(image)
     return os.sep.join(os.path.normpath(image).split(os.sep)[-2:])
 
 def assign_groups():
+    """Randomly assigns groups given screen selection"""
     left_group = None
     middle_group = None
     right_group = None
@@ -44,6 +57,7 @@ def assign_groups():
     return groups
 
 def assign_images(groups):
+    """Assigns images to screens"""
     left_image = BLANK_SCREEN
     middle_image = BLANK_SCREEN
     right_image = BLANK_SCREEN
@@ -66,6 +80,7 @@ def run_experiment(experiment_logger, vending_machine):
         trial_num = trial_index + 1
         experiment_logger.info("Trial %s started", trial_num)
 		
+        # Display fixation stimuli
         vending_machine.left_group.display_on_screen(BLANK_SCREEN, True)
         vending_machine.middle_group.display_on_screen(FIXATION_STIMULI, not FIXATION_BOOL)
         vending_machine.right_group.display_on_screen(BLANK_SCREEN, True)
@@ -73,6 +88,7 @@ def run_experiment(experiment_logger, vending_machine):
 		
         correct_response = False
 		
+        # Repeatedly present fixaton cross until correct choice is made
         while not correct_response:
             # Wait for choice on left, middle, or right screens. Timeout if no selection after FIXATION_DURATION
             selection = vending_machine.wait_for_input([vending_machine.left_group, vending_machine.middle_group, vending_machine.right_group], FIXATION_DURATION * 1000)
@@ -98,9 +114,10 @@ def run_experiment(experiment_logger, vending_machine):
         experiment_logger.info("Trial %s end of interfixation duration", trial_num)
 
         correct = False
-
+        #Assign groups to screens and images to groups
         groups = assign_groups()
         images = assign_images(groups)
+        # Set which screens should wait for input
         accepted_groups = []
         if SCREEN_SELECTION[0]:
             accepted_groups.append(vending_machine.left_group)
@@ -119,6 +136,7 @@ def run_experiment(experiment_logger, vending_machine):
         # Wait for input for STIMULI_DURATION
         selection = vending_machine.wait_for_input(accepted_groups, STIMULI_DURATION * 1000)
 
+        # Log selection, and if selection has a corresponding tray, log it's treat and set correct
         if selection == 'timeout':
             experiment_logger.info("Trial %s no selection made.", trial_num)
         elif selection == 'left':
@@ -137,6 +155,7 @@ def run_experiment(experiment_logger, vending_machine):
                 experiment_logger.info("Tray %d dispenses treat: %s", groups[2][1], groups[2][2])
                 correct = True
 
+        # If a correct choice was made, flash screen
         if correct:
             vending_machine.left_group.display_on_screen(WHITE_SCREEN, True)
             vending_machine.middle_group.display_on_screen(WHITE_SCREEN, True)
