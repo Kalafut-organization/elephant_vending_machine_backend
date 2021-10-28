@@ -20,7 +20,7 @@ APP.config.update(
 for remote_host in APP.config['REMOTE_HOSTS']:
     remote_user = APP.config['REMOTE_HOST_USERNAME']
     subprocess.Popen(['ssh', f'''{remote_user}@{remote_host}''', 'python',
-                      '/home/pi/button/button.py'])
+                      '/home/pi/elephant_vending_machine/button/button.py'])
 
 def kill_processes():
     """Kills remote button reading processes on monitor pis"""

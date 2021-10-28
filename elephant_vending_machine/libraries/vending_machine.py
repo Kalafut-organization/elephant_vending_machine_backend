@@ -133,14 +133,22 @@ class SensorGrouping:
             {red} {green} {blue} {display_time}'''
         subprocess.run(ssh_command, check=True, shell=True)
 
-    def display_on_screen(self, stimuli_name):
+    def display_on_screen(self, stimuli_name, default):
         """Displays the specified stimuli on the screen.
         Should only be called if the SensorGrouping config is not None
 
         Parameters:
             stimuli_name (str): The name of the file corresponding to the desired
                                 stimuli to be displayed.
+            default (bool): Whether the file is in the remote image
+                                directory or the default image directory
         """
+        path = ''
+        if default:
+            path = f'''/home/pi/elephant_vending_machine/default_imgs/{stimuli_name}'''
+        else:
+            path = f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{stimuli_name}'''
+
         shell = spur.SshShell(
             hostname=self.address,
             username='pi',
@@ -148,7 +156,6 @@ class SensorGrouping:
             load_system_host_keys=False
         )
         with shell:
-            result = shell.spawn(['feh', '-F',
-                                  f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{stimuli_name}''',
+            result = shell.spawn(['feh', '-F', path,
                                   '&'], update_env={'DISPLAY': ':0'}, store_pid=True).pid
         self.pid_of_previous_display_command = int(result)

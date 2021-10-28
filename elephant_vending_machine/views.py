@@ -409,9 +409,16 @@ def create_experiment_from_form():
     """Return JSON body with message indicating result of group creation request"""
     response = ""
     response_code = 400
+<<<<<<< HEAD
     # #pull template file
     with open( \
     'elephant_vending_machine/static/templates/form_template.py', \
+=======
+    #pull template file
+    print(request.form)
+    with open(os.path.dirname(os.path.abspath(__file__))+\
+    '/static/templates/form_template.py', \
+>>>>>>> 22c2545f9000d7b71dc551cb7e6b0c1ef642d135
     'r') as file:
         filedata = file.read()
 
@@ -447,16 +454,27 @@ def create_experiment_from_form():
 
     #save new experiment file in experiments and overwite
     name = request.form['name']
+<<<<<<< HEAD
     if(allowed_experiment(name)):
+=======
+    if allowed_experiment(name):
+>>>>>>> 22c2545f9000d7b71dc551cb7e6b0c1ef642d135
         filepath = ( \
             "elephant_vending_machine/static/experiment/" \
             + name + ".py")
         with open(filepath, 'w') as file:
             file.write(filedata)
         #Upload experiment
+<<<<<<< HEAD
         return redirect(url_for("upload_experiment"))
     else:
          response = "Error with request: File extension not allowed."
+=======
+        file.upload_experiment()
+        response_code = 200
+    else:
+        response = "Error with request: File extension not allowed."
+>>>>>>> 22c2545f9000d7b71dc551cb7e6b0c1ef642d135
     return make_response(jsonify({'message':response}), response_code)
 
 @APP.route('/experiment', methods=['POST'])
