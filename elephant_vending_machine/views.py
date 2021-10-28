@@ -409,29 +409,14 @@ def create_experiment_from_form():
     """Return JSON body with message indicating result of group creation request"""
     response = ""
     response_code = 400
-<<<<<<< HEAD
-    # #pull template file
-    with open( \
-    'elephant_vending_machine/static/templates/form_template.py', \
-=======
     #pull template file
     print(request.form)
     with open(os.path.dirname(os.path.abspath(__file__))+\
     '/static/templates/form_template.py', \
->>>>>>> 22c2545f9000d7b71dc551cb7e6b0c1ef642d135
     'r') as file:
         filedata = file.read()
 
     # #Replace variables with form data
-
-    # find the correct fixation
-    fixation = ""
-    if request.form['fixation_default']:
-        # TODO: update this with the actual default fixation
-        fixation = "\'elephant_vending_machine/static/default/fixation.png\'"
-    else:
-        fixation = request.form['new_fixation']
-    filedata = filedata.replace("_fixation_stimuli", fixation)
 
     filedata = filedata.replace("_inter_fix_duration", request.form['intermediate_duration'])
     filedata = filedata.replace("_fixation_duration", request.form['fixation_duration']) # ^ watch the order with these two
@@ -440,7 +425,14 @@ def create_experiment_from_form():
     filedata = filedata.replace("_replacement", request.form['replacement'])
     filedata = filedata.replace("_monitor_count", request.form['monitors'])
     # filedata = filedata.replace("_intertrial_interval", request.form['trial_interval'])
-    # filedata = filedata.replace("_intertrial_interval", request.form['trial_interval'])
+
+    # find the correct fixation
+    fixation = ""
+    if request.form['fixation_default']:
+        fixation = "\'fixation_stimuli.png\'"
+    else:
+        fixation = request.form['new_fixation']
+    filedata = filedata.replace("_fixation_stimuli", fixation)
 
     #preconfigure string with array for groups
     groups = request.form['groups']
@@ -454,27 +446,16 @@ def create_experiment_from_form():
 
     #save new experiment file in experiments and overwite
     name = request.form['name']
-<<<<<<< HEAD
-    if(allowed_experiment(name)):
-=======
     if allowed_experiment(name):
->>>>>>> 22c2545f9000d7b71dc551cb7e6b0c1ef642d135
         filepath = ( \
             "elephant_vending_machine/static/experiment/" \
             + name + ".py")
         with open(filepath, 'w') as file:
             file.write(filedata)
         #Upload experiment
-<<<<<<< HEAD
         return redirect(url_for("upload_experiment"))
     else:
          response = "Error with request: File extension not allowed."
-=======
-        file.upload_experiment()
-        response_code = 200
-    else:
-        response = "Error with request: File extension not allowed."
->>>>>>> 22c2545f9000d7b71dc551cb7e6b0c1ef642d135
     return make_response(jsonify({'message':response}), response_code)
 
 @APP.route('/experiment', methods=['POST'])
