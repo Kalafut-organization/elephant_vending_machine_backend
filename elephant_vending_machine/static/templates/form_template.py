@@ -4,7 +4,7 @@ import os
 
 FIXATION_STIMULI = _fixation_stimuli
 FIXATION_DURATION = _fixation_duration
-INTER_FIXATION_DURATION = _inter_fixation_duration
+INTER_FIX_DURATION = _inter_fix_duration
 STIMULI_DURATION = _stimuli_duration
 NUM_TRIALS = _num_trials
 INTERTRIAL_INTERVAL = _intertrial_interval
@@ -91,7 +91,7 @@ def run_experiment(experiment_logger, vending_machine):
 
         #Wait for interval between fixation and stimuli
         experiment_logger.info("Trial %s start of interfixation duration", trial_num)
-        time.sleep(INTER_FIXATION_DURATION)
+        time.sleep(INTER_FIX_DURATION)
         experiment_logger.info("Trial %s end of interfixation duration", trial_num)
 
         if(all(SCREEN_SELECTION)):
