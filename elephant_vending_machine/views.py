@@ -410,8 +410,9 @@ def create_experiment_from_form():
     response = ""
     response_code = 400
     #pull template file
-    with open( \
-    'elephant_vending_machine_backend/elephant_vending_machine/static/templates/form_template.py', \
+    print(request.form)
+    with open( os.path.dirname(os.path.abspath(__file__))+\
+    '/static/templates/form_template.py', \
     'r') as file:
         filedata = file.read()
     #Replace variables with form data
@@ -441,6 +442,7 @@ def create_experiment_from_form():
             file.write(filedata)
         #Upload experiment
         file.upload_experiment()
+        response_code = 200
     else:
         response = "Error with request: File extension not allowed."
     return make_response(jsonify({'message':response}), response_code)
