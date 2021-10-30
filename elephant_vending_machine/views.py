@@ -16,7 +16,7 @@ import shutil
 import subprocess
 from subprocess import CalledProcessError
 import py_compile
-from flask import request, make_response, jsonify
+from flask import json, request, make_response, jsonify, redirect, url_for
 from werkzeug.utils import secure_filename
 from elephant_vending_machine import APP
 from .libraries.experiment_logger import create_experiment_logger
@@ -221,14 +221,14 @@ def upload_image(group):
             response = "Success: Image saved."
             response_code = 201
 
-            try:
-                add_remote_image(save_path, group, filename)
-            except CalledProcessError:
-                if filename in os.listdir(save_path):
-                    os.remove(os.path.join(save_path, filename))
-                response = "Error: Failed to copy file to hosts. ", \
-                  "Image not saved, please try again"
-                response_code = 500
+            # try:
+            #     add_remote_image(save_path, group, filename)
+            # except CalledProcessError:
+            #     if filename in os.listdir(save_path):
+            #         os.remove(os.path.join(save_path, filename))
+            #     response = "Error: Failed to copy file to hosts. ", \
+            #       "Image not saved, please try again"
+            #     response_code = 500
         else:
             response = "Error with request: File extension not allowed."
     return  make_response(jsonify({'message': response}), response_code)
@@ -280,23 +280,23 @@ def copy_image(group, image):
       IMAGE_UPLOAD_FOLDER + "/" + group + "/" + image
     group_path = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + group2
     print(image_path, file=sys.stderr)
-    if os.path.isdir(group_path):
-        if os.path.exists(image_path):
-            try:
-                add_remote_image(old_group, group2, image)
-                shutil.copy(image_path, group_path)
-                response = "File " + image + " was successfully copied to group '" + 	group2 + "'."
-                response_code = 200
-            except CalledProcessError:
-                if os.path.exists(group_path + "/" + image):
-                    os.remove(group_path + "/" + image)
-                response = "Error: Failed to copy file to hosts. ", \
-                  "Image not copied, please try again"
-                response_code = 500
-        else:
-            response = "Error with request: " + image + " does not exist"
-    else:
-        response = "Error with request: " + group2 + " is not an existing directory"
+    # if os.path.isdir(group_path):
+    #     if os.path.exists(image_path):
+    #         try:
+    #             add_remote_image(old_group, group2, image)
+    #             shutil.copy(image_path, group_path)
+    #             response = "File " + image + " was successfully copied to group '" + 	group2 + "'."
+    #             response_code = 200
+    #         except CalledProcessError:
+    #             if os.path.exists(group_path + "/" + image):
+    #                 os.remove(group_path + "/" + image)
+    #             response = "Error: Failed to copy file to hosts. ", \
+    #               "Image not copied, please try again"
+    #             response_code = 500
+    #     else:
+    #         response = "Error with request: " + image + " does not exist"
+    # else:
+    #     response = "Error with request: " + group2 + " is not an existing directory"
     return  make_response(jsonify({'message': response}), response_code)
 
 @APP.route('/image/<group>/<filename>', methods=['DELETE'])
@@ -333,24 +333,24 @@ def delete_image(group, filename):
     response_code = 400
     response = ""
     image_directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER + "/" + group
-    if os.path.isdir(image_directory):
-        if filename in os.listdir(image_directory):
-            try:
-                try:
-                    delete_remote_image(group, filename)
-                    os.remove(os.path.join(image_directory, filename))
-                    response = f"File {filename} was successfully deleted."
-                    response_code = 200
-                except CalledProcessError:
-                    response_code = 500
-                    response = "Error: Failed to delete file from hosts. ", \
-                    "Image not deleted, please try again"
-            except IsADirectoryError:
-                response = f"{filename} exists, but is a directory and not a file. Deletion failed."
-        else:
-            response = f"File {filename} does not exist and so couldn't be deleted."
-    else:
-        response = f"Group {group} does not exist"
+    # if os.path.isdir(image_directory):
+    #     if filename in os.listdir(image_directory):
+    #         try:
+    #             try:
+    #                 delete_remote_image(group, filename)
+    #                 os.remove(os.path.join(image_directory, filename))
+    #                 response = f"File {filename} was successfully deleted."
+    #                 response_code = 200
+    #             except CalledProcessError:
+    #                 response_code = 500
+    #                 response = "Error: Failed to delete file from hosts. ", \
+    #                 "Image not deleted, please try again"
+    #         except IsADirectoryError:
+    #             response = f"{filename} exists, but is a directory and not a file. Deletion failed."
+    #     else:
+    #         response = f"File {filename} does not exist and so couldn't be deleted."
+    # else:
+    #     response = f"Group {group} does not exist"
     return make_response(jsonify({'message': response}), response_code)
 
 @APP.route('/<group>', methods=['GET'])
@@ -415,36 +415,47 @@ def create_experiment_from_form():
     '/static/templates/form_template.py', \
     'r') as file:
         filedata = file.read()
-    #Replace variables with form data
-    filedata = filedata.replace("_fixation_stimuli", request.form['fixation'])
-    filedata = filedata.replace("_fixation_duration", request.form['fixation_duration'])
-    filedata = filedata.replace("_inter_fixation_duration", request.form['intermediate_duration'])
+
+    # #Replace variables with form data
+
+    filedata = filedata.replace("_inter_fix_duration", request.form['intermediate_duration'])
+    filedata = filedata.replace("_fixation_duration", request.form['fixation_duration']) # ^ watch the order with these two
     filedata = filedata.replace("_stimuli_duration", request.form['stimuli_duration'])
     filedata = filedata.replace("_num_trials", request.form['trials'])
-    filedata = filedata.replace("_intertrial_interval", request.form['trial_interval'])
     filedata = filedata.replace("_replacement", request.form['replacement'])
     filedata = filedata.replace("_monitor_count", request.form['monitors'])
-    groups = request.form['selectedGroups']
+    # filedata = filedata.replace("_intertrial_interval", request.form['trial_interval'])
+
+    # find the correct fixation
+    fixation = ""
+    if request.form['fixation_default']:
+        fixation = "\'fixation_stimuli.png\'"
+    else:
+        fixation = request.form['new_fixation']
+    filedata = filedata.replace("_fixation_stimuli", fixation)
+
     #preconfigure string with array for groups
+    groups = request.form['groups']
     stim_groups = "STIMULI_GROUPS = " + groups
     filedata = filedata.replace("STIMULI_GROUPS = []", stim_groups)
     outcomes = request.form['outcomes']
+
     #preconfigure string with array for groups
     outcome_trays = "STIMULI_OUTCOMES = " + outcomes
     filedata = filedata.replace("STIMULI_OUTCOMES = []", outcome_trays)
+
     #save new experiment file in experiments and overwite
     name = request.form['name']
     if allowed_experiment(name):
         filepath = ( \
-            "elephant_vending_machine_backend/elephant_vending_machine/static/experiment/" \
+            "elephant_vending_machine/static/experiment/" \
             + name + ".py")
         with open(filepath, 'w') as file:
             file.write(filedata)
         #Upload experiment
-        file.upload_experiment()
-        response_code = 200
+        return redirect(url_for("upload_experiment"))
     else:
-        response = "Error with request: File extension not allowed."
+         response = "Error with request: File extension not allowed."
     return make_response(jsonify({'message':response}), response_code)
 
 @APP.route('/experiment', methods=['POST'])
@@ -760,16 +771,16 @@ def create_group():
             response = "Error with request: Group name must not be empty."
         elif allowed_group(group_name):
             filename = secure_filename(group_name)
-            try:
-                add_remote_group(filename)
-                save_path = os.path.dirname(os.path.abspath(__file__))+IMAGE_UPLOAD_FOLDER
-                folder = os.path.join(save_path, filename)
-                os.makedirs(folder)
-                response = "Success: Group created."
-                response_code = 201
-            except CalledProcessError:
-                response = "Error: Failed to create group on hosts."
-                response_code = 500
+            # try:
+            #     add_remote_group(filename)
+            #     save_path = os.path.dirname(os.path.abspath(__file__))+IMAGE_UPLOAD_FOLDER
+            #     folder = os.path.join(save_path, filename)
+            #     os.makedirs(folder)
+            #     response = "Success: Group created."
+            #     response_code = 201
+            # except CalledProcessError:
+            #     response = "Error: Failed to create group on hosts."
+            #     response_code = 500
         else:
             response = "Error with request: Group already exists."
     return make_response(jsonify({'message': response}), response_code)
@@ -781,16 +792,16 @@ def delete_group(name):
     directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
     response_code = 400
     response = ""
-    if name in os.listdir(directory):
-        try:
-            shutil.rmtree(os.path.join(directory, name))
-            delete_remote_group(name)
-            response = f"Group {name} was successfully deleted."
-            response_code = 200
-        except OSError:
-            response = "An error has occurred and the group could not be deleted"
-    else:
-        response = f"Group {name} does not exist and so couldn't be deleted."
+    # if name in os.listdir(directory):
+    #     try:
+    #         shutil.rmtree(os.path.join(directory, name))
+    #         delete_remote_group(name)
+    #         response = f"Group {name} was successfully deleted."
+    #         response_code = 200
+    #     except OSError:
+    #         response = "An error has occurred and the group could not be deleted"
+    # else:
+    #     response = f"Group {name} does not exist and so couldn't be deleted."
     return make_response(jsonify({'message': response}), response_code)
 
 @APP.route('/template', methods=['GET'])
