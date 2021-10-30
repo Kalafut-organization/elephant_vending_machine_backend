@@ -145,17 +145,20 @@ class SensorGrouping:
         """
         path = ''
         if default:
-            path = f'''/home/pi/elephant_vending_machine/default_imgs/{stimuli_name}'''
+            path = f'''/home/pi/elephant_vending_machine/default_img/{stimuli_name}'''
         else:
             path = f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{stimuli_name}'''
 
-        shell = spur.SshShell(
-            hostname=self.address,
-            username='pi',
-            missing_host_key=spur.ssh.MissingHostKey.accept,
-            load_system_host_keys=False
-        )
-        with shell:
-            result = shell.spawn(['feh', '-F', path,
-                                  '&'], update_env={'DISPLAY': ':0'}, store_pid=True).pid
-        self.pid_of_previous_display_command = int(result)
+        subprocess.Popen(['ssh', f'''pi@{self.address}''', 'DISPLAY=0', 'feh', '-F', path, '&'])
+        
+
+        # shell = spur.SshShell(
+        #     hostname=self.address,
+        #     username='pi',
+        #     missing_host_key=spur.ssh.MissingHostKey.accept,
+        #     load_system_host_keys=False
+        # )
+        # with shell:
+        #     result = shell.spawn(['feh', '-F', path,
+        #                           '&'], update_env={'DISPLAY': ':0'}, store_pid=True).pid
+        # self.pid_of_previous_display_command = int(result)
