@@ -21,7 +21,7 @@ def client():
         yield client
         subprocess.call(["rm","elephant_vending_machine/static/experiment/test_file.py"])
         subprocess.call(["rm","elephant_vending_machine/static/experiment/test_file2.py"])
-        subprocess.call(["rm","elephant_vending_machine/static/experiment/empty.py"])
+        subprocess.call(["rmdir","elephant_vending_machine/static/experiment/empty.py"])
 
 def test_post_experiment_route_no_file(client):
     response = client.post('/experiment')
@@ -91,3 +91,11 @@ def test_valid_file_extensions_invalid_file():
 
 def test_valid_file_extension_double_extension():
     assert views.allowed_file('sourcecode.c.py', {'py'}) == True
+
+def test_experiment_template(client):
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/test_file.py"])
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/test_file2.py"])
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/empty.py"])
+    response = client.get('/template')
+    response_json_files = json.loads(response.data)['files']
+    assert response_json_files == ["http://localhost/static/templates/form_template.py"]
