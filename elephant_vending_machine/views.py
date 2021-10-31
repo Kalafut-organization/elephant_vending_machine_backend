@@ -16,7 +16,7 @@ import shutil
 import subprocess
 from subprocess import CalledProcessError
 import py_compile
-from flask import json, request, make_response, jsonify, redirect, url_for
+from flask import json, request, make_response, jsonify
 from werkzeug.utils import secure_filename
 from elephant_vending_machine import APP
 from .libraries.experiment_logger import create_experiment_logger
@@ -418,7 +418,8 @@ def create_experiment_from_form():
 
     # #Replace variables with form data
     filedata = filedata.replace("_inter_fix_duration", request.form['intermediate_duration'])
-    filedata = filedata.replace("_fixation_duration", request.form['fixation_duration']) # ^ watch the order with these two
+    filedata = filedata.replace("_fixation_duration", \
+    request.form['fixation_duration']) # ^ watch the order with these two
     filedata = filedata.replace("_stimuli_duration", request.form['stimuli_duration'])
     filedata = filedata.replace("_num_trials", request.form['trials'])
     filedata = filedata.replace("_replacement", request.form['replacement'].capitalize())
@@ -435,10 +436,11 @@ def create_experiment_from_form():
 
     #preconfigure string with array for groups
     outcomes = request.form['outcomes']
-    list = json.loads(outcomes)
-    for item in list:
-        item[0] = "/home/pi/elephant_vending_machine_backend/elephant_vending_machine/static/img/" + item[0]
-    outcomes = json.dumps(list)
+    outcome_list = json.loads(outcomes)
+    for item in outcome_list:
+        item[0] = "/home/pi/elephant_vending_machine_backend/elephant_vending_machine/static/img/" \
+         + item[0]
+    outcomes = json.dumps(outcome_list)
     stim_groups = "STIMULI_GROUPS = " + outcomes
     filedata = filedata.replace("STIMULI_GROUPS = []", stim_groups)
 
@@ -452,7 +454,7 @@ def create_experiment_from_form():
         with open(filepath, 'w') as file:
             file.write(filedata)
     else:
-         response = "Error with request: File extension not allowed."
+        response = "Error with request: File extension not allowed."
     return make_response(jsonify({'message':response}), response_code)
 
 @APP.route('/experiment', methods=['POST'])
