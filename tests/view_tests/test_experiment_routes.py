@@ -21,7 +21,7 @@ def client():
         yield client
         subprocess.call(["rm","elephant_vending_machine/static/experiment/test_file.py"])
         subprocess.call(["rm","elephant_vending_machine/static/experiment/test_file2.py"])
-        subprocess.call(["rmdir","elephant_vending_machine/static/experiment/empty.py"])
+        subprocess.call(["rm","elephant_vending_machine/static/experiment/empty.py"])
 
 def test_post_experiment_route_no_file(client):
     response = client.post('/experiment')
@@ -99,3 +99,12 @@ def test_experiment_template(client):
     response = client.get('/template')
     response_json_files = json.loads(response.data)['files']
     assert response_json_files == ["http://localhost/static/templates/form_template.py"]
+
+def test_template_creation(client):
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/test_file.py"])
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/test_file2.py"])
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/empty.py"])
+    data = {'name': "name", 'intermediate_duration': 5, 'stimuli_duration': 5, 'fixation_duration': 5, 'fixation_default': True, 'trials':2, 'replacement': "False", "monitors":2, "fixation":"", "outcomes":'[["group1","treat1","tray1"]]'}
+    response = client.post('/experiment/create', data=data) 
+    assert response.status_code == 200
+    assert json.loads(response.data)['message'] == "File successfully created."
