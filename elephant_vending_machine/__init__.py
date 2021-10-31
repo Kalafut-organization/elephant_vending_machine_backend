@@ -17,18 +17,18 @@ APP.config.update(
     REMOTE_IMAGE_DIRECTORY='/home/pi/elephant_vending_machine/images'
 )
 
-for remote_host in APP.config['REMOTE_HOSTS']:
-    remote_user = APP.config['REMOTE_HOST_USERNAME']
-    subprocess.Popen(['ssh', f'''{remote_user}@{remote_host}''', 'python',
-                      '/home/pi/elephant_vending_machine/button/button.py'])
+# for remote_host in APP.config['REMOTE_HOSTS']:
+#     remote_user = APP.config['REMOTE_HOST_USERNAME']
+#     subprocess.Popen(['ssh', f'''{remote_user}@{remote_host}''', 'python',
+#                       '/home/pi/elephant_vending_machine/button/button.py'])
 
-def kill_processes():
-    """Kills remote button reading processes on monitor pis"""
-    for host in APP.config['REMOTE_HOSTS']:
-        user = APP.config['REMOTE_HOST_USERNAME']
-        subprocess.Popen(['ssh', f'''{user}@{host}''', 'pkill', '-f', 'button.py'])
+# def kill_processes():
+#     """Kills remote button reading processes on monitor pis"""
+#     for host in APP.config['REMOTE_HOSTS']:
+#         user = APP.config['REMOTE_HOST_USERNAME']
+#         subprocess.Popen(['ssh', f'''{user}@{host}''', 'pkill', '-f', 'button.py'])
 
-atexit.register(kill_processes)
+# atexit.register(kill_processes)
 
 # Circular imports are bad, but views are not used here, only imported, so it's OK
 # pylint: disable=wrong-import-position
