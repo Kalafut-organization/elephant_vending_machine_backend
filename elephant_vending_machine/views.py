@@ -437,11 +437,12 @@ def create_experiment_from_form():
     #preconfigure string with array for groups
     outcomes = request.form['outcomes']
     outcome_list = json.loads(outcomes)
+    groups = []
     for item in outcome_list:
-        item[0] = "/home/pi/elephant_vending_machine_backend/elephant_vending_machine/static/img/" \
-         + item[0]
-    outcomes = json.dumps(outcome_list)
-    stim_groups = "STIMULI_GROUPS = " + outcomes
+        groups.append(["/home/pi/elephant_vending_machine_backend/elephant_vending_machine/static/img/" + item, outcome_list[item]["name"], outcome_list[item]["tray"]])
+    #outcomes = json.dumps(groups)
+    stim_groups = "STIMULI_GROUPS = " + str(groups)
+    print(stim_groups)
     filedata = filedata.replace("STIMULI_GROUPS = []", stim_groups)
 
     #save new experiment file in experiments and overwite
