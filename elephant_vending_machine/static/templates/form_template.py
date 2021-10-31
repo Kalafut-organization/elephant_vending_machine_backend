@@ -126,9 +126,15 @@ def run_experiment(experiment_logger, vending_machine):
         if SCREEN_SELECTION[2]:
             accepted_groups.append(vending_machine.right_group)
         # Display random images from each group
-        vending_machine.left_group.display_on_screen(images[0], False)
-        vending_machine.middle_group.display_on_screen(images[1], False)
-        vending_machine.right_group.display_on_screen(images[2], False)
+        image_bool1 = False
+        if images[0] == 'all_black_screen.png': image_bool1 = True
+        image_bool2 = False
+        if images[1] == 'all_black_screen.png': image_bool2 = True
+        image_bool3 = False
+        if images[2] == 'all_black_screen.png': image_bool3 = True
+        vending_machine.left_group.display_on_screen(images[0], image_bool1)
+        vending_machine.middle_group.display_on_screen(images[1], image_bool2)
+        vending_machine.right_group.display_on_screen(images[2], image_bool3)
         # Log images displayed
         experiment_logger.info("Trial %s, '%s' stimuli displayed on left", trial_num, images[0])
         experiment_logger.info("Trial %s, '%s' stimuli displayed on middle", trial_num, images[1])
