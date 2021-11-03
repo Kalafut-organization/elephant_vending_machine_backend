@@ -425,7 +425,6 @@ def create_experiment_from_form():
     filedata = filedata.replace("_replacement", request.form['replacement'].capitalize())
     filedata = filedata.replace("_monitor_count", request.form['monitors'])
     # filedata = filedata.replace("_intertrial_interval", request.form['trial_interval'])
-
     # find the correct fixation
     fixation = ""
     if request.form['fixation_default']:
@@ -433,11 +432,11 @@ def create_experiment_from_form():
     else:
         fixation = request.form['new_fixation']
     filedata = filedata.replace("_fixation_stimuli", fixation)
-
     #preconfigure string with array for groups
     outcomes = request.form['outcomes']
     outcome_list = json.loads(outcomes)
     for item in outcome_list:
+        print(item)
         item[0] = "/home/pi/elephant_vending_machine_backend/elephant_vending_machine/static/img/" \
          + item[0]
     outcomes = json.dumps(outcome_list)
@@ -448,6 +447,7 @@ def create_experiment_from_form():
     name = request.form['name']
     if allowed_experiment(name):
         response_code = 200
+        response = "File successfully created."
         filepath = ( \
             "elephant_vending_machine/static/experiment/" \
             + name + ".py")
