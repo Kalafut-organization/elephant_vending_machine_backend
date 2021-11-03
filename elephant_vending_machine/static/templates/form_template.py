@@ -166,7 +166,6 @@ def run_experiment(experiment_logger, vending_machine):
             vending_machine.left_group.display_on_screen(WHITE_SCREEN, True)
             vending_machine.middle_group.display_on_screen(WHITE_SCREEN, True)
             vending_machine.right_group.display_on_screen(WHITE_SCREEN, True)
-            time.sleep(0.5)
 
         experiment_logger.info("Trial %s finished", trial_num)
 		

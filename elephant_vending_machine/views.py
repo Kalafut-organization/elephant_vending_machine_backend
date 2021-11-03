@@ -754,6 +754,9 @@ def list_groups():
     groups.sort()
     if '.gitignore' in groups:
         groups.remove('.gitignore')
+    for group in groups:
+        if not os.path.isdir(os.path.join(images_path, group)):
+            groups.remove(group)
     response_code = 200
     return make_response(jsonify({'names': groups}), response_code)
 
