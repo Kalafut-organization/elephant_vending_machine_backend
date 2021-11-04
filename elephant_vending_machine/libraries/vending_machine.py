@@ -118,6 +118,13 @@ class VendingMachine:
          f'''DISPLAY=0 feh -F -x -Y {images[1]} &''', f'''DISPLAY=0 feh -F -x -Y {images[2]} &'''))
         self.ssh_all_hosts('vcgencmd display_power 1')
 
+    def dispense_treat(index):
+        """ Sends ssh command to dispense treat in corresponding tray
+        
+        Parameters:
+            index: index (from 1 to 3) of the tray to be opened"""
+        subprocess.Popen(['ssh','arduino@192.168.0.14', 'python', 'dispense.py', f'''{index}'''])
+
 
 class SensorGrouping:
     """Provides an abstraction of the devices controlled by Raspberry Pis.
