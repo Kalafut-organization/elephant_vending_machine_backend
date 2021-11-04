@@ -90,23 +90,32 @@ class VendingMachine:
 
         self.signal_sender = ''
         return selection
-    
+
     def ssh_all_hosts(self, command):
+        """ Sends given command to remote hosts via ssh
+
+        Parameters:
+            command: command to be sent over ssh """
         hosts = self.addresses
         client = ParallelSSHClient(hosts, user='pi')
         client.run_command(command)
         client.join()
 
     def display_images(self, images):
+        """ Displays images on remote hosts via ssh
+
+        Parameters:
+            images: images to be displayed on the screens """
         for image in images:
-            if image == 'all_white_screen.png' or image == 'fixation_stimuli.png' or image == 'all_black_screen.png':
+            if image in ('all_white_screen.png', 'fixation_stimuli.png', 'all_black_screen.png'):
                 image = f'''/home/pi/elephant_vending_machine/default_img/{image}'''
             else:
                 image = f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{image}'''
         hosts = self.addresses
         client = ParallelSSHClient(hosts, user='pi')
         self.ssh_all_hosts('vcgencmd display_power 0')
-        client.run_command('%s', host_args=(f'''DISPLAY=0 feh -F -x -Y {images[0]} &''', f'''DISPLAY=0 feh -F -x -Y {images[1]} &''', f'''DISPLAY=0 feh -F -x -Y {images[2]} &'''))
+        client.run_command('%s', host_args=(f'''DISPLAY=0 feh -F -x -Y {images[0]} &''', \
+         f'''DISPLAY=0 feh -F -x -Y {images[1]} &''', f'''DISPLAY=0 feh -F -x -Y {images[2]} &'''))
         self.ssh_all_hosts('vcgencmd display_power 1')
 
 
