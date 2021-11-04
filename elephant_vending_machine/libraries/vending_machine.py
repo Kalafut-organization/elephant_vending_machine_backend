@@ -6,6 +6,7 @@ and detecting motion sensor input on the machine.
 
 import time
 import subprocess
+from pssh.clients import ParallelSSHClient
 
 LEFT_SCREEN = 1
 MIDDLE_SCREEN = 2
@@ -89,6 +90,24 @@ class VendingMachine:
 
         self.signal_sender = ''
         return selection
+    
+    def ssh_all_hosts(self, command):
+        hosts = self.addresses
+        client = ParallelSSHClient(hosts, user='pi')
+        client.run_command(command)
+        client.join()
+
+    def display_images(self, images):
+        for image in images:
+            if image == 'all_white_screen.png' or image == 'fixation_stimuli.png' or image == 'all_black_screen.png':
+                image = f'''/home/pi/elephant_vending_machine/default_img/{image}'''
+            else:
+                image = f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{image}'''
+        hosts = self.addresses
+        client = ParallelSSHClient(hosts, user='pi')
+        self.ssh_all_hosts('vcgencmd display_power 0')
+        client.run_command('%s', host_args=(f'''DISPLAY=0 feh -F -x -Y {images[0]} &''', f'''DISPLAY=0 feh -F -x -Y {images[1]} &''', f'''DISPLAY=0 feh -F -x -Y {images[2]} &'''))
+        self.ssh_all_hosts('vcgencmd display_power 1')
 
 
 class SensorGrouping:
