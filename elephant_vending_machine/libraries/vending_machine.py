@@ -113,10 +113,10 @@ class VendingMachine:
                 image = f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{image}'''
         hosts = self.addresses
         client = ParallelSSHClient(hosts, user='pi')
-        self.ssh_all_hosts('vcgencmd display_power 0')
+        self.ssh_all_hosts('xset -display :0 dpms force off')
         client.run_command('%s', host_args=(f'''DISPLAY=0 feh -F -x -Y {images[0]} &''', \
          f'''DISPLAY=0 feh -F -x -Y {images[1]} &''', f'''DISPLAY=0 feh -F -x -Y {images[2]} &'''))
-        self.ssh_all_hosts('vcgencmd display_power 1')
+        self.ssh_all_hosts('xset -display :0 dpms force on')
 
     def dispense_treat(index):
         """ Sends ssh command to dispense treat in corresponding tray
