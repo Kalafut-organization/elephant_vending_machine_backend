@@ -80,6 +80,8 @@ def run_experiment(experiment_logger, vending_machine):
         trial_num = trial_index + 1
         experiment_logger.info("Trial %s started", trial_num)
 		
+        # Reactivate screens
+        vending_machine.ssh_all_hosts('xset -display :0 dpms force on')
         # Display fixation stimuli
         vending_machine.display_images([BLANK_SCREEN, FIXATION_STIMULI, BLANK_SCREEN])
         experiment_logger.info("Presented fixation cross")
@@ -102,7 +104,7 @@ def run_experiment(experiment_logger, vending_machine):
                 experiment_logger.info("Trial %s timed out when waiting to select fixation cross", trial_num)
 
         # Blank out screens
-        vending_machine.display_images([BLANK_SCREEN, BLANK_SCREEN, BLANK_SCREEN])
+        vending_machine.ssh_all_hosts('xset -display :0 dpms force off')
 
         #Wait for interval between fixation and stimuli
         experiment_logger.info("Trial %s start of interfixation duration", trial_num)
@@ -121,6 +123,8 @@ def run_experiment(experiment_logger, vending_machine):
             accepted_groups.append(vending_machine.middle_group)
         if SCREEN_SELECTION[2]:
             accepted_groups.append(vending_machine.right_group)
+        # Reactivate screens
+        vending_machine.ssh_all_hosts('xset -display :0 dpms force on')
         # Display random images from each group
         vending_machine.display_images([images[0], images[1], images[2]])
         # Log images displayed
@@ -158,7 +162,7 @@ def run_experiment(experiment_logger, vending_machine):
         experiment_logger.info("Start of intertrial interval")
 		
         # Blank out screens
-        vending_machine.display_images([BLANK_SCREEN, BLANK_SCREEN, BLANK_SCREEN])
+        vending_machine.ssh_all_hosts('xset -display :0 dpms force off')
 
 		# Wait for intertrial interval
         time.sleep(INTERTRIAL_INTERVAL)
