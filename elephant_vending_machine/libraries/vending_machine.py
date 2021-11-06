@@ -1,3 +1,5 @@
+
+
 """Abstraction of physical "elephant vending machine"
 
 This module  allows for display of images, control of LEDs,
@@ -80,7 +82,7 @@ class VendingMachine:
 
         while self.signal_sender not in accepted_addresses and elapsed_time < timeout:
             elapsed_time = get_current_time_milliseconds() - start_time
-
+        print(self.signal_sender)
         if self.signal_sender == self.addresses[0]:
             selection = 'left'
         elif self.signal_sender == self.addresses[1]:
@@ -106,16 +108,18 @@ class VendingMachine:
 
         Parameters:
             images: images to be displayed on the screens """
+        new_images = []
         for image in images:
             if image in ('all_white_screen.png', 'fixation_stimuli.png', 'all_black_screen.png'):
-                image = f'''/home/pi/elephant_vending_machine/default_img/{image}'''
+                new_images.append(f'''/home/pi/elephant_vending_machine/default_img/{image}''')
             else:
-                image = f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{image}'''
+                new_images.append(f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{image}''')
         hosts = self.addresses
         client = ParallelSSHClient(hosts, user='pi')
         self.ssh_all_hosts('xset -display :0 dpms force off')
-        client.run_command('%s', host_args=(f'''DISPLAY=0 feh -F -x -Y {images[0]} &''', \
-         f'''DISPLAY=0 feh -F -x -Y {images[1]} &''', f'''DISPLAY=0 feh -F -x -Y {images[2]} &'''))
+        client.run_command('%s', host_args=(f'''DISPLAY=:0 feh -F -x -Y {new_images[0]} &''', \
+         f'''DISPLAY=:0 feh -F -x -Y {new_images[1]} &''', f'''DISPLAY=:0 feh -F -x -Y {new_images[2]} &'''))
+        time.sleep(1)
         self.ssh_all_hosts('xset -display :0 dpms force on')
 
     def dispense_treat(index):
@@ -183,4 +187,4 @@ class SensorGrouping:
         else:
             path = f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{stimuli_name}'''
 
-        subprocess.Popen(['ssh', f'''pi@{self.address}''', 'DISPLAY=0', 'feh', '-F', path, '&'])
+        subprocess.Popen(['ssh', f'''pi@{self.address}''', 'DISPLAY=:0', 'feh', '-F', '-x', '-Y', path, '&'])
