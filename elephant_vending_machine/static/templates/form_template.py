@@ -80,8 +80,6 @@ def run_experiment(experiment_logger, vending_machine):
         trial_num = trial_index + 1
         experiment_logger.info("Trial %s started", trial_num)
 		
-        # Reactivate screens
-        vending_machine.ssh_all_hosts('xset -display :0 dpms force on')
         # Display fixation stimuli
         vending_machine.display_images([BLANK_SCREEN, FIXATION_STIMULI, BLANK_SCREEN])
         experiment_logger.info("Presented fixation cross")
@@ -123,8 +121,6 @@ def run_experiment(experiment_logger, vending_machine):
             accepted_groups.append(vending_machine.middle_group)
         if SCREEN_SELECTION[2]:
             accepted_groups.append(vending_machine.right_group)
-        # Reactivate screens
-        vending_machine.ssh_all_hosts('xset -display :0 dpms force on')
         # Display random images from each group
         vending_machine.display_images([images[0], images[1], images[2]])
         # Log images displayed
@@ -153,9 +149,9 @@ def run_experiment(experiment_logger, vending_machine):
                 experiment_logger.info("Tray %d dispenses treat: %s", groups[2][1], groups[2][2])
                 correct = True
 
-        # If a correct choice was made, flash screen
-        if correct:
-            vending_machine.display_images([WHITE_SCREEN, WHITE_SCREEN, WHITE_SCREEN])
+        #if correct:
+            # FLash LEDS
+            # vending_machine.left_group.led_color_with_time(255,255,255,1000)
 
         experiment_logger.info("Trial %s finished", trial_num)
 		
@@ -163,6 +159,9 @@ def run_experiment(experiment_logger, vending_machine):
 		
         # Blank out screens
         vending_machine.ssh_all_hosts('xset -display :0 dpms force off')
+
+        #Clear images
+        vending_machine.ssh_all_hosts('pkill feh')
 
 		# Wait for intertrial interval
         time.sleep(INTERTRIAL_INTERVAL)
