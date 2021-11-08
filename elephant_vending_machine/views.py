@@ -423,7 +423,7 @@ def create_experiment_from_form():
     filedata = filedata.replace("_stimuli_duration", request.form['stimuli_duration'])
     filedata = filedata.replace("_num_trials", request.form['trials'])
     filedata = filedata.replace("_replacement", request.form['replacement'].capitalize())
-    filedata = filedata.replace("_monitor_count", request.form['monitors'])
+    filedata = filedata.replace("screen_selection{}", request.form['monitors'])
     filedata = filedata.replace("_intertrial_interval", request.form['intertrial_duration'])
     # find the correct fixation
     fixation = ""
