@@ -118,16 +118,18 @@ class VendingMachine:
         client = ParallelSSHClient(hosts, user='pi')
         self.ssh_all_hosts('xset -display :0 dpms force off')
         client.run_command('%s', host_args=(f'''DISPLAY=:0 feh -F -x -Y {new_images[0]} &''', \
-         f'''DISPLAY=:0 feh -F -x -Y {new_images[1]} &''', f'''DISPLAY=:0 feh -F -x -Y {new_images[2]} &'''))
+         f'''DISPLAY=:0 feh -F -x -Y {new_images[1]} &''', \
+         f'''DISPLAY=:0 feh -F -x -Y {new_images[2]} &'''))
         time.sleep(1)
         self.ssh_all_hosts('xset -display :0 dpms force on')
 
+    @staticmethod
     def dispense_treat(index):
         """ Sends ssh command to dispense treat in corresponding tray
-        
+
         Parameters:
             index: index (from 1 to 3) of the tray to be opened"""
-        subprocess.Popen(['ssh','arduino@192.168.0.14', 'python', 'dispense.py', f'''{index}'''])
+        subprocess.Popen(['ssh', 'arduino@192.168.0.14', 'python', 'dispense.py', f'''{index}'''])
 
 
 class SensorGrouping:
@@ -171,20 +173,21 @@ class SensorGrouping:
             {red} {green} {blue} {display_time}'''
         subprocess.run(ssh_command, check=True, shell=True)
 
-    def display_on_screen(self, stimuli_name, default):
-        """Displays the specified stimuli on the screen.
-        Should only be called if the SensorGrouping config is not None
+    # def display_on_screen(self, stimuli_name, default):
+    #     """Displays the specified stimuli on the screen.
+    #     Should only be called if the SensorGrouping config is not None
 
-        Parameters:
-            stimuli_name (str): The name of the file corresponding to the desired
-                                stimuli to be displayed.
-            default (bool): Whether the file is in the remote image
-                                directory or the default image directory
-        """
-        path = ''
-        if default:
-            path = f'''/home/pi/elephant_vending_machine/default_img/{stimuli_name}'''
-        else:
-            path = f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{stimuli_name}'''
+    #     Parameters:
+    #         stimuli_name (str): The name of the file corresponding to the desired
+    #                             stimuli to be displayed.
+    #         default (bool): Whether the file is in the remote image
+    #                             directory or the default image directory
+    #     """
+    #     path = ''
+    #     if default:
+    #         path = f'''/home/pi/elephant_vending_machine/default_img/{stimuli_name}'''
+    #     else:
+    #         path = f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{stimuli_name}'''
 
-        subprocess.Popen(['ssh', f'''pi@{self.address}''', 'DISPLAY=:0', 'feh', '-F', '-x', '-Y', path, '&'])
+    #     subprocess.Popen(['ssh', f'''pi@{self.address}''', \
+    #  'DISPLAY=:0', 'feh', '-F', '-x', '-Y', path, '&'])
