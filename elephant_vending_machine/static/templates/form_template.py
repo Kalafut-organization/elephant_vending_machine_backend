@@ -3,7 +3,6 @@ import time
 import os
 
 FIXATION_STIMULI = _fixation_stimuli
-FIXATION_BOOL = _fixation_bool
 FIXATION_DURATION = _fixation_duration
 INTER_FIX_DURATION = _inter_fix_duration
 STIMULI_DURATION = _stimuli_duration

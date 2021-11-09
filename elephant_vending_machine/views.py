@@ -426,7 +426,7 @@ def create_experiment_from_form():
     filedata = filedata.replace("_intertrial_interval", request.form['intertrial_duration'])
     # find the correct fixation
     fixation = ""
-    if request.form['fixation_default']:
+    if request.form['fixation_default'] == "true":
         fixation = "\'fixation_stimuli.png\'"
     else:
         fixation = request.form['new_fixation']
