@@ -804,10 +804,10 @@ def delete_group(name):
                 delete_remote_group(name)
                 try:
                     shutil.rmtree(os.path.join(directory, name))
+                    response = f"Group {name} was successfully deleted."
+                    response_code = 200
                 except OSError:
                     response = "An error has occurred and the group could not be deleted"
-                response = f"Group {name} was successfully deleted."
-                response_code = 200
             except CalledProcessError:
                 response_code = 500
                 response = "Error: Failed to delete file from hosts. ", \
