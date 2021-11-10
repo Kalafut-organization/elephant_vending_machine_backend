@@ -16,7 +16,7 @@ import shutil
 import subprocess
 from subprocess import CalledProcessError
 import py_compile
-from flask import request, make_response, jsonify
+from flask import json, request, make_response, jsonify
 from werkzeug.utils import secure_filename
 from elephant_vending_machine import APP
 from .libraries.experiment_logger import create_experiment_logger
@@ -410,37 +410,53 @@ def create_experiment_from_form():
     response = ""
     response_code = 400
     #pull template file
-    with open( \
-    'elephant_vending_machine_backend/elephant_vending_machine/static/templates/form_template.py', \
+    print(request.form)
+    with open(os.path.dirname(os.path.abspath(__file__))+\
+    '/static/templates/form_template.py', \
     'r') as file:
         filedata = file.read()
-    #Replace variables with form data
-    filedata = filedata.replace("_fixation_stimuli", request.form['fixation'])
-    filedata = filedata.replace("_fixation_duration", request.form['fixation_duration'])
-    filedata = filedata.replace("_inter_fixation_duration", request.form['intermediate_duration'])
+
+    # #Replace variables with form data
+    filedata = filedata.replace("_inter_fix_duration", request.form['intermediate_duration'])
+    filedata = filedata.replace("_fixation_duration", \
+    request.form['fixation_duration']) # ^ watch the order with these two
     filedata = filedata.replace("_stimuli_duration", request.form['stimuli_duration'])
     filedata = filedata.replace("_num_trials", request.form['trials'])
-    filedata = filedata.replace("_intertrial_interval", request.form['trial_interval'])
-    filedata = filedata.replace("_replacement", request.form['replacement'])
-    filedata = filedata.replace("_monitor_count", request.form['monitors'])
-    groups = request.form['selectedGroups']
+    filedata = filedata.replace("_replacement", request.form['replacement'].capitalize())
+    filedata = filedata.replace("_intertrial_interval", request.form['intertrial_duration'])
+    # find the correct fixation
+    fixation = ""
+    if request.form['fixation_default'] == "true":
+        fixation = "\'fixation_stimuli.png\'"
+    else:
+        fixation = request.form['new_fixation']
+    filedata = filedata.replace("_fixation_stimuli", fixation)
+    #preconfigure string with array for screens
+    screens = request.form['monitors']
+    screen_list = json.loads(screens)
+    screen_selection = "SCREEN_SELECTION = " + str(screen_list)
+    filedata = filedata.replace("SCREEN_SELECTION = []", screen_selection)
     #preconfigure string with array for groups
-    stim_groups = "STIMULI_GROUPS = " + groups
-    filedata = filedata.replace("STIMULI_GROUPS = []", stim_groups)
     outcomes = request.form['outcomes']
-    #preconfigure string with array for groups
-    outcome_trays = "STIMULI_OUTCOMES = " + outcomes
-    filedata = filedata.replace("STIMULI_OUTCOMES = []", outcome_trays)
+    outcome_list = json.loads(outcomes)
+    for item in outcome_list:
+        print(item)
+        item[0] = "/home/pi/elephant_vending_machine_backend/elephant_vending_machine/static/img/" \
+         + item[0]
+    outcomes = json.dumps(outcome_list)
+    stim_groups = "STIMULI_GROUPS = " + outcomes
+    filedata = filedata.replace("STIMULI_GROUPS = []", stim_groups)
+
     #save new experiment file in experiments and overwite
     name = request.form['name']
     if allowed_experiment(name):
+        response_code = 200
+        response = "File successfully created."
         filepath = ( \
-            "elephant_vending_machine_backend/elephant_vending_machine/static/experiment/" \
+            "elephant_vending_machine/static/experiment/" \
             + name + ".py")
         with open(filepath, 'w') as file:
             file.write(filedata)
-        #Upload experiment
-        file.upload_experiment()
     else:
         response = "Error with request: File extension not allowed."
     return make_response(jsonify({'message':response}), response_code)
@@ -742,6 +758,9 @@ def list_groups():
     groups.sort()
     if '.gitignore' in groups:
         groups.remove('.gitignore')
+    for group in groups:
+        if not os.path.isdir(os.path.join(images_path, group)):
+            groups.remove(group)
     response_code = 200
     return make_response(jsonify({'names': groups}), response_code)
 
@@ -779,16 +798,19 @@ def delete_group(name):
     directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
     response_code = 400
     response = ""
-    if name in os.listdir(directory):
-        try:
-            shutil.rmtree(os.path.join(directory, name))
-            delete_remote_group(name)
-            response = f"Group {name} was successfully deleted."
-            response_code = 200
-        except OSError:
-            response = "An error has occurred and the group could not be deleted"
+    if name != "Fixations":
+        if name in os.listdir(directory):
+            try:
+                delete_remote_group(name)
+                shutil.rmtree(os.path.join(directory, name))
+                response = f"Group {name} was successfully deleted."
+                response_code = 200
+            except OSError:
+                response = "An error has occurred and the group could not be deleted"
+        else:
+            response = f"Group {name} does not exist and so couldn't be deleted."
     else:
-        response = f"Group {name} does not exist and so couldn't be deleted."
+        response = "The fixations group cannot be deleted"
     return make_response(jsonify({'message': response}), response_code)
 
 @APP.route('/template', methods=['GET'])

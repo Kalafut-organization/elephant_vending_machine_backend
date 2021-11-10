@@ -3,9 +3,8 @@ import time
 import os
 
 FIXATION_STIMULI = _fixation_stimuli
-FIXATION_BOOL = _fixation_bool
 FIXATION_DURATION = _fixation_duration
-INTER_FIXATION_DURATION = _inter_fixation_duration
+INTER_FIX_DURATION = _inter_fix_duration
 STIMULI_DURATION = _stimuli_duration
 NUM_TRIALS = _num_trials
 INTERTRIAL_INTERVAL = _intertrial_interval
@@ -81,9 +80,7 @@ def run_experiment(experiment_logger, vending_machine):
         experiment_logger.info("Trial %s started", trial_num)
 		
         # Display fixation stimuli
-        vending_machine.left_group.display_on_screen(BLANK_SCREEN, True)
-        vending_machine.middle_group.display_on_screen(FIXATION_STIMULI, not FIXATION_BOOL)
-        vending_machine.right_group.display_on_screen(BLANK_SCREEN, True)
+        vending_machine.display_images([BLANK_SCREEN, FIXATION_STIMULI, BLANK_SCREEN])
         experiment_logger.info("Presented fixation cross")
 		
         correct_response = False
@@ -104,13 +101,11 @@ def run_experiment(experiment_logger, vending_machine):
                 experiment_logger.info("Trial %s timed out when waiting to select fixation cross", trial_num)
 
         # Blank out screens
-        vending_machine.left_group.display_on_screen(BLANK_SCREEN, True)
-        vending_machine.middle_group.display_on_screen(BLANK_SCREEN, True)
-        vending_machine.right_group.display_on_screen(BLANK_SCREEN, True)
+        vending_machine.ssh_all_hosts('xset -display :0 dpms force off')
 
         #Wait for interval between fixation and stimuli
         experiment_logger.info("Trial %s start of interfixation duration", trial_num)
-        time.sleep(INTER_FIXATION_DURATION)
+        time.sleep(INTER_FIX_DURATION)
         experiment_logger.info("Trial %s end of interfixation duration", trial_num)
 
         correct = False
@@ -126,9 +121,7 @@ def run_experiment(experiment_logger, vending_machine):
         if SCREEN_SELECTION[2]:
             accepted_groups.append(vending_machine.right_group)
         # Display random images from each group
-        vending_machine.left_group.display_on_screen(images[0], False)
-        vending_machine.middle_group.display_on_screen(images[1], False)
-        vending_machine.right_group.display_on_screen(images[2], False)
+        vending_machine.display_images([images[0], images[1], images[2]])
         # Log images displayed
         experiment_logger.info("Trial %s, '%s' stimuli displayed on left", trial_num, images[0])
         experiment_logger.info("Trial %s, '%s' stimuli displayed on middle", trial_num, images[1])
@@ -155,21 +148,19 @@ def run_experiment(experiment_logger, vending_machine):
                 experiment_logger.info("Tray %d dispenses treat: %s", groups[2][1], groups[2][2])
                 correct = True
 
-        # If a correct choice was made, flash screen
-        if correct:
-            vending_machine.left_group.display_on_screen(WHITE_SCREEN, True)
-            vending_machine.middle_group.display_on_screen(WHITE_SCREEN, True)
-            vending_machine.right_group.display_on_screen(WHITE_SCREEN, True)
-            time.sleep(0.5)
+        #if correct:
+            # FLash LEDS
+            # vending_machine.left_group.led_color_with_time(255,255,255,1000)
 
         experiment_logger.info("Trial %s finished", trial_num)
 		
         experiment_logger.info("Start of intertrial interval")
 		
         # Blank out screens
-        vending_machine.left_group.display_on_screen(BLANK_SCREEN, True)
-        vending_machine.middle_group.display_on_screen(BLANK_SCREEN, True)
-        vending_machine.right_group.display_on_screen(BLANK_SCREEN, True)
+        vending_machine.ssh_all_hosts('xset -display :0 dpms force off')
+
+        #Clear images
+        vending_machine.ssh_all_hosts('pkill feh')
 
 		# Wait for intertrial interval
         time.sleep(INTERTRIAL_INTERVAL)

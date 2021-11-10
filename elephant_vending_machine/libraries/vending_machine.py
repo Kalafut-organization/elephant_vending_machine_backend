@@ -1,3 +1,5 @@
+
+
 """Abstraction of physical "elephant vending machine"
 
 This module  allows for display of images, control of LEDs,
@@ -6,7 +8,7 @@ and detecting motion sensor input on the machine.
 
 import time
 import subprocess
-import spur
+from pssh.clients import ParallelSSHClient
 
 LEFT_SCREEN = 1
 MIDDLE_SCREEN = 2
@@ -80,7 +82,7 @@ class VendingMachine:
 
         while self.signal_sender not in accepted_addresses and elapsed_time < timeout:
             elapsed_time = get_current_time_milliseconds() - start_time
-
+        print(self.signal_sender)
         if self.signal_sender == self.addresses[0]:
             selection = 'left'
         elif self.signal_sender == self.addresses[1]:
@@ -90,6 +92,44 @@ class VendingMachine:
 
         self.signal_sender = ''
         return selection
+
+    def ssh_all_hosts(self, command):
+        """ Sends given command to remote hosts via ssh
+
+        Parameters:
+            command: command to be sent over ssh """
+        hosts = self.addresses
+        client = ParallelSSHClient(hosts, user='pi')
+        client.run_command(command)
+        client.join()
+
+    def display_images(self, images):
+        """ Displays images on remote hosts via ssh
+
+        Parameters:
+            images: images to be displayed on the screens """
+        new_images = []
+        for image in images:
+            if image in ('all_white_screen.png', 'fixation_stimuli.png', 'all_black_screen.png'):
+                new_images.append(f'''/home/pi/elephant_vending_machine/default_img/{image}''')
+            else:
+                new_images.append(f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{image}''')
+        hosts = self.addresses
+        client = ParallelSSHClient(hosts, user='pi')
+        self.ssh_all_hosts('xset -display :0 dpms force off')
+        client.run_command('%s', host_args=(f'''DISPLAY=:0 feh -F -x -Y {new_images[0]} &''', \
+         f'''DISPLAY=:0 feh -F -x -Y {new_images[1]} &''', \
+         f'''DISPLAY=:0 feh -F -x -Y {new_images[2]} &'''))
+        time.sleep(1)
+        self.ssh_all_hosts('xset -display :0 dpms force on')
+
+    @staticmethod
+    def dispense_treat(index):
+        """ Sends ssh command to dispense treat in corresponding tray
+
+        Parameters:
+            index: index (from 1 to 3) of the tray to be opened"""
+        subprocess.Popen(['ssh', 'arduino@192.168.0.14', 'python', 'dispense.py', f'''{index}'''])
 
 
 class SensorGrouping:
@@ -133,29 +173,21 @@ class SensorGrouping:
             {red} {green} {blue} {display_time}'''
         subprocess.run(ssh_command, check=True, shell=True)
 
-    def display_on_screen(self, stimuli_name, default):
-        """Displays the specified stimuli on the screen.
-        Should only be called if the SensorGrouping config is not None
+    # def display_on_screen(self, stimuli_name, default):
+    #     """Displays the specified stimuli on the screen.
+    #     Should only be called if the SensorGrouping config is not None
 
-        Parameters:
-            stimuli_name (str): The name of the file corresponding to the desired
-                                stimuli to be displayed.
-            default (bool): Whether the file is in the remote image
-                                directory or the default image directory
-        """
-        path = ''
-        if default:
-            path = f'''/home/pi/elephant_vending_machine/default_imgs/{stimuli_name}'''
-        else:
-            path = f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{stimuli_name}'''
+    #     Parameters:
+    #         stimuli_name (str): The name of the file corresponding to the desired
+    #                             stimuli to be displayed.
+    #         default (bool): Whether the file is in the remote image
+    #                             directory or the default image directory
+    #     """
+    #     path = ''
+    #     if default:
+    #         path = f'''/home/pi/elephant_vending_machine/default_img/{stimuli_name}'''
+    #     else:
+    #         path = f'''{self.config['REMOTE_IMAGE_DIRECTORY']}/{stimuli_name}'''
 
-        shell = spur.SshShell(
-            hostname=self.address,
-            username='pi',
-            missing_host_key=spur.ssh.MissingHostKey.accept,
-            load_system_host_keys=False
-        )
-        with shell:
-            result = shell.spawn(['feh', '-F', path,
-                                  '&'], update_env={'DISPLAY': ':0'}, store_pid=True).pid
-        self.pid_of_previous_display_command = int(result)
+    #     subprocess.Popen(['ssh', f'''pi@{self.address}''', \
+    #  'DISPLAY=:0', 'feh', '-F', '-x', '-Y', path, '&'])

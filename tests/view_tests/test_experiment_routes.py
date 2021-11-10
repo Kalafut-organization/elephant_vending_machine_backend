@@ -91,3 +91,20 @@ def test_valid_file_extensions_invalid_file():
 
 def test_valid_file_extension_double_extension():
     assert views.allowed_file('sourcecode.c.py', {'py'}) == True
+
+def test_experiment_template(client):
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/test_file.py"])
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/test_file2.py"])
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/empty.py"])
+    response = client.get('/template')
+    response_json_files = json.loads(response.data)['files']
+    assert response_json_files == ["http://localhost/static/templates/form_template.py"]
+
+def test_template_creation(client):
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/test_file.py"])
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/test_file2.py"])
+    subprocess.call(["touch", "elephant_vending_machine/static/experiment/empty.py"])
+    data = {'name': "name", 'intermediate_duration': 5, 'intertrial_duration': 5, 'stimuli_duration': 5, 'fixation_duration': 5, 'fixation_default': True, 'trials':2, 'replacement': "False", "monitors":'[true, false, true]', "fixation":"", "outcomes":'[["group1","treat1","tray1"]]'}
+    response = client.post('/experiment/create', data=data) 
+    assert response.status_code == 200
+    assert json.loads(response.data)['message'] == "File successfully created."
