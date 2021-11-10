@@ -802,11 +802,16 @@ def delete_group(name):
         if name in os.listdir(directory):
             try:
                 delete_remote_group(name)
-                shutil.rmtree(os.path.join(directory, name))
+                try:
+                    shutil.rmtree(os.path.join(directory, name))
+                except OSError:
+                    response = "An error has occurred and the group could not be deleted"
                 response = f"Group {name} was successfully deleted."
                 response_code = 200
-            except OSError:
-                response = "An error has occurred and the group could not be deleted"
+            except CalledProcessError:
+                response_code = 500
+                response = "Error: Failed to delete file from hosts. ", \
+                 "Image not deleted, please try again"
         else:
             response = f"Group {name} does not exist and so couldn't be deleted."
     else:
