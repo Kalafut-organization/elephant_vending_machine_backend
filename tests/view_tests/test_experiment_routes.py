@@ -104,7 +104,7 @@ def test_template_creation(client):
     subprocess.call(["touch", "elephant_vending_machine/static/experiment/test_file.py"])
     subprocess.call(["touch", "elephant_vending_machine/static/experiment/test_file2.py"])
     subprocess.call(["touch", "elephant_vending_machine/static/experiment/empty.py"])
-    data = {'name': "name", 'intermediate_duration': 5, 'intertrial_duration': 5, 'stimuli_duration': 5, 'fixation_duration': 5, 'fixation_default': True, 'trials':2, 'replacement': "False", "monitors":'[true, false, true]', "fixation":"", "outcomes":'[["group1","treat1","tray1"]]'}
+    data = {'name': "name", 'intermediate_duration': 5, 'intertrial_duration': 5, 'stimuli_duration': 5, 'fixation_duration': 5, 'fixation_default': "true", 'trials':2, 'replacement': "False", "monitors":'[true, false, true]', "fixation":"", "outcomes":'[["group1","treat1","tray1"]]'}
     response = client.post('/experiment/create', data=data) 
     assert response.status_code == 200
     assert json.loads(response.data)['message'] == "File successfully created."

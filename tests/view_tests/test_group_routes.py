@@ -58,11 +58,19 @@ def test_delete_group_route_not_exist(client):
     assert b"Group test does not exist and so couldn't be deleted." in response.data
 
 def test_delete_group_route_os_error(monkeypatch, client):
+    monkeypatch.setattr('subprocess.run', lambda command, check, shell: CompletedProcess(['some_command'], returncode=0))
     monkeypatch.setattr('shutil.rmtree', lambda path: raise_(OSError))
     subprocess.call(["mkdir", "elephant_vending_machine/static/img/test"])
     response = client.delete('/groups/test')
     assert response.status_code == 400
     assert b'An error has occurred and the group could not be deleted' in response.data
+
+def test_delete_group_happy_path(monkeypatch, client):
+    monkeypatch.setattr('subprocess.run', lambda command, check, shell: CompletedProcess(['some_command'], returncode=0))
+    subprocess.call(["mkdir", "elephant_vending_machine/static/img/test"])
+    response = client.delete('/groups/test')
+    assert response.status_code == 200
+    assert b'Group test was successfully deleted.' in response.data 
 
 def test_get_group_route(client):
     subprocess.call(["mkdir", "elephant_vending_machine/static/img/test"])
