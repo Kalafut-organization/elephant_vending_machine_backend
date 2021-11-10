@@ -798,16 +798,21 @@ def delete_group(name):
     directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
     response_code = 400
     response = ""
-    if name in os.listdir(directory):
-        try:
-            shutil.rmtree(os.path.join(directory, name))
-            delete_remote_group(name)
-            response = f"Group {name} was successfully deleted."
-            response_code = 200
-        except OSError:
-            response = "An error has occurred and the group could not be deleted"
+    if name != "Fixations":
+        if name in os.listdir(directory):
+            try:
+                delete_remote_group(name)
+                shutil.rmtree(os.path.join(directory, name))
+                response = f"Group {name} was successfully deleted."
+                response_code = 200
+            except CalledProcessError:
+                response_code = 500
+                response = "Error: Failed to delete file from hosts. ", \
+                 "Image not deleted, please try again"
+        else:
+            response = f"Group {name} does not exist and so couldn't be deleted."
     else:
-        response = f"Group {name} does not exist and so couldn't be deleted."
+        response = "The fixations group cannot be deleted"
     return make_response(jsonify({'message': response}), response_code)
 
 @APP.route('/template', methods=['GET'])
