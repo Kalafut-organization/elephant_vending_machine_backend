@@ -63,3 +63,16 @@ folder. If using the image syncing, this must be a passwordless SSH key that has
     * This will ensure the containers automatically restart in case of error or reboots.
     * To stop the containers, and avoid auto-restarting, use `docker-compose down`
     * Container storage is persisted between runs
+    
+## Running in Dev
+You will need to run commands on the server Pi though ssh network commands, this is included in these instructions
+
+1. Connect to the same network as the Server Pi and navigate to your terminal
+1. run command, `ssh pi@192.168.0.100`
+1. A sign in should appear, username is `pi` password is `raspberry`
+1. you should now be in the Server Pi terminal, run these commands to activate the backend
+1. `source .venv/bin/activate`
+1. `export FLASK_APP=elephant_vending_machine`
+1. `flask run --host=0.0.0.0`
+1. the backend should be runnig now
+1. to deactivate the back end run `deactivate` on the ssh terminal 
