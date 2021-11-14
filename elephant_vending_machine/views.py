@@ -811,7 +811,7 @@ def delete_group(name):
             except CalledProcessError:
                 response_code = 500
                 response = "Error: Failed to delete file from hosts. ", \
-                 "Image not deleted, please try again"
+                 "Group not deleted, please try again"
         else:
             response = f"Group {name} does not exist and so couldn't be deleted."
     else:

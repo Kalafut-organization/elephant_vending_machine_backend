@@ -83,11 +83,11 @@ class VendingMachine:
         while self.signal_sender not in accepted_addresses and elapsed_time < timeout:
             elapsed_time = get_current_time_milliseconds() - start_time
         print(self.signal_sender)
-        if self.signal_sender == self.addresses[0]:
+        if self.signal_sender == self.addresses[0] and self.signal_sender in accepted_addresses:
             selection = 'left'
-        elif self.signal_sender == self.addresses[1]:
+        elif self.signal_sender == self.addresses[1] and self.signal_sender in accepted_addresses:
             selection = 'middle'
-        elif self.signal_sender == self.addresses[2]:
+        elif self.signal_sender == self.addresses[2] and self.signal_sender in accepted_addresses:
             selection = 'right'
 
         self.signal_sender = ''
