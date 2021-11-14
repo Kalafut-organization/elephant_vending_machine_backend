@@ -83,8 +83,8 @@ def test_delete_group_no_connection(monkeypatch, client):
     subprocess.call(["mkdir", "elephant_vending_machine/static/img/test"])
     response = client.delete('/groups/test')
     assert response.status_code == 500
-    assert json.loads(response.data)['message'] == "Error: Failed to delete file from hosts. ", \
-                 "Image not deleted, please try again"
+    assert json.loads(response.data)['message'] == ['Error: Failed to delete file from hosts. ', \
+         'Group not deleted, please try again'] 
 
 def test_get_group_route(client):
     subprocess.call(["mkdir", "elephant_vending_machine/static/img/test"])
