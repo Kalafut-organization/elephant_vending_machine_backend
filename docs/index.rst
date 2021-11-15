@@ -9,8 +9,7 @@ Welcome to Elephant Vending Machine's documentation!
    hardware/router
    hardware/webserverpi
    hardware/sensorpi
-   hardware/sensorwiring
-   hardware/ledwiring
+   hardware/gpiowiring
 
 .. toctree::
    :maxdepth: 2
@@ -19,6 +18,15 @@ Welcome to Elephant Vending Machine's documentation!
    usage/guiaccess
    usage/runningexperiments
    usage/managingfiles
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Archived Documentation
+
+   archived/overview
+   archived/hardware_overview
+   archived/sensorwiring
+   archived/ledwiring
    
 
 Indices and tables
