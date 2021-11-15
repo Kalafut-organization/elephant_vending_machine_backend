@@ -1,7 +1,7 @@
 Hardware Overview
 =================
 
-.. image:: ../_static/images/equipment_diagram.png
+.. image:: ../_static/images/archived_equipment_diagram.png
   :width: 800
   :alt: Connected hardware components
 
@@ -11,11 +11,10 @@ Webserver Pi stores the stimuli, experiment, and log files and handles
 all the logic of running experiments. 
 
 The other three Raspberry Pis are used to interface with the additional
-hardware. Each Sensor Pi has a GPIO button and a screen. The GPIO buttons send
-an input to the rasberry pis so it can be determined which stimuli was selected
-and the appropriate outcome. The screens are used to display stimuli to the elephant.
-They will flash white when a correct outcome is selected. Note: in the current design
-the screen is the button that the elephant will push.
+hardware. Each Sensor Pi has an LED strip and a screen. The LED strip is
+used to provide visual feedback to the elephant about whether or not the
+selection it made was correct as determined by the experiment file. The
+screens are used to display stimuli to the elephant.
 
 
 Parts List
@@ -28,9 +27,9 @@ Parts List
 +-------------------------------+----------------------------------+----------+
 | Raspberry Pi                  | Raspberry Pi 3 B                 | 4        |
 +-------------------------------+----------------------------------+----------+
-| GPIO Buttons                  | Unknown                          | 3        |
+| Sonar Sensor                  | MaxBotix MB1330 XL-MaxSonar-AE3  | 3        |
 +-------------------------------+----------------------------------+----------+
-| Arduino                       | Uno Rev3                         | 1        |
+| Led Strip                     | WS281X RGB LED Strip             | 3        |
 +-------------------------------+----------------------------------+----------+
 | Monitor                       | Unknown                          | 3        |
 +-------------------------------+----------------------------------+----------+
