@@ -423,21 +423,24 @@ def create_experiment_from_form():
     filedata = filedata.replace("_stimuli_duration", request.form['stimuli_duration'])
     filedata = filedata.replace("_num_trials", request.form['trials'])
     filedata = filedata.replace("_replacement", request.form['replacement'].capitalize())
-    filedata = filedata.replace("_monitor_count", request.form['monitors'])
-    # filedata = filedata.replace("_intertrial_interval", request.form['trial_interval'])
-
+    filedata = filedata.replace("_intertrial_interval", request.form['intertrial_duration'])
     # find the correct fixation
     fixation = ""
-    if request.form['fixation_default']:
+    if request.form['fixation_default'] == "true":
         fixation = "\'fixation_stimuli.png\'"
     else:
         fixation = request.form['new_fixation']
     filedata = filedata.replace("_fixation_stimuli", fixation)
-
+    #preconfigure string with array for screens
+    screens = request.form['monitors']
+    screen_list = json.loads(screens)
+    screen_selection = "SCREEN_SELECTION = " + str(screen_list)
+    filedata = filedata.replace("SCREEN_SELECTION = []", screen_selection)
     #preconfigure string with array for groups
     outcomes = request.form['outcomes']
     outcome_list = json.loads(outcomes)
     for item in outcome_list:
+        print(item)
         item[0] = "/home/pi/elephant_vending_machine_backend/elephant_vending_machine/static/img/" \
          + item[0]
     outcomes = json.dumps(outcome_list)
@@ -448,6 +451,7 @@ def create_experiment_from_form():
     name = request.form['name']
     if allowed_experiment(name):
         response_code = 200
+        response = "File successfully created."
         filepath = ( \
             "elephant_vending_machine/static/experiment/" \
             + name + ".py")
@@ -754,6 +758,9 @@ def list_groups():
     groups.sort()
     if '.gitignore' in groups:
         groups.remove('.gitignore')
+    for group in groups:
+        if not os.path.isdir(os.path.join(images_path, group)):
+            groups.remove(group)
     response_code = 200
     return make_response(jsonify({'names': groups}), response_code)
 
@@ -791,16 +798,24 @@ def delete_group(name):
     directory = os.path.dirname(os.path.abspath(__file__)) + IMAGE_UPLOAD_FOLDER
     response_code = 400
     response = ""
-    if name in os.listdir(directory):
-        try:
-            shutil.rmtree(os.path.join(directory, name))
-            delete_remote_group(name)
-            response = f"Group {name} was successfully deleted."
-            response_code = 200
-        except OSError:
-            response = "An error has occurred and the group could not be deleted"
+    if name != "Fixations":
+        if name in os.listdir(directory):
+            try:
+                delete_remote_group(name)
+                try:
+                    shutil.rmtree(os.path.join(directory, name))
+                    response = f"Group {name} was successfully deleted."
+                    response_code = 200
+                except OSError:
+                    response = "An error has occurred and the group could not be deleted"
+            except CalledProcessError:
+                response_code = 500
+                response = "Error: Failed to delete file from hosts. ", \
+                 "Group not deleted, please try again"
+        else:
+            response = f"Group {name} does not exist and so couldn't be deleted."
     else:
-        response = f"Group {name} does not exist and so couldn't be deleted."
+        response = "The fixations group cannot be deleted"
     return make_response(jsonify({'message': response}), response_code)
 
 @APP.route('/template', methods=['GET'])

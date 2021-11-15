@@ -1,7 +1,9 @@
 version: "3.7"
 services:
   webapp:
-    build: .
+    build:
+      context: .
+      network: host
     restart: always
     #devices:
     #  - "/dev/ttyACM0:/dev/ttyACM0"    
