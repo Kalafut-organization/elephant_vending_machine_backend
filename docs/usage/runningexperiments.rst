@@ -14,3 +14,4 @@ then confirm in the popup by selecting "Run" again to begin running an experimen
 .. image:: ../_static/images/confirm_run_experiment.png
   :width: 800
   :alt: Vending Machine Experiment Runner confirm run popup
+  
