@@ -58,7 +58,6 @@ page to create a blank folder.
   :width: 800
   :alt: Vending Machine Stimuli Management confirm delete popup
 
-  
 Managing Stimuli
 ################
 After choosing the "View" button on a stimuli group folder, you will be navigated to a page containing all the
