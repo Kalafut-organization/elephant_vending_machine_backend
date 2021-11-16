@@ -15,11 +15,11 @@ Images of the wiring can be seen below:
   :width: 800
   :alt: Raspberry Pi wiring
 
-.. image:: ../_static/images/gpio-2.png
+.. image:: ../_static/images/gpio2.png
   :width: 800
   :alt: Breadboard wiring (left)
 
-.. image:: ../_static/images/gpio-3.png
+.. image:: ../_static/images/gpio3.png
   :width: 800
   :alt: Breadboard wiring (right)
 
