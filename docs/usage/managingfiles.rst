@@ -64,7 +64,7 @@ Managing Stimuli
 After choosing the "View" button on a stimuli group folder, you will be navigated to a page containing all the
 stimuli images in that group. 
 
-.. image:: ../_static/images/stimuli_folder_overview.png
+.. image:: ../_static/images/stimuli_inside_folder_overview.png
   :width: 800
   :alt: Vending Machine Stimuli Group Management page
 
@@ -77,6 +77,6 @@ then confirm in the popup by selecting "Delete" again to delete a stimuli file.
 
 Additionally, you can "Copy to Folder" stimuli, which allows you to copy a file to another group folder.
 
-.. image:: ../_static/images/copy_stimuli.png
+.. image:: ../_static/images/copy_stimuli_image.png
   :width: 800
-  :alt: Vending Machine Stimuli Management confirm delete popup
+  :alt: Vending Machine Stimuli Management copy popup
