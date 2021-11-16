@@ -54,7 +54,7 @@ On this stimuli management page, you can select the "View" button to open any st
 you cannot deleted the "Fixations" folder. In order to add a new group, a unique name can be entered at the top of this 
 page to create a blank folder.
 
-.. image:: ../_static/images/confirm_delete_group.png
+.. image:: ../_static/images/confirm_group_delete.png
   :width: 800
   :alt: Vending Machine Stimuli Management confirm delete popup
 
