@@ -66,6 +66,19 @@ def assign_images(groups):
             images[i] = random_image(groups[i][0])
     return images
 
+def selection_response(group, vending_machine, experiment_logger):
+    """Determines if a group is a 'correct' group"""
+    tray_num = group[1]
+    treat_name = group[2]
+    if group is not None:
+        if tray_num != 0:
+            vending_machine.dispense_treat(tray_num)
+            experiment_logger.info("Tray %d dispenses treat: %s", tray_num, treat_name)
+            print("Tray %d dispenses treat: %s" % (tray_num, treat_name))
+            return True
+    return False
+
+
 def run_experiment(experiment_logger, vending_machine):
     """This is an experiment template to be used by the creation form.
     
@@ -78,10 +91,12 @@ def run_experiment(experiment_logger, vending_machine):
     for trial_index in range(NUM_TRIALS):
         trial_num = trial_index + 1
         experiment_logger.info("Trial %s started", trial_num)
+        print("Trial %s started" % trial_num)
 		
         # Display fixation stimuli
         vending_machine.display_images([BLANK_SCREEN, FIXATION_STIMULI, BLANK_SCREEN])
         experiment_logger.info("Presented fixation cross")
+        print("Presented fixation cross")
 		
         correct_response = False
 		
@@ -92,21 +107,27 @@ def run_experiment(experiment_logger, vending_machine):
 
             if selection == 'middle':
                 experiment_logger.info("Trial %s picked middle when selecting fixation cross", trial_num)
+                print("Trial %s picked middle when selecting fixation cross" % trial_num)
                 correct_response = True
             elif selection == 'left':
                 experiment_logger.info("Trial %s picked left when selecting fixation cross", trial_num)
+                print("Trial %s picked left when selecting fixation cross" % trial_num)
             elif selection == 'right':
                 experiment_logger.info("Trial %s picked right when selecting fixation cross", trial_num)
+                print("Trial %s picked right when selecting fixation cross" % trial_num)
             else:
                 experiment_logger.info("Trial %s timed out when waiting to select fixation cross", trial_num)
+                print("Trial %s timed out when waiting to select fixation cross" % trial_num)
 
         # Blank out screens
         vending_machine.ssh_all_hosts('xset -display :0 dpms force off')
 
         #Wait for interval between fixation and stimuli
         experiment_logger.info("Trial %s start of interfixation duration", trial_num)
+        print("Trial %s start of interfixation duration" % trial_num)
         time.sleep(INTER_FIX_DURATION)
         experiment_logger.info("Trial %s end of interfixation duration", trial_num)
+        print("Trial %s end of interfixation duration" % trial_num)
 
         correct = False
         #Assign groups to screens and images to groups
@@ -126,35 +147,38 @@ def run_experiment(experiment_logger, vending_machine):
         experiment_logger.info("Trial %s, '%s' stimuli displayed on left", trial_num, images[0])
         experiment_logger.info("Trial %s, '%s' stimuli displayed on middle", trial_num, images[1])
         experiment_logger.info("Trial %s, '%s' stimuli displayed on right", trial_num, images[2])
+        print("Trial %s, '%s' stimuli displayed on left" % (trial_num, images[0]))
+        print("Trial %s, '%s' stimuli displayed on middle" % (trial_num, images[1]))
+        print("Trial %s, '%s' stimuli displayed on right" % (trial_num, images[2]))
         # Wait for input for STIMULI_DURATION
         selection = vending_machine.wait_for_input(accepted_groups, STIMULI_DURATION * 1000)
 
         # Log selection, and if selection has a corresponding tray, log it's treat and set correct
         if selection == 'timeout':
             experiment_logger.info("Trial %s no selection made.", trial_num)
+            print("Trial %s no selection made." % trial_num)
         elif selection == 'left':
             experiment_logger.info("Trial %s picked left", trial_num)
-            if groups[0][1] != 0:
-                experiment_logger.info("Tray %d dispenses treat: %s", groups[0][1], groups[0][2])
-                correct = True
+            print("Trial %s picked left", trial_num)
+            correct = selection_response(groups[0], vending_machine, experiment_logger)
         elif selection == 'middle':
             experiment_logger.info("Trial %s picked middle", trial_num)
-            if groups[1][1] != 0:
-                experiment_logger.info("Tray %d dispenses treat: %s", groups[1][1], groups[1][2])
-                correct = True
+            print("Trial %s picked middle", trial_num)
+            correct = selection_response(groups[1], vending_machine, experiment_logger)
         else:
             experiment_logger.info("Trial %s picked right", trial_num)
-            if groups[2][1] != 0:
-                experiment_logger.info("Tray %d dispenses treat: %s", groups[2][1], groups[2][2])
-                correct = True
+            print("Trial %s picked right", trial_num)
+            correct = selection_response(groups[2], vending_machine, experiment_logger)
 
         #if correct:
             # FLash LEDS
             # vending_machine.left_group.led_color_with_time(255,255,255,1000)
 
         experiment_logger.info("Trial %s finished", trial_num)
+        print("Trial %s finished" % trial_num)
 		
         experiment_logger.info("Start of intertrial interval")
+        print("Start of intertrial interval")
 		
         # Blank out screens
         vending_machine.ssh_all_hosts('xset -display :0 dpms force off')
@@ -166,5 +190,7 @@ def run_experiment(experiment_logger, vending_machine):
         time.sleep(INTERTRIAL_INTERVAL)
 		
         experiment_logger.info("End of intertrial interval")
+        print("End of intertrial interval")
 
     experiment_logger.info("Experiment finished")
+    print("Experiment finished")
