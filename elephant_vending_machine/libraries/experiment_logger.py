@@ -44,7 +44,7 @@ class CsvFormatter(logging.Formatter):
             current UTC timestamp and record text
         """
 
-        self.writer.writerow([datetime.utcnow(), record.getMessage()])
+        self.writer.writerow([datetime.now(), record.getMessage()])
         data = self.output.getvalue()
         self.output.truncate(0)
         self.output.seek(0)
