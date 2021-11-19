@@ -9,7 +9,7 @@ and detecting motion sensor input on the machine.
 import time
 import subprocess
 from pssh.clients import ParallelSSHClient
-import requests 
+import requests
 
 LEFT_SCREEN = 1
 MIDDLE_SCREEN = 2
