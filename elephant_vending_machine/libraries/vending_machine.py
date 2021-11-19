@@ -9,6 +9,7 @@ and detecting motion sensor input on the machine.
 import time
 import subprocess
 from pssh.clients import ParallelSSHClient
+import requests 
 
 LEFT_SCREEN = 1
 MIDDLE_SCREEN = 2
@@ -129,8 +130,9 @@ class VendingMachine:
 
         Parameters:
             index: index (from 1 to 3) of the tray to be opened"""
-        subprocess.Popen(['ssh', 'arduino@192.168.0.14', 'python', 'dispense.py', f'''{index}'''])
-
+        #headers = {'Content-Type':'text/plain'}
+        response = requests.post(url="192.168.0.14/motor", data=str(index))
+        print(response)
 
 class SensorGrouping:
     """Provides an abstraction of the devices controlled by Raspberry Pis.
