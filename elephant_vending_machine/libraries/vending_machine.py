@@ -126,7 +126,7 @@ class VendingMachine:
 
     @staticmethod
     def dispense_treat(index):
-        """ Sends ssh command to dispense treat in corresponding tray
+        """ Sends post request to dispense treat in corresponding tray
 
         Parameters:
             index: index (from 1 to 3) of the tray to be opened"""
