@@ -68,8 +68,8 @@ def assign_images(groups):
 
 def selection_response(group, vending_machine, experiment_logger):
     """Determines if a group is a 'correct' group"""
-    tray_num = group[1]
-    treat_name = group[2]
+    treat_name = group[1]
+    tray_num = group[2]
     if group is not None:
         if tray_num != 0:
             vending_machine.dispense_treat(tray_num)

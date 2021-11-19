@@ -70,7 +70,7 @@ def run_experiment(filename):
     response_code = 400
     response_body = {}
     if filename in os.listdir(experiment_directory):
-        log_filename = str(datetime.utcnow()) + ' ' + filename + '.csv'
+        log_filename = str(datetime.now()) + ' ' + filename + '.csv'
         exp_logger = create_experiment_logger(log_filename)
 
         exp_logger.info('Experiment %s started', filename)
