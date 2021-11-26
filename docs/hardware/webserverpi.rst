@@ -59,8 +59,8 @@ Installing and Starting the Frontend
 #. Download the frontend project with :code:`git clone https://github.com/Kalafut-organization/elephant_vending_machine_frontend.git`
 #. Update npm with :code:`curl https://www.npmjs.com/install.sh | sudo sh`
 #. Navigate to the cloned directory
-#. Ensure that the `.env` file has the address that the backend is using. For the backend running in docker, this should be `http://192.168.0.100`.
+#. Ensure that the :code:`.env` file has the address that the backend is using. For the backend running in docker, this should be :code:`http://192.168.0.100`.
+#. For the image to build successfully, you will most likely need to temporarily remove the static IP of the pi.
 #. Run :code:`docker-compose build --no-cached` to build the images
-   * For the image to build successfully, you will most likely need to temporarily remove the static IP of the pi.
 #. Connect the Pi to the configured project router via ethernet
 #. Start the backend server with :code:`docker-compose up`
