@@ -20,6 +20,7 @@ Welcome to Elephant Vending Machine's documentation!
    usage/runningexperiments
    usage/managingfiles
    usage/arduinotest
+   usage/runningindev
 
 .. toctree::
    :maxdepth: 2
