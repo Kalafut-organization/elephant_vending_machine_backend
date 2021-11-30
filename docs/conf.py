@@ -18,11 +18,11 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'Elephant Vending Machine'
-copyright = '2020, Katie Kalafut, Megan Knox, Riya Lengade, Nick Male, Alex Waibel'
-author = 'Megan Knox, Riya Lengade, Nick Male, Alex Waibel'
+copyright = '2021, Katie Kalafut, Sam Baker, Greta Noeth, Ben Rogers, Issac Wiita, Megan Knox, Riya Lengade, Nick Male, Alex Waibel'
+author = 'Sam Baker, Greta Noeth, Ben Rogers, Issac Wiita'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1'
+release = '0.2'
 
 
 # -- General configuration ---------------------------------------------------
