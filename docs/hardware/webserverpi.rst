@@ -81,12 +81,15 @@ and so that it can be easily run on different hardware in the future. During dev
 the front and back end without docker so that realtime logging can be seen in terminals. Also, everytime a change is made,
 docker images need to be rebuilt (which takes a while). See the readme files in each github repository to see how to run 
 everything in development.   
+
 If you are running in development, it is best to stop the docker containers first. To see if they are running, 
 use the command :code:`docker ps`. You can stop them by navigating into each repository and running 
 :code:`docker-compose down`. If you made changes and want to test running with docker, you just need to 
 rebuild the images then start the containers (see "Installing and Starting the Frontend/Backend" above). 
 The containers should then automatically start everytime the webserver pi is turned on.   
+
 When you are switching between these two methods of running the code, you have to make sure the front end can still access
 the back end. The address used for this is defined in :code:`.env` in the front end. When running in development, it should have port 5000.
 When running in production with docker, it should not have a port.   
+
 Finally, keep in mind that the front end is configured to run on port 3000 in development and port 4000 in production with docker.
