@@ -22,6 +22,19 @@ The created SSH key must now be copied to the sensor Pis.
 #. Enter :code:`exit` to end the SSH connection
 #. Repeat the above steps for the other two sensor Pis with IPs :code:`192.168.0.12` and :code:`192.168.0.13`
 
+Setting the IP
+###################
+The IP address of the webserver needs to be static. This should already be done, but these instructions still might be needed.
+This is easiest to do with a monitor, keyboard, and mouse.
+
+#. Right click on the internet icon in the top right of the raspberry pi toolbar.
+#. Select "Wireless & Wired Network Settings"
+#. Set "Configure" to "interface" and "eth0".
+#. Ensure "Automatically configure empty options" is checked
+#. Ensure "Disable IPv6" is checked
+#. Set "IPv4 Address" to :code:`192.168.0.100`. (If you need to remove the static IP, ensure this field is blank.)
+#. Click "Apply" and restart the pi.
+
 Installing Docker and Docker-Compose
 ####################################
 Docker is used to manage multiple services for the backend and ensure the backend runs across reboots.
@@ -35,32 +48,45 @@ Docker is used to manage multiple services for the backend and ensure the backen
 
 Installing and Starting the Backend
 ####################################
-The following steps are required to start the frontend. Note you will likely want to
-install front and back end at the same time, while connected to the internet, and then
-connect the Pi to the project router and run the commands to start both the front and back ends.
+If you just need to rebuild the image, skip to step 5.
 
 #. Ensure the Pi is connected to the internet
 #. Download the backend project with :code:`git clone https://github.com/Kalafut-organization/elephant_vending_machine_backend.git`
 #. Use :code:`cd elephant_vending_machine_backend` to enter the project directory
 #. Use :code:`cp ~/.ssh/id_rsa .` to copy the SSH key you generated previously into the project directory
-#. Run :code:`docker-compose build --no-cached` to build the images
+#. Run :code:`docker-compose build --no-cached` to build the images (Ensure you have a good internet connection for this step. An ethernet connection is recommended.)
 #. Connect the Pi to the configured project router via ethernet
 #. Start the backend server with :code:`docker-compose up`
 
-If you change the backend code and you aren't seeing these changes reflected in the running
-Docker service, you may need to run :code:`docker system prune` and :code:`docker volume prune`.
-Note that this will delete any of the experiments, stimuli, and logs stored on the server so be
-cautious and back up any of these files you need to keep.
-
 Installing and Starting the Frontend
 ####################################
+If you just need to rebuild the image, skip to step 5.
 
 #. Ensure the Pi is connected to the internet
 #. Download the frontend project with :code:`git clone https://github.com/Kalafut-organization/elephant_vending_machine_frontend.git`
 #. Update npm with :code:`curl https://www.npmjs.com/install.sh | sudo sh`
 #. Navigate to the cloned directory
 #. Ensure that the :code:`.env` file has the address that the backend is using. For the backend running in docker, this should be :code:`http://192.168.0.100`.
-#. For the image to build successfully, you will most likely need to temporarily remove the static IP of the pi.
-#. Run :code:`docker-compose build --no-cached` to build the images
+#. Remove the static IP of the pi. (see "Setting the static IP" above)
+#. Run :code:`docker-compose build --no-cached` to build the images (Ensure you have a good internet connection for this step. An ethernet connection is recommended.)
+#. Restore the static IP of the pi. (see "Setting the static IP" above)
 #. Connect the Pi to the configured project router via ethernet
 #. Start the backend server with :code:`docker-compose up`
+
+Working in Development vs Production (Docker)
+####################################
+
+The purpose of getting this application to work with Docker is so that it can automatically run when the pi is turned on, 
+and so that it can be easily run on different hardware in the future. During development, though, it is best to run 
+the front and back end without docker so that realtime logging can be seen in terminals. Also, everytime a change is made,
+docker images need to be rebuilt (which takes a while). See the readme files in each github repository to see how to run 
+everything in development.   
+If you are running in development, it is best to stop the docker containers first. To see if they are running, 
+use the command :code:`docker ps`. You can stop them by navigating into each repository and running 
+:code:`docker-compose down`. If you made changes and want to test running with docker, you just need to 
+rebuild the images then start the containers (see "Installing and Starting the Frontend/Backend" above). 
+The containers should then automatically start everytime the webserver pi is turned on.   
+When you are switching between these two methods of running the code, you have to make sure the front end can still access
+the back end. The address used for this is defined in :code:`.env` in the front end. When running in development, it should have port 5000.
+When running in production with docker, it should not have a port.   
+Finally, keep in mind that the front end is configured to run on port 3000 in development and port 4000 in production with docker.

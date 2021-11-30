@@ -17,16 +17,6 @@ OSU CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cin
     * NOTE: You will need to activate your virtual environment every time you close and reopen your terminal
 1. Use `pip install -r requirements.txt` to install all required dependencies
 
-## Starting the application
-NOTE: See section "Running in Production" if you intend to make calls from the front-end
-1. Tell Flask where to find application instance
-    * On Windows run `set FLASK_APP=elephant_vending_machine`
-    * On Unix or MacOS run `export FLASK_APP=elephant_vending_machine`
-    * If outside the project directory be sure to include the full path to the application directory
-    * OPTIONAL: To enable development features run `export FLASK_ENV=development` on Unix or `set FLASK_ENV=development` on Windows
-1. `pip install -e .`
-1. `flask run`
-
 ## Configuring Remote Pis for RGB LED Strip Interfacing
 1. Follow this reference: https://tutorials-raspberrypi.com/connect-control-raspberry-pi-ws2812-rgb-led-strips/
 1. For our purposes, we did not use an external power source and found the power provided by the pi to be sufficient.
@@ -53,7 +43,7 @@ NOTE: See section "Running in Production" if you intend to make calls from the f
 ## Running in production
 NOTE: This step is necessary to allow the front-end to make API calls. If you don't run the project using Docker it uses a port that the front-end is not expecting and API calls will fail. If running on a device without the sonar sensors connected (such as your dev machine),
 you'll have to remove the `devices` line from the `docker-compose.yml` file. You'll also need to add a file called `id_rsa` to the project
-folder. If using the image syncing, this must be a passwordless SSH key that has been set up with the remote machines to sync images to. Otherwise, it can be an empty file.
+folder. If using the image syncing, this must be a passwordless SSH key that has been set up with the remote machines to sync images to. Otherwise, it can be an empty file.   
 
 1. Connect to your Raspberry Pi
 1. Clone this repo to the Pi
@@ -65,16 +55,19 @@ folder. If using the image syncing, this must be a passwordless SSH key that has
     * Container storage is persisted between runs
     
 ## Running in Dev
-You will need to run commands on the server Pi though ssh network commands, this is included in these instructions
+If you are starting the backend on the webserver pi, you can run the commands via ssh if you don't have a keyboard/mouse/monitor. This is included in these instructions. If you are just running on your own machine, you can obviously skip these steps.
 
 1. Connect to the same network as the Server Pi and navigate to your terminal
 1. run command, `ssh pi@192.168.0.100`
 1. A sign in should appear, username is `pi` password is `raspberry`
-1. you should now be in the Server Pi terminal
-1. enter the directory for the backend by running command `cd elephant_vending_machine_backend`
-1. run these commands to activate the backend
-1. `source .venv/bin/activate`
-1. `export FLASK_APP=elephant_vending_machine`
-1. `flask run --host=0.0.0.0`
-1. the backend should be runnig now
-1. to deactivate the back end run `deactivate` on the ssh terminal 
+1. You should now be in the Server Pi terminal
+1. Navigate to the backend directory: `cd elephant_vending_machine_backend`
+1. Start the virtual environment: `source .venv/bin/activate`
+1. Tell Flask where to find application instance:
+    * On Windows run `set FLASK_APP=elephant_vending_machine`
+    * On Unix or MacOS run `export FLASK_APP=elephant_vending_machine`
+    * If outside the project directory be sure to include the full path to the application directory
+    * OPTIONAL: To enable development features run `export FLASK_ENV=development` on Unix or `set FLASK_ENV=development` on Windows
+1. Install dependencies, if needed: `pip install -e .`
+1. Run the application: `flask run --host=0.0.0.0`
+1. To stop the backend, run `CTRL+C` from the terminal window it was started in.
