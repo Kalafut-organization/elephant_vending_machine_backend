@@ -11,7 +11,7 @@ You will need to run commands on the server Pi though ssh network commands, this
 you should now be in the Server Pi terminal
 
 4. Enter the directory for the backend by running command 'cd elephant_vending_machine_frontend'
-5. Ensure that the .env file has the address that the backend is using. For the backend running in development with Flask, this should be http://192.168.0.100:5000.
+5. Ensure that the .env file has the address that the backend is using. For the backend running in development with Flask, this should be http://192.168.0.100:5000. -(Try Port 3000)
 6. Run this command 'npm start'
 
 the front end should open on your web browser
