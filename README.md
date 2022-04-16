@@ -76,6 +76,7 @@ If you are starting the backend on the webserver pi, you can run the commands vi
    * Run the application: `flask run --host=0.0.0.0`
    * To stop the backend, run `CTRL+C` from the terminal window it was started in.
 1. Automatic Setup:
+   * There should be two shell script files in the `elephant_vending_machine` folder of the Server RPi, called `setup.sh` and `clearExperiment.sh`
    * Run the shell script `setup.sh` using `bash setup.sh`
       * Note, this script performs the above manual setup commands.
    * To stop the backend, run `CTRL+C` from the terminal window it was started in and run shell script `clearExperiment.sh` using `bash clearExperiment.sh`.
