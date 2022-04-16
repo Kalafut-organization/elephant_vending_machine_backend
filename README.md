@@ -80,3 +80,4 @@ If you are starting the backend on the webserver pi, you can run the commands vi
    * Run the shell script `setup.sh` using `bash setup.sh`
       * Note, this script performs the above manual setup commands.
    * To stop the backend, run `CTRL+C` from the terminal window it was started in and run shell script `clearExperiment.sh` using `bash clearExperiment.sh`.
+      * Note, this script turns off LEDs and clears images on all displays.
