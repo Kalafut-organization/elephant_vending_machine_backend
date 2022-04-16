@@ -20,15 +20,18 @@ OSU CSE 5911 Capstone Project: Elephant Vending Machine in coordination with Cin
 ## Configuring Remote Pis for RGB LED Strip Interfacing
 1. Follow this reference: https://tutorials-raspberrypi.com/connect-control-raspberry-pi-ws2812-rgb-led-strips/
 1. For our purposes, we did not use an external power source and found the power provided by the pi to be sufficient.
+2. Ensure that LED code is executed using Python 3, not Python 2. The interaction between the `time` library and `neopixel` library 
+when using Python 2 has presented bugs in the past.
 
 ## Dependencies for Image Display
 1. Image display is done by utilizing feh: https://linux.die.net/man/1/feh
 1. To install feh, run `sudo apt install feh` while connected via SSH to the pi.
 * Note, this will need to be done on each of the remote pis only, the web server does not require installion of feh.
 
-## Test suite
+## Automatic Test Suite
 1. To execute the test suite run `coverage run -m pytest`
 1. To view coverage report after tests have been run use `coverage report`
+* Note, this test suite was originally developed in AU21.
 
 ## Linting
 1. Navigate to the root directory of this project
@@ -61,13 +64,18 @@ If you are starting the backend on the webserver pi, you can run the commands vi
 1. run command, `ssh pi@192.168.0.100`
 1. A sign in should appear, username is `pi` password is `raspberry`
 1. You should now be in the Server Pi terminal
-1. Navigate to the backend directory: `cd elephant_vending_machine_backend`
-1. Start the virtual environment: `source .venv/bin/activate`
-1. Tell Flask where to find application instance:
-    * On Windows run `set FLASK_APP=elephant_vending_machine`
-    * On Unix or MacOS run `export FLASK_APP=elephant_vending_machine`
-    * If outside the project directory be sure to include the full path to the application directory
-    * OPTIONAL: To enable development features run `export FLASK_ENV=development` on Unix or `set FLASK_ENV=development` on Windows
-1. Install dependencies, if needed: `pip install -e .`
-1. Run the application: `flask run --host=0.0.0.0`
-1. To stop the backend, run `CTRL+C` from the terminal window it was started in.
+1. Manual Setup:
+   * Navigate to the backend directory: `cd elephant_vending_machine_backend`
+   * Start the virtual environment: `source .venv/bin/activate`
+   * Tell Flask where to find application instance:
+      * On Windows run `set FLASK_APP=elephant_vending_machine`
+      * On Unix or MacOS run `export FLASK_APP=elephant_vending_machine`
+      * If outside the project directory be sure to include the full path to the application directory
+      * OPTIONAL: To enable development features run `export FLASK_ENV=development` on Unix or `set FLASK_ENV=development` on Windows
+   * Install dependencies, if needed: `pip install -e .`
+   * Run the application: `flask run --host=0.0.0.0`
+   * To stop the backend, run `CTRL+C` from the terminal window it was started in.
+1. Automatic Setup:
+   * Run the shell script `setup.sh` using `bash setup.sh`
+      * Note, this script performs the above manual setup commands.
+   * To stop the backend, run `CTRL+C` from the terminal window it was started in and run shell script `clearExperiment.sh` using `bash clearExperiment.sh`.
