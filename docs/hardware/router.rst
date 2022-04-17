@@ -8,11 +8,11 @@ in the event that it has been reset to factory defaults.
 
 #. Connect your computer via ethernet to router port "Ethernet 1"
 #. Navigate to :code:`192.168.0.1` in a web browser
-#. Set the admin login password, which Katie should have, and click "Next"
+#. Set the admin login password (originally "urfSj6GeUCntSmx9") and click "Next"
 #. Set timezone to "Eastern Time" and click "Next"
 #. Leave internet connetion type set to "Dynamic IP" and click "Next"
 #. Leave "Do NOT Clone MAC Address" selected and click "Next"
-#. Set both the 2.4GHz and 5GHz networks to use the SSID "Elephant-Vending-Machine" and set the password for both to the correct WiFi login password, which Katie should have then click "Next"
+#. Set both the 2.4GHz and 5GHz networks to use the SSID "Elephant-Vending-Machine" and set the password for both to the correct WiFi login password (originally "urfSj6GeUCntSmx9") then click "Next"
 #. You should now be on the Summary page. Make sure all settings look correct and select "Save"
 
 Configuring Static IPs for Raspberry Pis
