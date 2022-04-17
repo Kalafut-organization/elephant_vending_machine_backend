@@ -11,10 +11,11 @@ Webserver Pi stores the stimuli, experiment, and log files and handles
 all the logic of running experiments. 
 
 The other three Raspberry Pis are used to interface with the additional
-hardware. Each Sensor Pi has a GPIO button and a screen. The GPIO buttons send
+hardware. Each Sensor Pi is connected to a GPIO button, a monitor, and an LED strip. The GPIO buttons send
 an input to the rasberry pis so it can be determined which stimuli was selected
-and the appropriate outcome. The screens are used to display stimuli to the elephant.
-They will flash white when a correct outcome is selected. Note: in the current design
+and the appropriate outcome. The screens are used to display stimuli to the elephant. The LEDs are used
+to provide instant visual feedback given the choice made on a button press.
+LEDs display differing responses based on evaluation of the choice. Note: in the current design
 the screen is the button that the elephant will push.
 
 
@@ -26,9 +27,13 @@ Parts List
 +===============================+==================================+==========+
 | Router                        | TP-Link Archer C1200             | 1        |
 +-------------------------------+----------------------------------+----------+
-| Raspberry Pi                  | Raspberry Pi 3 B                 | 4        |
+| Sensor Pis                    | Two RPi 3B, One RPi 4 (4/15/22)  | 3        |
++-------------------------------+----------------------------------+----------+
+| Server Pi                     | RPi 4                            | 1        |
 +-------------------------------+----------------------------------+----------+
 | GPIO Buttons                  | Unknown                          | 3        |
++-------------------------------+----------------------------------+----------+
+| LED Strips                    | NeoPixel AdaFruit LED Strips     | 3        |
 +-------------------------------+----------------------------------+----------+
 | Arduino                       | Uno Rev3                         | 1        |
 +-------------------------------+----------------------------------+----------+
