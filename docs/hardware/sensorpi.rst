@@ -7,7 +7,7 @@ Upon starting a Pi the first time you will be prompted to set some general syste
 
 #. Set the language and timezone
 #. Leave the username/passwords as the default (pi and raspberry respectively)
-#. Connect the pi to the internet
+#. Connect the pi to the internet (most easily done using a mobile hotspot, if available)
 
 Configuring feh
 ###############
