@@ -18,8 +18,8 @@ Images of the wiring can be seen below:
   :alt: Raspberry Pi Pin Header Wiring
 
 The following pinout should be followed:
-* Board Pin #1, 3v3 Power --> Level Shifter Input Wire
-* Board Pin #3, BCM2/GPIO2/SDA --> Button Input Wire
-* Board Pin #6, GND --> Level Shifter Ground Wire
-* Board Pin #12, BCM18/GPIO18/PWM0 --> LED Signal Wire
-* Board Pin #39, GND --> Button Ground Wire
+  * Board Pin #1, 3v3 Power --> Level Shifter Input Wire
+  * Board Pin #3, BCM2/GPIO2/SDA --> Button Input Wire
+  * Board Pin #6, GND --> Level Shifter Ground Wire
+  * Board Pin #12, BCM18/GPIO18/PWM0 --> LED Signal Wire
+  * Board Pin #39, GND --> Button Ground Wire
