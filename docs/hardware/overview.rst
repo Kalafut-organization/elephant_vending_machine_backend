@@ -1,7 +1,7 @@
 Hardware Overview
 =================
 
-.. image:: ../_static/images/equipment_diagram.png
+.. image:: ../_static/images/hardware_diagram_with_leds.png
   :width: 800
   :alt: Connected hardware components
 
