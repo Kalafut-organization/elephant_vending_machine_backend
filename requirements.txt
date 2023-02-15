@@ -65,7 +65,7 @@ ssh2-python==0.26.0
 typed-ast==1.4.1
 urllib3==1.25.8
 wcwidth==0.1.8
-Werkzeug==0.16.1
+Werkzeug==2.2.3
 wrapt==1.11.2
 zipp==1.1.0
 zope.event==4.5.0
